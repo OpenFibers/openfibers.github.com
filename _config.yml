@@ -7,7 +7,7 @@ title: Hack Life of OpenFibers
 subtitle: To live is to change the world and zhuangbility.
 author: OpenFibers
 simple_search: https://www.google.com/search
-description:
+description: "重度Cocoa使用者，网易云音乐Mac端作者，互联网脑残黑"
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -91,7 +91,7 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name: openfibers
+disqus_short_name: openthread
 disqus_show_comment_count: true
 
 # Google Analytics
