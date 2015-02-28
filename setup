@@ -2,3 +2,4 @@
 bundle
 echo "git@github.com:OpenFibers/openfibers.github.com.git" | rake setup_github_pages
 rake generate
+rake deploy
