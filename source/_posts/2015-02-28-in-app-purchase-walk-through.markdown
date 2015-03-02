@@ -34,7 +34,7 @@ categories: [iOS]
 
 官方给出的流程图是这样的：
 
-![](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Art/intro_2x.png)
+{% img left /images/blog/iap/1.iap_intro_2x.png %}
 
 1. 获取内购列表（从App内读取或从自己服务器读取）
 2. App Store请求可用的内购列表
@@ -91,18 +91,37 @@ Restored|By the system|By your app|By the system
 2. 点击My Apps
 3. 进入想使用IAP的App详情
 4. 选择In-App Purchases  
-![](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Art/AppDetails-menu-4_2x.png)
+{% img left /images/blog/iap/2.iap_news_alerts_2x.png %}
 5. 点击Create New  
-![](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Art/In-AppPurchasesCreateNew_2x.png)
-6. 选择IAP虚拟物品类型。注意虚拟物品一旦新建，类型无法修改。
-7. 填入Internal Name。只能在iTunes Connect中看到这个名字。不会出现在App Store中。最长255字节。
-8. 填入***Product ID***。每件物品有一个单独的***Product ID***，***Product ID***用于从App Store获取价格信息，以及付费时标识是哪种物品被购买了。例如com.163.neteasemusic.skin.dog。这个新建之后也是不能修改的。
-9. 然后是设置价格。Cleared For Sale选为YES是虚拟物品被审核通过自动上架。NO是手动上架。Price Tier则是价格。
-10. 多语言描述，这个是给用户看的。
-11. 是否要在iTunes托管可购买内容，这个后面再说
-12. 填入review notes和review用的截图。
+{% img left /images/blog/iap/3.iap_AppDetails-menu-4_2x.png %}
+6. 选择IAP虚拟物品类型。注意虚拟物品一旦新建，类型无法修改。  
+{% img left /images/blog/iap/5.iap_iTunes_SelectType.png %}
+7. 填入Internal Name。只能在iTunes Connect中看到这个名字。不会出现在App Store中。最长255字节。  
+{% img left /images/blog/iap/6.iap_internal_name.png %}
+8. 填入***Product ID***。每件物品有一个单独的***Product ID***，***Product ID***用于从App Store获取价格信息，以及付费时标识是哪种物品被购买了。例如com.163.neteasemusic.skin.dog。这个新建之后也是不能修改的。  
+{% img left /images/blog/iap/7.iap_product_id.png %}
+9. 然后是设置价格。Cleared For Sale选为YES是虚拟物品被审核通过自动上架。NO是手动上架。Price Tier则是价格。  
+{% img left /images/blog/iap/8.iap_price.png %}
+10. 多语言描述，这个是给用户看的。  
+{% img left /images/blog/iap/9.iap_add_language_1.png %}
+{% img left /images/blog/iap/10.iap_add_language_2.png %}
+11. 是否要在iTunes托管可购买内容，这个后面再说  
+{% img left /images/blog/iap/11.iap_host_contents.png %}
+12. 填入review notes和review用的截图。  
+{% img left /images/blog/iap/12.iap_review_notes_and_screen_shot.png %}
 13. 保存。
-14. 保存后除了类型和Product ID都可以修改
+14. 保存后除了类型和Product ID都可以修改  
+{% img left /images/blog/iap/13.iap_edit_product1.png %}
+{% img left /images/blog/iap/14.iap_edit_product2.png %}
+{% img left /images/blog/iap/15.iap_edit_product3.png %}
+{% img left /images/blog/iap/16.iap_edit_product4.png %}
+
+新建完就可以在代码里使用了。
+
+### 在苹果托管不可消耗品（Non-consumable products）的内容
+首次创建不可消耗品时可以选择把内容托管到苹果服务器，当然也可以随时将自己服务器上的内容迁移到苹果服务器由苹果托管。  
+需要使用托管功能的话，首先在iTunes Connect中提交不可消耗品让苹果审核。然后在Xcode中选取In-App Purchase Content template创建虚拟物品, 放入需要托管的内容, 然后使用Archive功能上传。或者使用Xcode为每一种虚拟物品创建一个.pkg文件，然后使用Application Loader一次性上传。  
+具体细节请参考[Using Application Loader](https://itunesconnect.apple.com/docs/UsingApplicationLoader.pdf)中和In-App Purchase有关的章节。
 
 # 代码里该做的事情
 
