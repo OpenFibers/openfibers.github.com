@@ -226,7 +226,7 @@ Restored|By the system|By your app|By the system
 
 ### 完成购买
 在收到Purchased或Restored回调后，持久化购买记录以及receipt data。  
-然后通知PaymentQueue，购买已经完成了：
+然后通知PaymentQueue，购买已经完成了。对finishTransaction则会触发系统IAP的UI刷新：
 ```
 	SKPaymentTransaction *transaction = <# The current payment #>;
 	[[SKPaymentQueue defaultQueue] finishTransaction:transaction];
@@ -240,6 +240,7 @@ Restored|By the system|By your app|By the system
 以下代码用Cocoa实现了二次验证的过程。但是这个过程最好通过自己的后台服务器来做，不然非常容易在客户端被伪造返回结果。  
 这里使用Cocoa实现只是为了阐述请求与返回值的格式。
 发送二次验证请求：
+
 ```
 #define SANDBOX_VERIFY_RECEIPT_URL          [NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"]
 #define APP_STORE_VERIFY_RECEIPT_URL        [NSURL URLWithString:@"https://buy.itunes.apple.com/verifyReceipt"]
@@ -249,6 +250,8 @@ Restored|By the system|By your app|By the system
 #else
 #define VERIFY_RECEIPT_URL APP_STORE_VERIFY_RECEIPT_URL
 #endif
+
+...
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
 {
@@ -295,3 +298,7 @@ Restored|By the system|By your app|By the system
 ```
 
 更多验证相关问题，请参考[Receipt Validation Programming Guide](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Introduction.html#//apple_ref/doc/uid/TP40010573)
+
+验证成功后，则是真正的发放内容、道具等。
+
+Over
