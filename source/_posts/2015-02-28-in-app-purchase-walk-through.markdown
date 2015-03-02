@@ -6,7 +6,7 @@ comments: true
 categories: [iOS]
 ---
 
-### 适用情况
+# 适用情况
 
 想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。  
 除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。  
@@ -30,22 +30,22 @@ categories: [iOS]
 
 <!--more-->
 
-###购买及发放虚拟物品流程
+#购买及发放虚拟物品流程
 
 官方给出的流程图是这样的：
 
 ![](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/StoreKitGuide/Art/intro_2x.png)
 
-1. 向App Store请求内购列表
-2. 向用户展示内购列表
-3. 用户选择了内购列表，再发个购买请求
-4. 收到购买完成的回掉
-5. 发放虚拟物品
+1. 获取内购列表（从App内读取或从自己服务器读取）
+2. App Store请求可用的内购列表
+3. 向用户展示内购列表
+4. 用户选择了内购列表，再发个购买请求
+5. 收到购买完成的回掉
+6. 发放虚拟物品
 
-实际上第一步的内购列表可以提前预置在客户端内，或放在自己的服务器上（可以合并请求加快访问速度，而且连App Store本身也不快）。
+# 虚拟物品
 
 ### 虚拟物品的分类
-
 虚拟物品分为以下几种类型：  
 
 1. 消耗品（Consumable products）：比如游戏内金币等。
@@ -77,8 +77,34 @@ Appears in the receipt|Always|Once|Always
 Synced across devices|By the system|By your app|By the system
 Restored|By the system|By your app|By the system
 
-### 在iTunes Connect上新建虚拟物品
-每件物品有一个单独的***product identifier***，***product identifier***用于从App Store获取价格信息，以及付费时标识是哪种物品被购买了。
+### 关于自动更新订阅品更新周期组（Auto-Renewable Subscription Duration Families）：  
+每种订阅品的每种更新周期可以在iTunes Connect中设置一个单独的价格。图中给出了一种订阅品的不同长度的更新周期的价格截图：  
+![](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Art/iap_news_alerts_2x.png)
+你可以把每种订阅品的每个长度的更新周期看成一个单独的产品，每个产品有自己独有的时长、价格、市场促销属性。  
+为了让用户可以从中挑选一个偏好的更新周期，上图中我们为此种订阅的每个长度的更新周期分别设值了一个单独的价格，有一周的、一个月的、两个月的、季度的、半年的和一年的。  
+上图中这种订阅品的全部六种更新周期合起来称为一个自动更新订阅品更新周期组（Auto-Renewable Subscription Duration Families）。  
+
+# 人肉和iTunes Connect交互
+
+### 新建虚拟物品
+1. 登录[iTunes Connect](https://itunesconnect.apple.com/)
+2. 点击My Apps
+3. 进入想使用IAP的App详情
+4. 选择In-App Purchases  
+![](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Art/AppDetails-menu-4_2x.png)
+5. 点击Create New  
+![](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Art/In-AppPurchasesCreateNew_2x.png)
+6. 选择IAP虚拟物品类型。注意虚拟物品一旦新建，类型无法修改。
+7. 填入Internal Name。只能在iTunes Connect中看到这个名字。不会出现在App Store中。最长255字节。
+8. 填入***Product ID***。每件物品有一个单独的***Product ID***，***Product ID***用于从App Store获取价格信息，以及付费时标识是哪种物品被购买了。例如com.163.neteasemusic.skin.dog。这个新建之后也是不能修改的。
+9. 然后是设置价格。Cleared For Sale选为YES是虚拟物品被审核通过自动上架。NO是手动上架。Price Tier则是价格。
+10. 多语言描述，这个是给用户看的。
+11. 是否要在iTunes托管可购买内容，这个后面再说
+12. 填入review notes和review用的截图。
+13. 保存。
+14. 保存后除了类型和Product ID都可以修改
+
+# 代码里该做的事情
 
 ### 获取物品列表
 
