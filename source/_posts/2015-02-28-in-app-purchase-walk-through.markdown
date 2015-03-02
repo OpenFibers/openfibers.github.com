@@ -30,7 +30,7 @@ categories: [iOS]
 
 <!--more-->
 
-#购买及发放虚拟物品流程
+#购买及发放虚拟产品流程
 
 官方给出的流程图是这样的：
 
@@ -41,12 +41,12 @@ categories: [iOS]
 3. 向用户展示内购列表
 4. 用户选择了内购列表，再发个购买请求
 5. 收到购买完成的回掉
-6. 发放虚拟物品
+6. 发放虚拟产品
 
-# 虚拟物品
+# 虚拟产品
 
-### 虚拟物品的分类
-虚拟物品分为以下几种类型：  
+### 虚拟产品的分类
+虚拟产品分为以下几种类型：  
 
 1. 消耗品（Consumable products）：比如游戏内金币等。
 2. 不可消耗品（Non-consumable products）：简单来说就是一次购买，终身可用（用户可随时从App Store restore）。
@@ -57,7 +57,7 @@ categories: [iOS]
 类型2、3、5都是以Apple ID为粒度的。比如小张有三个iPad，有一个Apple ID购买了不可消耗品，则三个iPad上都可以使用。  
 类型1、4一般来说则是现买现用。如果开发者自己想做更多控制，一般选4。
 
-几种物品的区别如下（表格懒得翻译了）：
+几种产品的区别如下（表格懒得翻译了）：
 
 ***Table 1-1  Comparison of product types***
 
@@ -86,7 +86,7 @@ Restored|By the system|By your app|By the system
 
 # 人肉和iTunes Connect交互
 
-### 新建虚拟物品
+### 新建虚拟产品
 1. 登录[iTunes Connect](https://itunesconnect.apple.com/)
 2. 点击My Apps
 3. 进入想使用IAP的App详情
@@ -94,13 +94,13 @@ Restored|By the system|By your app|By the system
 {% img left /images/blog/iap/2.iap_news_alerts_2x.png %}
 5. 点击Create New  
 {% img left /images/blog/iap/3.iap_AppDetails-menu-4_2x.png %}
-6. 选择IAP虚拟物品类型。注意虚拟物品一旦新建，类型无法修改。  
+6. 选择IAP虚拟产品类型。注意虚拟产品一旦新建，类型无法修改。  
 {% img left /images/blog/iap/5.iap_iTunes_SelectType.png %}
 7. 填入Internal Name。只能在iTunes Connect中看到这个名字。不会出现在App Store中。最长255字节。  
 {% img left /images/blog/iap/6.iap_internal_name.png %}
-8. 填入***Product ID***。每件物品有一个单独的***Product ID***，***Product ID***用于从App Store获取价格信息，以及付费时标识是哪种物品被购买了。例如com.163.neteasemusic.skin.dog。这个新建之后也是不能修改的。  
+8. 填入***Product ID***。每件产品有一个单独的***Product ID***，***Product ID***用于从App Store获取价格信息，以及付费时标识是哪种产品被购买了。例如com.163.neteasemusic.skin.dog。这个新建之后也是不能修改的。  
 {% img left /images/blog/iap/7.iap_product_id.png %}
-9. 然后是设置价格。Cleared For Sale选为YES是虚拟物品被审核通过自动上架。NO是手动上架。Price Tier则是价格。  
+9. 然后是设置价格。Cleared For Sale选为YES是虚拟产品被审核通过自动上架。NO是手动上架。Price Tier则是价格。  
 {% img left /images/blog/iap/8.iap_price.png %}
 10. 多语言描述，这个是给用户看的。  
 {% img left /images/blog/iap/9.iap_add_language_1.png %}
@@ -119,25 +119,179 @@ Restored|By the system|By your app|By the system
 新建完就可以在代码里使用了。
 
 ### 在苹果托管不可消耗品（Non-consumable products）的内容
+托管内容仅限于针对不可消耗品。  
 首次创建不可消耗品时可以选择把内容托管到苹果服务器，当然也可以随时将自己服务器上的内容迁移到苹果服务器由苹果托管。  
-需要使用托管功能的话，首先在iTunes Connect中提交不可消耗品让苹果审核。然后在Xcode中选取In-App Purchase Content template创建虚拟物品, 放入需要托管的内容, 然后使用Archive功能上传。或者使用Xcode为每一种虚拟物品创建一个.pkg文件，然后使用Application Loader一次性上传。  
+需要使用托管功能的话，首先在iTunes Connect中提交不可消耗品让苹果审核。然后在Xcode中选取In-App Purchase Content template创建虚拟产品, 放入需要托管的内容, 然后使用Archive功能上传。或者使用Xcode为每一种虚拟产品创建一个.pkg文件，然后使用Application Loader一次性上传。  
 具体细节请参考[Using Application Loader](https://itunesconnect.apple.com/docs/UsingApplicationLoader.pdf)中和In-App Purchase有关的章节。
+
+关于和iTunes Connect的交互，更多细节请参考[In-App Purchase Configuration Guide for iTunes Connect](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Chapters/Introduction.html#//apple_ref/doc/uid/TP40013727-CH1-SW1)。
 
 # 代码里该做的事情
 
-### 获取物品列表
+### 获取产品列表
 
-SKProductRequest
+1. 首先读取出App中内嵌的或是服务端中的Product IDs。
+2. 使用SKProductRequest向苹果服务器验证哪些Product IDs是可用的。
+发出请求：
+```
+	#import <StoreKit/StoreKit.h>
+	#define kInAppPurchaseProUpgradeProductId   @"com.163.neteasemusic.skin.dog"
+	...
+    NSSet *productIDs = [NSSet setWithObject:kInAppPurchaseProUpgradeProductId];
+    SKProductsRequest *request= [[SKProductsRequest alloc] initWithProductIdentifiers:productIDs];
+    request.delegate = self;
+    [request start];
+```
+
+接收结果
+```
+- (void)productsRequest:(SKProductsRequest *)request
+     didReceiveResponse:(SKProductsResponse *)response
+{
+    NSArray *myProducts = response.products;
+    for (SKProduct *product in myProducts)
+    {
+        //product
+    }
+}
+
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error
+{
+	//处理错误
+}
+```
 
 ### 发送购买请求
-
-SKMutablePayment
+```
+	#import <StoreKit/StoreKit.h>
+	...
+	SKProduct *product = <# products request中返回的SKProduct #>;
+	SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
+	payment.quantity = 2;
+	[[SKPaymentQueue defaultQueue] addPayment:payment];
+```
+或者
+```
+	#import <StoreKit/StoreKit.h>
+	...
+	SKProduct *product = <# products request中返回的SKProduct #>;
+	SKPayment *payment = [SKPayment paymentWithProduct:product];
+	[[SKPaymentQueue defaultQueue] addPayment:payment];
+```
 
 ### 观察购买状态
 
-[[SKPaymentQueue defaultQueue] addTransactionObserver:observer];
+首先在程序启动时注册观察者
+```
+	#import <StoreKit/StoreKit.h>
+	...
+	[[SKPaymentQueue defaultQueue] addTransactionObserver:observer];
+```
 
-### 二次验证是否为合法购买，没被破解
+并且实现回调，处理相应的购买返回。
+```
+- (void)paymentQueue:(SKPaymentQueue *)queue
+ updatedTransactions:(NSArray *)transactions
+{
+    for (SKPaymentTransaction *transaction in transactions)
+    {
+        switch (transaction.transactionState)
+        {
+            // Call the appropriate custom method for the transaction state.
+            case SKPaymentTransactionStatePurchasing:
+                [self showTransactionAsInProgress:transaction deferred:NO];
+                break;
+            case SKPaymentTransactionStateDeferred:
+                [self showTransactionAsInProgress:transaction deferred:YES];
+                break;
+            case SKPaymentTransactionStateFailed:
+                [self failedTransaction:transaction];
+                break;
+            case SKPaymentTransactionStatePurchased:
+                [self completeTransaction:transaction];
+                break;
+            case SKPaymentTransactionStateRestored:
+                [self restoreTransaction:transaction];
+                break;
+            default:
+                // For debugging
+                NSLog(@"Unexpected transaction state %@", @(transaction.transactionState));
+                break;
+        }
+    }
+}
+```
 
-https://sandbox.itunes.apple.com/verifyReceipt
-https://buy.itunes.apple.com/verifyReceipt
+需要监听SKPaymentQueue的更多状态变更，请实现[SKPaymentTransactionObserver](https://developer.apple.com/library/ios/documentation/StoreKit/Reference/SKPaymentTransactionObserver_Protocol/index.html#//apple_ref/occ/intf/SKPaymentTransactionObserver)协议中提供的更多方法。
+
+### 完成购买
+在收到Purchased或Restored回调后，持久化购买记录以及receipt data。  
+然后通知PaymentQueue，购买已经完成了：
+```
+	SKPaymentTransaction *transaction = <# The current payment #>;
+	[[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+```
+另外在发放功能或道具之前，最好在自己服务端做一次二次校验，防止越狱插件或者Wifi的HTTP代理伪造购买记录。
+
+### 二次验证防止破解
+
+越狱插件或者HTTP代理均可让用户做到伪造购买记录。当我们收到购买完成的回调后，最好经过自己服务器验证购买是否合法。
+
+以下代码用Cocoa实现了二次验证的过程。但是这个过程最好通过自己的后台服务器来做，不然非常容易在客户端被伪造返回结果。  
+这里使用Cocoa实现只是为了阐述请求与返回值的格式。
+发送二次验证请求：
+```
+#define SANDBOX_VERIFY_RECEIPT_URL          [NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"]
+#define APP_STORE_VERIFY_RECEIPT_URL        [NSURL URLWithString:@"https://buy.itunes.apple.com/verifyReceipt"]
+
+#ifdef DEBUG
+#define VERIFY_RECEIPT_URL SANDBOX_VERIFY_RECEIPT_URL
+#else
+#define VERIFY_RECEIPT_URL APP_STORE_VERIFY_RECEIPT_URL
+#endif
+
+- (void)verifyTransaction:(SKPaymentTransaction *)transaction
+{
+    NSData *transactionReceipt = transaction.transactionReceipt;
+    NSString *base64String = [OTBase64Helper base64forData:transactionReceipt];
+    NSDictionary *receiptDictionary = @{@"receipt-data":base64String};
+    NSData *data = [receiptDictionary JSONData];
+    
+    if (_receiptRequest)
+    {
+        [_receiptRequest cancel];
+        _receiptRequest = nil;
+    }
+    _receiptRequest = [[ASIFormDataRequest alloc] initWithURL:VERIFY_RECEIPT_URL];
+    _receiptRequest.userInfo = @{@"ProductIdentifier" : transaction.payment.productIdentifier};
+    _receiptRequest.delegate = self;
+    [_receiptRequest appendPostData:data];
+    [_receiptRequest startAsynchronous];
+}
+```
+
+接收二次验证结果：
+```
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
+    NSString *responseString = [request responseString];
+    NSDictionary *dictionary = [responseString objectFromJSONString];
+    NSString *productId = dictionary[@"receipt"][@"product_id"];
+    NSNumber *status = dictionary[@"status"];
+    if (status.intValue == 0)
+    {
+        //校验成功，发放内容
+    }
+    else
+    {
+        //校验失败，不做处理或相应惩罚
+    }
+}
+
+- (void)requestFailed:(ASIHTTPRequest *)request
+{
+    //出错处理
+}
+```
+
+更多验证相关问题，请参考[Receipt Validation Programming Guide](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Introduction.html#//apple_ref/doc/uid/TP40010573)
