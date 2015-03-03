@@ -6,7 +6,7 @@ comments: true
 categories: [iOS]
 ---
 
-# 适用情况
+## 1. 适用情况
 
 想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。  
 除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。  
@@ -30,7 +30,7 @@ categories: [iOS]
 
 <!--more-->
 
-#购买及发放虚拟产品流程
+## 2. 购买及发放虚拟产品流程
 
 官方给出的流程图是这样的：
 
@@ -43,7 +43,7 @@ categories: [iOS]
 5. 收到购买完成的回掉
 6. 发放虚拟产品
 
-# 虚拟产品
+## 3.虚拟产品
 
 ### 虚拟产品的分类
 虚拟产品分为以下几种类型：  
@@ -84,7 +84,7 @@ Restored|By the system|By your app|By the system
 为了让用户可以从中挑选一个偏好的更新周期，上图中我们为此种订阅的每个长度的更新周期分别设值了一个单独的价格，有一周的、一个月的、两个月的、季度的、半年的和一年的。  
 上图中这种订阅品的全部六种更新周期合起来称为一个自动更新订阅品更新周期组（Auto-Renewable Subscription Duration Families）。  
 
-# 人肉和iTunes Connect交互
+## 4. 人肉和iTunes Connect交互
 
 ### 新建虚拟产品
 1. 登录[iTunes Connect](https://itunesconnect.apple.com/)
@@ -126,7 +126,7 @@ Restored|By the system|By your app|By the system
 
 关于和iTunes Connect的交互，更多细节请参考[In-App Purchase Configuration Guide for iTunes Connect](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Chapters/Introduction.html#//apple_ref/doc/uid/TP40013727-CH1-SW1)。
 
-# 代码里该做的事情
+## 5. 代码里该做的事情
 
 ### 获取产品列表
 
