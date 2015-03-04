@@ -79,7 +79,7 @@ Restored|By the system|By your app|By the system
 
 ### 关于自动更新订阅品更新周期组（Auto-Renewable Subscription Duration Families）：  
 每种订阅品的每种更新周期可以在iTunes Connect中设置一个单独的价格。图中给出了一种订阅品的不同长度的更新周期的价格截图：  
-{% img left /images/blog/iap/2.iap_news_alerts_2x.png %}  
+{% img left /images/blog/iap/2.iap_news_alerts_2x.jpg %}  
 你可以把每种订阅品的每个长度的更新周期看成一个单独的产品，每个产品有自己独有的时长、价格、市场促销属性。  
 为了让用户可以从中挑选一个偏好的更新周期，上图中我们为此种订阅的每个长度的更新周期分别设值了一个单独的价格，有一周的、一个月的、两个月的、季度的、半年的和一年的。  
 上图中这种订阅品的全部六种更新周期合起来称为一个自动更新订阅品更新周期组（Auto-Renewable Subscription Duration Families）。  
