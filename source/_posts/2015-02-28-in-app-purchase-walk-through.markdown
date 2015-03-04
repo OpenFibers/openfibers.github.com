@@ -132,7 +132,7 @@ Restored|By the system|By your app|By the system
 1. 首先读取出App中内嵌的或是服务端中的Product IDs。
 2. 使用SKProductRequest向苹果服务器验证哪些Product IDs是可用的。
 发出请求：
-```
+```objective-c
 	#import <StoreKit/StoreKit.h>
 	#define kInAppPurchaseProUpgradeProductId   @"com.163.neteasemusic.skin.dog"
 	...
@@ -143,7 +143,7 @@ Restored|By the system|By your app|By the system
 ```
 
 接收结果
-```
+```objective-c
 - (void)productsRequest:(SKProductsRequest *)request
      didReceiveResponse:(SKProductsResponse *)response
 {
@@ -161,7 +161,7 @@ Restored|By the system|By your app|By the system
 ```
 
 ### 发送购买请求
-```
+```objective-c
 	#import <StoreKit/StoreKit.h>
 	...
 	SKProduct *product = <# products request中返回的SKProduct #>;
@@ -170,7 +170,7 @@ Restored|By the system|By your app|By the system
 	[[SKPaymentQueue defaultQueue] addPayment:payment];
 ```
 或者
-```
+```objective-c
 	#import <StoreKit/StoreKit.h>
 	...
 	SKProduct *product = <# products request中返回的SKProduct #>;
@@ -181,14 +181,14 @@ Restored|By the system|By your app|By the system
 ### 观察购买状态
 
 首先在程序启动时注册观察者
-```
+```objective-c
 	#import <StoreKit/StoreKit.h>
 	...
 	[[SKPaymentQueue defaultQueue] addTransactionObserver:observer];
 ```
 
 并且实现回调，处理相应的购买返回。
-```
+```objective-c
 - (void)paymentQueue:(SKPaymentQueue *)queue
  updatedTransactions:(NSArray *)transactions
 {
@@ -226,7 +226,7 @@ Restored|By the system|By your app|By the system
 ### 完成购买
 在收到Purchased或Restored回调后，持久化购买记录以及receipt data。  
 然后通知PaymentQueue，购买已经完成了。对finishTransaction则会触发系统IAP的UI刷新：
-```
+```objective-c
 	SKPaymentTransaction *transaction = <# The current payment #>;
 	[[SKPaymentQueue defaultQueue] finishTransaction:transaction];
 ```
@@ -240,7 +240,7 @@ Restored|By the system|By your app|By the system
 这里使用Cocoa实现只是为了阐述请求与返回值的格式。
 发送二次验证请求：
 
-```
+```objective-c
 #define SANDBOX_VERIFY_RECEIPT_URL          [NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"]
 #define APP_STORE_VERIFY_RECEIPT_URL        [NSURL URLWithString:@"https://buy.itunes.apple.com/verifyReceipt"]
 
@@ -273,7 +273,7 @@ Restored|By the system|By your app|By the system
 ```
 
 接收二次验证结果：
-```
+```objective-c
 - (void)requestFinished:(ASIHTTPRequest *)request
 {
     NSString *responseString = [request responseString];
