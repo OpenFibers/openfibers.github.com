@@ -3,7 +3,7 @@ layout: post
 title: "在Windows上安装Ruby"
 date: 2015-03-04 22:18:27 +0800
 comments: true
-categories: 
+categories: ["Ruby"]
 ---
 
 Mac上使用RVM[https://rvm.io]安装与管理各种版本的Ruby是非常简单易行的。今天心血来潮想在Windows上写Octopress，安装了Ruby，似乎已经没有13年的时候那么难装了。

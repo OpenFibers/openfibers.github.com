@@ -3,7 +3,7 @@ layout: post
 title: "使用BFG Repo-Cleaner清除git的历史错误提交"
 date: 2015-03-04 14:50:59 +0800
 comments: true
-categories: 
+categories: ["git"]
 ---
 
 Git中有时会不小心提交大文件或密码到repo中，然而使用git-filter-branch清理以往的全部提交是非常复杂的。  
