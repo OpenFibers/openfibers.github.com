@@ -66,7 +66,7 @@ ScreenTest[1876:465146]
  native scale: 2.608696
 ```
 
-再来看iPhone6+标准模式下输出：
+iPhone6+放大模式下输出：
 ```
 ScreenTest[1893:466244] 
  bounds: { {0, 0}, {375, 667} }
