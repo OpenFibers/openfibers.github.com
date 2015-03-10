@@ -23,7 +23,7 @@ iPhone6和6+的设置(Settings)->显示与亮度(Display & Brightness)->显示�
 The native scale factor for the physical screen. (read-only)
 ```
 
-何为`native scale factor`? 写文档这哥们有点懒啊，妥妥的中国大陆互联网公司文档范儿。猜测是物理分辨率与`[UIScreen bounds]`的比值。光猜不放心，最好还是做个实验看下这个猜测是不是对的。  
+何为`native scale factor`? 写文档这哥们有点懒啊，妥妥的中国大陆互联网公司文档范儿，搞不好是本着'不知道上层用户用得着用不着先开放了再说'的原则做的底层。猜测是物理分辨率与`[UIScreen bounds]`的比值。光猜不放心，最好还是做个实验看下这个猜测是不是对的。  
 
 ```objective-c
     CGRect bounds = [[UIScreen mainScreen] bounds];
