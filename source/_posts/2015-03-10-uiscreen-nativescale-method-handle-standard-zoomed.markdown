@@ -11,7 +11,7 @@ categories: ["iOS"]
 iPhone6和6+的设置(Settings)->显示与亮度(Display & Brightness)->显示模式(View)都带有标准模式(Standard)和放大模式(Zoomed)。  
 这个功能被引入后，依赖`[UIScreen bounds]`和`[UIScreen scale]`并不能完全确定屏幕分辨率是多大、用户选择了放大试图还是标准视图。比如放大模式下iPhone6读到的这两个属性和iPhone5是一模一样的，而放大模式下iPhone6+的`[UIScreen bounds]`属性和标准模式下iPhone6的一样。
 
-为方便我们判断各种不同情况，iOS8中苹果引入了`[UIScreen screenScale]`。  
+iOS8中苹果引入了`[UIScreen screenScale]`，可以用来区分不同的显示模式。  
 
 <!--more-->
 
