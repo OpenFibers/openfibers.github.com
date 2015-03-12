@@ -3,7 +3,7 @@ layout: post
 title: "Apple Watch人机交互指南"
 date: 2015-03-11 13:49:29 +0800
 comments: true
-categories: 
+categories: ["WatchKit", "iOS", "Apple Watch"]
 ---
 
 翻译自[官方文档 - Apple Watch Human Interface Guidelines](https://developer.apple.com/library/prerelease/ios/documentation/UserExperience/Conceptual/WatchHumanInterfaceGuidelines/index.html)。
