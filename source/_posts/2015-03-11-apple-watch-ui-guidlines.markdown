@@ -8,6 +8,13 @@ categories:
 
 翻译自[官方文档 - Apple Watch Human Interface Guidelines](https://developer.apple.com/library/prerelease/ios/documentation/UserExperience/Conceptual/WatchHumanInterfaceGuidelines/index.html)。
 
+文档主要分为三部分：  
+1. 为Apple Watch设计软件的注意事项。包括介绍了watch软件的特点、watch独有的新的交互方式、Glances、Notifications、Modal Sheets、布局、颜色与排版、动画、app品牌化，也穿插了一些设计原则；  
+2. 各种控件的使用与设计原则。包括labels、images、groups、tables、buttons、switches、sliders、maps、dates、times和menus。虽然控件种类不多，但是和以往相比区别还是比较大的；  
+3. Icon、image和menu image的设计原则。  
+
+苹果的人机交互文档不只是给码农看的，也是给PD与设计师看的。建议PD和设计师们也读一读。  
+
 # 为Apple Watch设计软件的注意事项：
 
 ## Apple从未有过的穿戴式设备
