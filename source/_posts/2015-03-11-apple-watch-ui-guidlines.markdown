@@ -338,87 +338,51 @@ Date对象和timer对象是一种特殊的label，用来展示和时间相关的
 
 # 图片与图标的设计规范
 
+## 图标和图片尺寸
 
+每个app都有一个独特的icon。和iPhone app不同，手表上home screen的app icon是不带title的，用户仅通过icon来区分app，所以icon不但要求是容易识别的，而且还应该能够表达出app的作用。  
 
+{% img left /images/blog/apple_watch_guidelines/24.HomeScreen_2x.jpg 312 549 %}  
 
+### 图标尺寸
+Home screen上显示圆形图标。下表列出了各种情况下图标的正常尺寸。创建的icon文件是一张方形的图片，系统将自动将其切割成圆形。(注意Xcode中是以point为单位列出icon尺寸，非pixel为单位)
 
+Asset|Apple Watch (38mm)|Apple Watch (42mm)
+--------|--------|--------
+Notification center icon|48 pixels|55 pixels
+Home screen icon & Long look notification icon|80 pixels|88 pixels
+Short Look icon|172 pixels|196 pixels
 
+所有的图片都只创建@2x版本即可，无需创建其他尺寸的版本。  
+所有的images和icons都应该使用png格式，但是要避免使用interlaced PNGs。  
+Icons和images的标准颜色位深是24，红绿蓝各8位。也可附加一个8位的alpha通道，但是此通道不会背显示出来。也可以使用indexed colors PNGs来节约存储空间。  
 
+### Home Screen Icon
 
+Apple Watch上home screen的icon和iPhone上的相似，但是并没有标题。尽管Icon如此小，Icon也必须要清晰的表示app内容。如果WatchKit app与其对应的iOS功能接近，icon应该在视觉上相似。如果WatchKit app是iOS app的一个组件或是控制器的话，icon可以根据需要设计成不同的样式。  
 
+注意事项：  
+1. 为了最好的显示效果，你需要让专业的视觉设计师来设计图标。专业的设计师更知道该怎么专业的画图标。  
+2. Icon要使用通用、易于理解的图像，避免使用晦涩、抽象、仅表达附带意义的图像作为icon。举个例子，Mail的icon是个信封，不是农村的铁邮箱，不是信使包，也不是邮局的标签。  
+3. 尽量简洁。避免在icon里加很多各种各样的小图片。使用一个能表达app本质的元素，用简单、独特的形状绘制出来效果是最好的。给Icon添加细节时要谨慎。如果icon的内容或形状过于复杂，会让用户感觉迷惑，而且图标尺寸小的时候很容易发糊。  
+4. Icon是app的主要概念的一个抽象表达。一般来说，用艺术的方式表达现实是一个好主意，因为这可以向用户强调app主题的抽象意义。  
+5. 确保Apple Watch上的icon和iPhone上的icon相似，这会让用户自动把watch的app和iPhone上的app在脑海中相关联。  
 
+请为两种尺寸的watch创建不同分辨率的home icon，这样才能让app在两种表盘大小上看起来都不错。Icon尺寸前面已经说过了。
 
+## Menu Images
 
+Force Touch menu中icon的alpha channel决定了icon的显示结果。其他颜色信息在显示时将被丢弃。  
 
+图片画布的尺寸要比内容尺寸稍大。图标周围多余的空白部分可以确保在图标和menu icon的边缘之间有足够的边距。
 
+Device|Canvas size|Content size
+--------|--------|--------
+Apple Watch (38mm)|70 pixels|46 pixels
+Apple Watch (42mm)|80 pixels|54 pixels
 
+设计menu icon的图形时，线的粗细要兼顾到屏幕尺寸和图形的复杂度。但线最少要保证4px宽，以避免显示发虚的情况。  
+{% img left /images/blog/apple_watch_guidelines/25.menu_glyphs_2x.png 670 375 %}  
+推荐使用PNG格式保存menu icon。  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Over
