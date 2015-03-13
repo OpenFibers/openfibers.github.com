@@ -323,7 +323,7 @@ Date对象和timer对象是一种特殊的label，用来展示和时间相关的
 任何需要显示当前日期或时间的地方，都要使用date对象
 
 ### Timer Labels
-{% img left /images/blog/apple_watch_guidelines/21.map_image_2x.jpg 336 207 %}  
+{% img left /images/blog/apple_watch_guidelines/22.timer_labels_2x.png.jpeg 168 207 %}  
 
 特点：  
 1. 从一个特定时间开始计时或者开始倒计时  
