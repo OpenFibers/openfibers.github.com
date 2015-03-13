@@ -64,7 +64,7 @@ Glances的特点:
 Notifications是在apple watch上用于处理远程通知或本地通知的方便轻量的交互方式。  
 无论是远程通知，还是本地通知，都分为两个阶段。  
 第一个阶段称为Short Look, 在通知到达的第一时间展示给用户，应谨慎选择内容，给用户提供最少量的信息，以保护用户隐私。如果用户低下手腕，Short Look会自动隐藏。  
-如果用户点击Short Look或者抬起手腕，Look Look将会显示出来。Long Look应当显示通知的详细信息。Long Look一旦弹出，只可被用户关闭。  
+如果用户点击Short Look或者抬起手腕，Long Look将会显示出来。Long Look应当显示通知的详细信息。Long Look一旦弹出，只可被用户关闭。  
 
 ### Short Look Notifications
 
