@@ -86,6 +86,12 @@ Restored|By the system|By your app|By the system
 
 ## 4. 人肉和iTunes Connect交互
 
+### 填写银行卡与纳税信息
+1. 登录[iTunes Connect](https://itunesconnect.apple.com/)
+2. 点击Agreements, Tax, and Banking，填写Contact Info, Bank Info, Tax Info。如果填过就不用再填了。刚刚填写完成后，各种信息正在审核，如下图：  
+{% img left /images/blog/iap/17.iap_tax_banking.png %}  
+即使信息正在审核，沙箱环境下也是可以访问IAP服务的，并不需要等审核完成才能测试。  
+
 ### 新建虚拟产品
 1. 登录[iTunes Connect](https://itunesconnect.apple.com/)
 2. 点击My Apps
@@ -115,9 +121,15 @@ Restored|By the system|By your app|By the system
 {% img left /images/blog/iap/15.iap_edit_product3.png %}
 {% img left /images/blog/iap/16.iap_edit_product4.png %}
 
-新建完就可以在代码里使用了。
+新建完，不用等待苹果审核就可以在沙箱环境使用了。  
 
-### 在苹果托管不可消耗品（Non-consumable products）的内容
+### 新建测试帐号
+1. 登录[iTunes Connect](https://itunesconnect.apple.com/)  
+2. 点击Users and Roles  
+3. 点击Sandbox Testers  
+4. 添加Tester。添加后在测试机上用tester帐号登录app store  
+
+### 附：在苹果托管不可消耗品（Non-consumable products）的内容需知
 托管内容仅限于针对不可消耗品。  
 首次创建不可消耗品时可以选择把内容托管到苹果服务器，当然也可以随时将自己服务器上的内容迁移到苹果服务器由苹果托管。  
 需要使用托管功能的话，首先在iTunes Connect中提交不可消耗品让苹果审核。然后在Xcode中选取In-App Purchase Content template创建虚拟产品, 放入需要托管的内容, 然后使用Archive功能上传。或者使用Xcode为每一种虚拟产品创建一个.pkg文件，然后使用Application Loader一次性上传。  
@@ -130,8 +142,7 @@ Restored|By the system|By your app|By the system
 ### 获取产品列表
 
 1. 首先读取出App中内嵌的或是服务端中的Product IDs。
-2. 使用SKProductRequest向苹果服务器验证哪些Product IDs是可用的。
-发出请求：
+2. 使用SKProductRequest向苹果服务器验证哪些Product IDs是可用的。注意不要在[Class load]里发送请求，一定要等到App didFinishLauching之后再发，不然无法接到请求返回。核心代码如下：
 ```objective-c
 	#import <StoreKit/StoreKit.h>
 	#define kInAppPurchaseProUpgradeProductId   @"com.163.neteasemusic.skin.dog"
