@@ -11,11 +11,10 @@ Git中有时会不小心提交大文件或密码到repo中，然而使用git-fil
 
 以下命令中所有的 bfg 是 java -jar bfg.jar 的alias。
 
-### 1. 克隆一份repo到本地，切换到目标分支，于是以后删除历史纪录的操作都是针对master分支的
+### 1. 克隆一份repo到本地
 
 ```bash
 git clone --mirror git@github.com:OpenFibers/openfibers.github.com.git
-git checkout master
 ```
 
 ### 2. 执行bfg命令移除目标文件： 
@@ -49,7 +48,7 @@ $ bfg --delete-folders .git --delete-files .git  --no-blob-protection  openfiber
 ### 3. Reflog & Push Back to Remote Repo
 
 ```
-$ cd some-big-repo.git
+$ cd openfibers.github.com.git
 $ git reflog expire --expire=now --all && git gc --prune=now --aggressive
 $ git push
 ```
