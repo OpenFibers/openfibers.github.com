@@ -9,6 +9,8 @@ categories: ["键盘"]
 很喜欢HHKB的键位，但是静电容的手感不是太喜欢，type-s一直在吃灰。于是萌生了做一把HHKB布局的GH60的想法。  
 GH60富有富玩法，穷有穷玩法，这次是最穷的玩法。200块钱的洋垃圾键帽，60块钱的poker2外壳，改好弹簧的内胆400块钱，35块钱的屏蔽滑块，总共700搞定。  
 
+{% img left /images/blog/GH60_HHKB/keyboard2.JPG %}  
+
 <!--more-->
 
 ## 内胆
@@ -37,7 +39,6 @@ Poker2外壳的加强筋仅仅为Ansi布局的卫星轴留了空隙，HHKB最下
 ## 成品
 {% img left /images/blog/GH60_HHKB/keyboard1.JPG %}  
 {% img left /images/blog/GH60_HHKB/keyboard2.JPG %}  
-{% img left /images/blog/GH60_HHKB/keyboard3.JPG %}  
 
 Over
 
