@@ -53,6 +53,9 @@ published: false
 ##10.9
 
 ```
+extern OSStatus CGSSetWindowBackgroundBlurRadius(CGSConnection connection, NSInteger   windowNumber, int radius);
+extern CGSConnection CGSDefaultConnectionForThread();
+
 - (void)setWindowBackgroundBlurRadius:(int)radius
 {
     CGSConnection connection = CGSDefaultConnectionForThread();
