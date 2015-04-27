@@ -351,3 +351,44 @@ extern "C" {
 ```
 
 ##10.10
+```
+
+@interface NSView (Vibrancy)
+
+//Returns NSVisualEffectView
+- (instancetype)insertVibrancyViewBlendingMode:(NSVisualEffectBlendingMode)mode;
+
+@end
+
+@implementation NSView (Vibrancy)
+
+- (instancetype)insertVibrancyViewBlendingMode:(NSVisualEffectBlendingMode)mode
+{
+    Class vibrantClass=NSClassFromString(@"NSVisualEffectView");
+    if (vibrantClass)
+    {
+        NSVisualEffectView *vibrant=[[vibrantClass alloc] initWithFrame:self.bounds];
+        [vibrant setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+        [vibrant setBlendingMode:mode];
+        [self addSubview:vibrant positioned:NSWindowBelow relativeTo:nil];
+        
+        return vibrant;
+    }
+    return nil;
+}
+
+@end
+
+```
+
+```
+@implementation NSWindow (BackgroundBlur)
+
+- (void)enableBlur
+{
+    [self.contentView insertVibrancyViewBlendingMode:NSVisualEffectBlendingModeBehindWindow];
+}
+
+@end
+
+```
