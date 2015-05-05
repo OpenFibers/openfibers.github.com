@@ -1,16 +1,74 @@
 ---
 layout: post
-title: "transparent window in osx"
+title: "OSX各种实现毛玻璃效果窗口的方式与比较"
 date: 2015-04-27 19:22:15 +0800
 comments: true
 categories: ["OSX"]
-published: false
+published: true
 ---
 
+毛玻璃窗体是10.10中新增的效果. 比如Finder的左边栏.  
+本文只对10.8, 10.9, 10.10三个版本进行讨论. 我的App未对10.6和10.7做任何支持, 此处也不予讨论.  
 
-10.7太老不予支持. 从10.8开始讲起.
+##第一种方式: NSVisualEffectView
 
-##10.8
+这是10.10中新开放的API, 只能在10.10的runtime上使用.  
+如果需要上架App Store, 这也是在10.10上完成毛玻璃效果的唯一方式.  
+首先为NSView增加扩展:  
+
+```objective-c
+@interface NSView (Vibrancy)
+
+//Returns NSVisualEffectView
+- (instancetype)insertVibrancyViewBlendingMode:(NSVisualEffectBlendingMode)mode;
+
+@end
+
+@implementation NSView (Vibrancy)
+
+- (instancetype)insertVibrancyViewBlendingMode:(NSVisualEffectBlendingMode)mode
+{
+    Class vibrantClass=NSClassFromString(@"NSVisualEffectView");
+    if (vibrantClass)
+    {
+        NSVisualEffectView *vibrant=[[vibrantClass alloc] initWithFrame:self.bounds];
+        [vibrant setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+        [vibrant setBlendingMode:mode];
+        [self addSubview:vibrant positioned:NSWindowBelow relativeTo:nil];
+        
+        return vibrant;
+    }
+    return nil;
+}
+
+@end
+
+```
+
+<!--more-->
+
+然后调用(代码只举例了整个window的contentView开启半透明):  
+
+```
+@implementation NSWindow (BackgroundBlur)
+
+- (void)enableBlur
+{
+    [self.contentView insertVibrancyViewBlendingMode:NSVisualEffectBlendingModeBehindWindow];
+}
+
+@end
+
+```
+
+值得一提的是, 虽然SDK10.9中不包含NSVisualEffectView, 但是把NSVisualEffectView.h拷贝到工程中, 稍加改动修掉编译错误, 在SDK10.9下编译后, product放在10.10下运行, 是能正常显示毛玻璃效果的.  
+至于我为什么要这么蛋疼的用SDK10.9编译一个只在10.10上用的功能, 因为SDK10.10编译后窗体标题不能隐藏, 而我的App必须隐藏窗口标题...  
+然后我的App上架App Store的版本中只用此方式为10.10增加了毛玻璃窗体, 其他版本下均未实现透明窗体.  
+
+##第二种方式: CGSConnection
+
+此方式只能在10.8中使用. 其他版本中调用后不会生效.  
+以下是给NSWindow增加的扩展中的方法. self表示一个NSWindow.  
 
 ```objective-c
 - (void)applyGaussianBlurWithRadius:(CGFloat)radius
@@ -50,7 +108,11 @@ published: false
 
 ```
 
-##10.9
+##第三种方式: 私有APICGSSetWindowBackgroundBlurRadius
+
+此方法只能在10.9以上版本使用, 且为私有API, 使用后App不能上架, 而且模糊半径最大为15px, 设置更大的值系统会按照15px处理.  
+这也是10.9中实现窗体半透明的唯一方式, 10.9中内置的Terminate.app也是用此法实现的.  
+以下是给NSWindow增加的扩展中的方法. self表示一个NSWindow.  
 
 ```
 extern OSStatus CGSSetWindowBackgroundBlurRadius(CGSConnection connection, NSInteger   windowNumber, int radius);
@@ -62,6 +124,8 @@ extern CGSConnection CGSDefaultConnectionForThread();
     CGSSetWindowBackgroundBlurRadius(connection, [self windowNumber], radius);
 }
 ```
+
+然后在工程中放入声明私有API的头文件CGSPrivate.h:  
 
 ```
 //
@@ -350,45 +414,4 @@ extern "C" {
 
 ```
 
-##10.10
-```
-
-@interface NSView (Vibrancy)
-
-//Returns NSVisualEffectView
-- (instancetype)insertVibrancyViewBlendingMode:(NSVisualEffectBlendingMode)mode;
-
-@end
-
-@implementation NSView (Vibrancy)
-
-- (instancetype)insertVibrancyViewBlendingMode:(NSVisualEffectBlendingMode)mode
-{
-    Class vibrantClass=NSClassFromString(@"NSVisualEffectView");
-    if (vibrantClass)
-    {
-        NSVisualEffectView *vibrant=[[vibrantClass alloc] initWithFrame:self.bounds];
-        [vibrant setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
-        [vibrant setBlendingMode:mode];
-        [self addSubview:vibrant positioned:NSWindowBelow relativeTo:nil];
-        
-        return vibrant;
-    }
-    return nil;
-}
-
-@end
-
-```
-
-```
-@implementation NSWindow (BackgroundBlur)
-
-- (void)enableBlur
-{
-    [self.contentView insertVibrancyViewBlendingMode:NSVisualEffectBlendingModeBehindWindow];
-}
-
-@end
-
-```
+Over
