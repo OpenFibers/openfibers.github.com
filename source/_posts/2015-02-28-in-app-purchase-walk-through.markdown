@@ -316,8 +316,74 @@ Restored|By the system|By your app|By the system
 }
 ```
 
+苹果的返回值如下：  
+```JSON
+{
+"receipt": {
+            "original_purchase_date_pst":"2015-06-03 04:00:37 America/Los_Angeles",
+            "purchase_date_ms":"1433329237329",
+            "unique_identifier":"secret9f135e2cd8f7dda951a15c01cd2220c60b",
+            "original_transaction_id":"1000000157783770",
+            "bvrs":"2.6.0",
+            "transaction_id":"1000000157783770",
+            "quantity":"1",
+            "unique_vendor_identifier":"SECRETCD-89AD-45C4-8937-359CCA9E8F36",
+            "item_id":"SECRET509",
+            "product_id":"com.your.iap.product.id",
+            "purchase_date":"2015-06-03 11:00:37 Etc/GMT",
+            "original_purchase_date":"2015-06-03 11:00:37 Etc/GMT",
+            "purchase_date_pst":"2015-06-03 04:00:37 America/Los_Angeles",
+            "bid":"com.your.app.bundle.id",
+            "original_purchase_date_ms":"1433329237329"
+            },
+"status": 0
+}
+```
+
 更多验证相关问题，请参考[Receipt Validation Programming Guide](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Introduction.html#//apple_ref/doc/uid/TP40010573)
 
-验证成功后，则是真正的发放内容、道具等。
+验证成功后，则是真正的发放内容、道具等。  
+
+## 6.服务端二次验证后再发放数据中的安全问题
+
+由于是和钱关系最紧密的功能，IAP安全性显得无比重要。  
+如果是用的“经服务端二次验证成功发放道具”的逻辑，而非“购买成功发放道具，二次验证失败惩罚处理”，则在我的实践过程中，以下几件事是必须要做的。  
+
+### 客户端防止用户数据丢失
+不像支付宝SDK那样全部校验在服务端做，用IAP时部分流程的完整性是需要客户端保证的。  
+在transaction完成后，和服务端的二次验证完成前，要对transaction.transactionReceipt做持久化。  
+删除此持久化的时机应当是收到从服务端发回的二次验证请求的响应时，确认服务端已和苹果完成通信之后（服务端返回和苹果连接失败则不应删除已保存的receiptData）。  
+
+### 服务端防止被盗  
+服务端防盗主要有两点：  
+1. 自己服务器的线上环境避免使用苹果sandbox环境做二次验证，防止公司内部使用同一个apple developer id的人建立sandbox test user监守自盗。  
+2. 对验证通过的小票做废弃记录，防止黑客使用同一个小票反复验证购买。  
+再回顾一下，苹果二次验证接口的返回值如下：  
+
+```JSON
+{
+"receipt": {
+            "original_purchase_date_pst":"2015-06-03 04:00:37 America/Los_Angeles",
+            "purchase_date_ms":"1433329237329",
+            "unique_identifier":"secret9f135e2cd8f7dda951a15c01cd2220c60b",
+            "original_transaction_id":"1000000157783770",
+            "bvrs":"2.6.0",
+            "transaction_id":"1000000157783770",
+            "quantity":"1",
+            "unique_vendor_identifier":"SECRETCD-89AD-45C4-8937-359CCA9E8F36",
+            "item_id":"SECRET509",
+            "product_id":"com.your.iap.product.id",
+            "purchase_date":"2015-06-03 11:00:37 Etc/GMT",
+            "original_purchase_date":"2015-06-03 11:00:37 Etc/GMT",
+            "purchase_date_pst":"2015-06-03 04:00:37 America/Los_Angeles",
+            "bid":"com.your.app.bundle.id",
+            "original_purchase_date_ms":"1433329237329"
+            },
+"status": 0
+}
+```
+后台需要在发起支付前针对每一笔支付生成一个订单。服务端使用客户端发来的receiptData得到苹果的二次验证返回时，首先比较订单中的IAP product_id和返回值中的product_id是否一致，若不一致则视本次支付无效。若一致，则需要判断返回值中的unique_identifier是否被使用过；若未被使用过，则视此次交易完成，并将此unique_identifier标记为已使用。  
+
 
 Over
+
