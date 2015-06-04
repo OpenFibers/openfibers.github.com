@@ -171,6 +171,10 @@ Restored|By the system|By your app|By the system
 }
 ```
 
+### 向自己的服务器生成订单  
+如果需要经过自己的服务器做二次验证，建议在调用苹果支付接口前做这一步。  
+订单中必须要保存的是订单ID和用户想要购买的商品ID。这个记录是为了在二次验证时服务端做检查，防止 A 商品的 receipt 被用户拿来做 B 商品的购买结果校验。  
+
 ### 发送购买请求
 ```objective-c
 	#import <StoreKit/StoreKit.h>
@@ -245,7 +249,9 @@ Restored|By the system|By your app|By the system
 
 ### 二次验证防止破解
 
-越狱插件或者HTTP代理均可让用户做到伪造购买记录。当我们收到购买完成的回调后，最好经过自己服务器验证购买是否合法。
+越狱插件或者HTTP代理均可让用户做到伪造购买记录。当我们收到购买完成的回调后，最好经过自己服务器验证购买是否合法。  
+
+####经过 App Store 验证
 
 以下代码用Cocoa实现了二次验证的过程。但是这个过程最好通过自己的后台服务器来做，不然非常容易在客户端被伪造返回结果。  
 这里使用Cocoa实现只是为了阐述请求与返回值的格式。
@@ -340,6 +346,15 @@ Restored|By the system|By your app|By the system
 }
 ```
 
+#### 纯本地验证
+除了网络验证以外，苹果提供了纯粹的本地验证方式：[Validating Receipts Locally](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html#//apple_ref/doc/uid/TP40010573-CH1-SW2).  
+这种方式可以做到防止被通用破解方式破解，但并不能防止针对特定 App 的破解。  
+
+#### 第三方网站验证
+有些第三方网站提供了经服务端的验证服务。比如[urbanairship](http://urbanairship.com/products). 但是我并没有用过，所以不知道具体效果如何。毕竟第三方服务无法做到在用户发起购买之前生成订单记录，与购买后验证结果比对，所以我还是比较担心第三方验证服务的安全性的。而且鸡国网络连国外验证服务器，你懂的。。
+
+总之想要万无一失，建议开发自己的验证接口。  
+
 更多验证相关问题，请参考[Receipt Validation Programming Guide](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Introduction.html#//apple_ref/doc/uid/TP40010573)
 
 验证成功后，则是真正的发放内容、道具等。  
@@ -382,8 +397,20 @@ Restored|By the system|By your app|By the system
 "status": 0
 }
 ```
-后台需要在发起支付前针对每一笔支付生成一个订单。服务端使用客户端发来的receiptData得到苹果的二次验证返回时，首先比较订单中的IAP product_id和返回值中的product_id是否一致，若不一致则视本次支付无效。若一致，则需要判断返回值中的unique_identifier是否被使用过；若未被使用过，则视此次交易完成，并将此unique_identifier标记为已使用。  
+第5点中提到过，后台需要在发起支付前针对每一笔支付生成一个订单。服务端使用客户端发来的receiptData得到苹果的二次验证返回时，首先比较订单中的商品和返回值中的 product_id 是否对应，若不一致则用户用作弊手段传了另一个商品的 receiptData 过来，视本次支付无效。若一致，则需要判断返回值中的unique_identifier是否被使用过；若未被使用过，则视此次交易完成，并将此unique_identifier标记为已使用；若使用过，则用户使用作弊手段传了之前购买时的 receiptData 过来。  
 
+## 7.切换线上/测试环境
+
+需要在代码里显示声明的环境，就只有二次验证地址：  
+
+```objective-c
+#define SANDBOX_VERIFY_RECEIPT_URL          [NSURL URLWithString:@"https://sandbox.itunes.apple.com/verifyReceipt"]
+#define APP_STORE_VERIFY_RECEIPT_URL        [NSURL URLWithString:@"https://buy.itunes.apple.com/verifyReceipt"]
+```
+
+而调用苹果接口时连接的是线上环境还是测试环境，猜测是由编译 App 的证书决定的。目前看来，开发证书编译后，连接的是苹果的 Sandbox 环境；AppStore 上下载的则是连接苹果的线上环境。  
+
+另外再次强调，除非少量必要的自己线上环境的测试需要连接苹果的 Sandbox 验证服务之外，自己服务端的二次验证 API 应该严格做到自己的环境是线上环境，则连接苹果的线上环境二次验证接口。防止监守自盗的情况出现。  
 
 Over
 
