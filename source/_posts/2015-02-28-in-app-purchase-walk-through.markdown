@@ -21,7 +21,7 @@ categories: ["iOS"]
 
 在IAP里，不能出售:  
 
-1. 现实世界的商品或服务：比如刚才提到的一次「性服务」。  
+1. 现实世界的商品或服务：比如刚才提到的一次「性服务」。严格遵守此方案有个好处：IAP 如果被破解，用户无法得到大量实物，开发商也不会有很大经济损失。非要做的话想绕过也是可以的：用 IAP 购买代币，审核通过后用代币购买实物。  
 2. 其他[the App Review GuideLines](https://developer.apple.com/appstore/guidelines.html)中规定的不允许的内容：比如刚才提到的一次「性服务」。
 
 顺便说下，有次大网易的同事分享时提到：使用兑换码兑换App内服务是一条高压线。像Uber和Amazon里允许有码，是因为他们的码是用在现实世界的产品或服务上的。  
@@ -348,7 +348,9 @@ Restored|By the system|By your app|By the system
 
 #### 纯本地验证
 除了网络验证以外，苹果提供了纯粹的本地验证方式：[Validating Receipts Locally](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html#//apple_ref/doc/uid/TP40010573-CH1-SW2).  
-这种方式可以做到防止被通用破解方式破解，但并不能防止针对特定 App 的破解。  
+Receipt data 经过 App Store 证书签名，所以第三方无法凭空生成能够通过此法验证的 receipt data。只要做好证书校验，无需担心用户会伪造 receipt data。  
+在客户端使用这种方式可以做到防止被通用破解方式破解，但并不能防止针对特定 App 的破解。  
+实际上，这种验证方式是苹果为服务端设计的。Receipt data 的格式遵守ASN.1格式，服务端安装asn1c就可以解析 receipt data，并不需要纯手写一份解析代码。只要服务端代码和 asn1c 不出 bug，在服务端使用这种方式验证就是安全的。  
 
 #### 第三方网站验证
 有些第三方网站提供了经服务端的验证服务。比如[urbanairship](http://urbanairship.com/products). 但是我并没有用过，所以不知道具体效果如何。毕竟第三方服务无法做到在用户发起购买之前生成订单记录，与购买后验证结果比对，所以我还是比较担心第三方验证服务的安全性的。而且鸡国网络连国外验证服务器，你懂的。。
@@ -357,7 +359,8 @@ Restored|By the system|By your app|By the system
 
 更多验证相关问题，请参考[Receipt Validation Programming Guide](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Introduction.html#//apple_ref/doc/uid/TP40010573)
 
-验证成功后，则是真正的发放内容、道具等。  
+大多数产品在验证成功后，才是真正的发放内容、道具等。特别是充值后立即消费的虚拟货币基本都是这么处理的。  
+但是据我猜测， IAP 的设计者是想让开发者在购买完成时发放内容、道具，在二次验证失败时以删除内容、道具等方式来进行处罚。这样做的好处是：服务端不做小票对应商品验证/失效小票记录的话（后面会提到具体做法。带侥幸心理不做这个是很危险的，我们第二天就被 hack 了），用户无法通过向服务端重复发送同一张有效小票并关联不同的订单来伪造购买记录。  
 
 ## 6.服务端二次验证后再发放数据中的安全问题
 
@@ -370,6 +373,9 @@ Restored|By the system|By your app|By the system
 删除此持久化的时机应当是收到从服务端发回的二次验证请求的响应时，确认服务端已和苹果完成通信之后（服务端返回和苹果连接失败则不应删除已保存的receiptData）。  
 
 ### 服务端防止被盗  
+
+由于和开发者自身网站业务耦合紧，这部分内容任意一篇 IAP 的文档中都没有提到。但是在我实践中，这部分工作一旦有疏漏，被 hack 是分分钟的事。强烈建议认真阅读本部分，并在服务端完成类似实践。  
+
 服务端防盗主要有两点：  
 1. 自己服务器的线上环境避免使用苹果sandbox环境做二次验证，防止公司内部使用同一个apple developer id的人建立sandbox test user监守自盗。  
 2. 对验证通过的小票做废弃记录，防止黑客使用同一个小票反复验证购买。  
