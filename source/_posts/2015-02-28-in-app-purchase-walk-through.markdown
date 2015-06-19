@@ -3,7 +3,7 @@ layout: post
 title: "In-App Purchase Walk Through"
 date: 2015-02-28 16:19:15 +0800
 comments: true
-categories: ["iOS"]
+categories: ["iOS", "IAP"]
 ---
 
 ## 1. 适用情况
