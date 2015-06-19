@@ -1,0 +1,86 @@
+---
+layout: post
+title: "WWDC 2015 带来的新玩法"
+date: 2015-06-19 15:07:10 +0800
+comments: true
+categories: 
+---
+
+WWDC 2015 更新了五大产品线：OS X EI，iOS 9，watchOS 2，Xcode 7，Swift 2.  
+
+##1. OS X EI
+
+### Metal APIs
+Metal是一个开销极低的一种访问 GPU 的框架。  
+Metal framework 提供了 GPU 加速的先进的3D渲染和数据并行计算能力。  
+Metal 提供了流水线式的 API（streamlined API），预编译着色器（precompiled shaders），以及高性能的多线程支持。这些 features 可以帮助你把你的游戏或 app 的性能提升一个档次。  
+Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。  
+
+相关资源：  
+[Metal Home Page](https://developer.apple.com/metal/)  
+[Metal Programming Guide](https://developer.apple.com/library/ios/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40014221-CH1-SW1)  
+[Metal Shading Language Guide](https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalShadingLanguageGuide/Introduction/Introduction.html)  
+[Metal Framework Reference](https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalFrameworkReference/index.html)  
+
+### 支持 Swift2
+这个后面详细说。  
+
+### Force Touch APIs for Safari
+OS X 从10.10.3开始支持 Force Touch。  
+Force Touch trackpad 为 mac 带来了新的交互方式:  
+1. Force click  
+	用力点击可以支持和点击不同的操作。  
+2. Accelerators  
+	比如用力按下时拖拽可以加速拖拽。  
+3. Pressure sensitivity  
+	压力感应：软件可根据触摸压力更改行为。比如画图软件可以在用力按下时让画笔变粗。  
+4. Drag and drop
+	拖拽可以增加新的交互了。比如用力压下的拖拽可以直接打开拖拽目标。  
+
+相关资源：  
+[Force Touch Home Page](https://developer.apple.com/osx/force-touch/)  
+
+### App Extensions for Photos
+可以给 Photos 开发插件，比如自定义的 filter 或者编辑工具。  
+看来苹果想一统 OS X 上的看图软件。  
+
+相关资源：  
+[App Extension Programming Guide](https://developer.apple.com/library/prerelease/mac/documentation/General/Conceptual/ExtensibilityPG/index.html)
+
+## 2. iOS 9
+
+### Multitasking
+iPad 可以同一屏显示两个 App 了。  
+支持以下模式：Slide Over, Split View, 和 Picture in Picture。  
+
+相关资源：  
+[Adopting Multitasking Enhancements on iPad](https://developer.apple.com/library/prerelease/ios/documentation/WindowsViews/Conceptual/AdoptingMultitaskingOniPad/index.html)  
+[Lister (for watchOS, iOS, and OS X)](https://developer.apple.com/library/prerelease/ios/samplecode/Lister/Introduction/Intro.html#//apple_ref/doc/uid/TP40014701)
+
+
+### Search
+包括 App history、允许用户使用 Spotlight 搜索 App 内容和 web markup。  
+1. App history
+	让用户可以回到他上次打开 app 时在 app 的位置。据说只要声明 app 已支持 Search，就能自动实现这一点。  
+2. Content indexing
+	用Core Spotlight支持 Spotlight 中搜索文件内容。  
+3. Web markup
+	可以在 app 中标记 app 可以访问的 web 资源，以便让这些 web 资源支持 Search。  
+	可以支持 universal link，在 web 和 app 之间跳转。  
+
+相关资源：  
+[#Search in What's New in iOS 9](https://developer.apple.com/library/prerelease/ios/releasenotes/General/WhatsNewIniOS/Articles/iOS9.html#//apple_ref/doc/uid/TP40016198-DontLinkElementID_1)
+
+### 游戏框架
+[SceneKit](https://developer.apple.com/scenekit/),[SpriteKit](https://developer.apple.com/spritekit/),[Metal](https://developer.apple.com/metal/),[GameplayKit](https://developer.apple.com/library/prerelease/ios/documentation/General/Conceptual/GameplayKit_Guide/index.html#//apple_ref/doc/uid/TP40015172),[ReplayKit](https://developer.apple.com/library/prerelease/ios/samplecode/DemoBots/Introduction/Intro.html),[Model I/O](https://developer.apple.com/library/prerelease/ios/documentation/ModelIO/Reference/ModelIO_Framework/index.html)
+
+### App Thinning
+App Store 允许用户下载
+
+### HomeKit
+### HealthKit
+### MapKit
+### CloudKit
+### Safari and Web Content
+### News Publisher
+### Swift 2
