@@ -239,7 +239,7 @@ Restored|By the system|By your app|By the system
 需要监听SKPaymentQueue的更多状态变更，请实现[SKPaymentTransactionObserver](https://developer.apple.com/library/ios/documentation/StoreKit/Reference/SKPaymentTransactionObserver_Protocol/index.html#//apple_ref/occ/intf/SKPaymentTransactionObserver)协议中提供的更多方法。
 
 ### 完成购买
-在收到Purchased或Restored回调后，持久化购买记录以及receipt data。  
+在收到Purchased或Restored回调后，持久化购买记录以及receipt data。iOS6.X 或之前的版本中，持久化 receipt data 必须万无一失，因为一旦丢失，将没有任何途径再次拿到此 receipt，造成用户购买记录丢失。获取 receipt data 需要注意的点将在后面的二次验证中详细说。  
 然后通知PaymentQueue，购买已经完成了。对finishTransaction则会触发系统IAP的UI刷新：
 ```objective-c
 	SKPaymentTransaction *transaction = <# The current payment #>;
@@ -271,7 +271,7 @@ Restored|By the system|By your app|By the system
 
 - (void)verifyTransaction:(SKPaymentTransaction *)transaction
 {
-    NSData *transactionReceipt = transaction.transactionReceipt;
+    NSData *transactionReceipt = [[self class]] receiptDataFromTransaction:transaction];
     NSString *base64String = [OTBase64Helper base64forData:transactionReceipt];
     NSDictionary *receiptDictionary = @{@"receipt-data":base64String};
     NSData *data = [receiptDictionary JSONData];
@@ -287,7 +287,43 @@ Restored|By the system|By your app|By the system
     [_receiptRequest appendPostData:data];
     [_receiptRequest startAsynchronous];
 }
+
++ (NSData *)receiptDataFromTransaction:(SKPaymentTransaction *)transaction
+{
+    NSData *receiptData = [self receiptDataInReceiptURL];
+    if (!receiptData)
+    {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+        if ([transaction respondsToSelector:@selector(transactionReceipt)])
+        {
+            //Works in iOS3 - iOS8, deprected since iOS7, actual deprecated (returns nil) since iOS9
+            receiptData = transaction.transactionReceipt;
+        }
+#pragma clang diagnostic pop
+    }
+    return receiptData;
+}
+
++ (NSData *)receiptDataInReceiptURL
+{
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0") && [[NSBundle mainBundle] respondsToSelector:@selector(appStoreReceiptURL)])
+    {
+        //Works since iOS7, implemented but calls selector not found directly in iOS6
+        //so must decide by if system version >= 7.0, DO NOT use respondsToSelector:@selector(appStoreReceiptURL)
+        NSURL *receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[receiptUrl path]])
+        {
+            NSData *receiptData = [NSData dataWithContentsOfURL:receiptUrl];
+            return receiptData;
+        }
+    }
+    return nil;
+}
+
 ```
+
+需要注意的是，如果 App 不需要支持 iOS6.x 及之前的版本，建议仅使用 appStoreReceiptURL 获取 receipt 数据。appStoreReceiptURL 从 iOS7 开始启用，会返回用户在此 app 上购买过的全部 receipt 的 data（粒度猜测应该是本机，本 App Store 帐号，本 App 内的购买，具体没测试）。  
 
 接收二次验证结果：
 ```objective-c
@@ -323,6 +359,9 @@ Restored|By the system|By your app|By the system
 ```
 
 苹果的返回值如下：  
+
+transaction.transactionReceipt：  
+
 ```JSON
 {
 "receipt": {
@@ -344,6 +383,12 @@ Restored|By the system|By your app|By the system
             },
 "status": 0
 }
+```
+
+[[NSBundle mainBundle] appStoreReceiptURL]：  
+
+```JSON
+
 ```
 
 #### 纯本地验证
@@ -369,7 +414,7 @@ Receipt data 经过 App Store 证书签名，所以第三方无法凭空生成�
 
 ### 客户端防止用户数据丢失
 不像支付宝SDK那样全部校验在服务端做，用IAP时部分流程的完整性是需要客户端保证的。  
-在transaction完成后，和服务端的二次验证完成前，要对transaction.transactionReceipt做持久化。  
+在transaction完成后，和服务端的二次验证完成前，要对receipt data做持久化。  
 删除此持久化的时机应当是收到从服务端发回的二次验证请求的响应时，确认服务端已和苹果完成通信之后（服务端返回和苹果连接失败则不应删除已保存的receiptData）。  
 
 ### 服务端防止被盗  
