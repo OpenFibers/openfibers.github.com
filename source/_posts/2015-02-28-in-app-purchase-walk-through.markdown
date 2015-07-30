@@ -360,7 +360,7 @@ Restored|By the system|By your app|By the system
 
 苹果的返回值如下：  
 
-transaction.transactionReceipt：  
+使用transaction.transactionReceipt取得的小票经二次验证后返回值：  
 
 ```JSON
 {
@@ -385,10 +385,59 @@ transaction.transactionReceipt：
 }
 ```
 
-[[NSBundle mainBundle] appStoreReceiptURL]：  
+使用[[NSBundle mainBundle] appStoreReceiptURL]取得的小票经二次验证后返回值：  
 
 ```JSON
-
+{
+"status":0,
+"environment":"Sandbox",
+"receipt":  {
+            //in_app 中全部支付共有的信息（本App的IAP信息）
+            "receipt_type":"ProductionSandbox",
+            "adam_id":0,
+            "app_item_id":0,
+            "bundle_id":"com.netease.neteasemusic",
+            "application_version":"2.9.0",
+            "download_id":0,
+            "version_external_identifier":0,
+            "request_date":"2015-07-29 03:37:17 Etc/GMT",
+            "request_date_ms":"1438141037628",
+            "request_date_pst":"2015-07-28 20:37:17 America/Los_Angeles",
+            "original_purchase_date":"2013-08-01 07:00:00 Etc/GMT",
+            "original_purchase_date_ms":"1375340400000",
+            "original_purchase_date_pst":"2013-08-01 00:00:00 America/Los_Angeles",
+            "original_application_version":"1.0",
+            "in_app":   [
+                            //每笔交易分别的信息
+                            {
+                                "quantity":"1",
+                                "product_id":"com.netease.neteasemusictest.pack.clouddrive.2t12",
+                                "transaction_id":"1000000164784521",
+                                "original_transaction_id":"1000000164784521",
+                                "purchase_date":"2015-07-23 15:03:04 Etc/GMT",
+                                "purchase_date_ms":"1437663784000",
+                                "purchase_date_pst":"2015-07-23 08:03:04 America/Los_Angeles",
+                                "original_purchase_date":"2015-07-23 15:03:04 Etc/GMT",
+                                "original_purchase_date_ms":"1437663784000",
+                                "original_purchase_date_pst":"2015-07-23 08:03:04 America/Los_Angeles",
+                                "is_trial_period":"false"
+                            },
+                            {
+                                "quantity":"1",
+                                "product_id":"com.netease.neteasemusictest.pack.clouddrive.1t12",
+                                "transaction_id":"1000000165136224",
+                                "original_transaction_id":"1000000165136224",
+                                "purchase_date":"2015-07-27 06:40:40 Etc/GMT",
+                                "purchase_date_ms":"1437979240000",
+                                "purchase_date_pst":"2015-07-26 23:40:40 America/Los_Angeles",
+                                "original_purchase_date":"2015-07-27 06:40:40 Etc/GMT",
+                                "original_purchase_date_ms":"1437979240000",
+                                "original_purchase_date_pst":"2015-07-26 23:40:40 America/Los_Angeles",
+                                "is_trial_period":"false"
+                            }
+                        ]
+            }
+}
 ```
 
 #### 纯本地验证
@@ -405,50 +454,38 @@ Receipt data 经过 App Store 证书签名，所以第三方无法凭空生成�
 更多验证相关问题，请参考[Receipt Validation Programming Guide](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Introduction.html#//apple_ref/doc/uid/TP40010573)
 
 大多数产品在验证成功后，才是真正的发放内容、道具等。特别是充值后立即消费的虚拟货币基本都是这么处理的。  
-但是据我猜测， IAP 的设计者是想让开发者在购买完成时发放内容、道具，在二次验证失败时以删除内容、道具等方式来进行处罚。这样做的好处是：服务端不做小票对应商品验证/失效小票记录的话（后面会提到具体做法。带侥幸心理不做这个是很危险的，我们第二天就被 hack 了），用户无法通过向服务端重复发送同一张有效小票并关联不同的订单来伪造购买记录。  
+但是从接口来看， IAP 的设计者是想让开发者在购买完成时发放内容、道具，在二次验证失败时以删除内容、道具等方式来进行处罚。  
 
 ## 6.服务端二次验证后再发放数据中的安全问题
 
 由于是和钱关系最紧密的功能，IAP安全性显得无比重要。  
-如果是用的“经服务端二次验证成功发放道具”的逻辑，而非“购买成功发放道具，二次验证失败惩罚处理”，则在我的实践过程中，以下几件事是必须要做的。  
 
-### 客户端防止用户数据丢失
-不像支付宝SDK那样全部校验在服务端做，用IAP时部分流程的完整性是需要客户端保证的。  
-在transaction完成后，和服务端的二次验证完成前，要对receipt data做持久化。  
-删除此持久化的时机应当是收到从服务端发回的二次验证请求的响应时，确认服务端已和苹果完成通信之后（服务端返回和苹果连接失败则不应删除已保存的receiptData）。  
+### 客户端数据安全
 
-### 服务端防止被盗  
+客户端根据使用不同的获取 receipt 的接口，需要做的事情也不同：
 
-由于和开发者自身网站业务耦合紧，这部分内容任意一篇 IAP 的文档中都没有提到。但是在我实践中，这部分工作一旦有疏漏，被 hack 是分分钟的事。强烈建议认真阅读本部分，并在服务端完成类似实践。  
+####1. 客户端使用transaction.transactionReceipt（或使用transaction.transactionReceipt + appStoreReceiptURL两者）:  
 
-服务端防盗主要有两点：  
-1. 自己服务器的线上环境避免使用苹果sandbox环境做二次验证，防止公司内部使用同一个apple developer id的人建立sandbox test user监守自盗。  
-2. 对验证通过的小票做废弃记录，防止黑客使用同一个小票反复验证购买。  
-再回顾一下，苹果二次验证接口的返回值如下：  
+如果要支持 iOS6，那么不得不使用transaction.transactionReceipt在 iOS6上读取receipt，客户端需要保证持久化逻辑：  
+在transaction完成后，和服务端的二次验证完成前，要对receipt data做持久化；
+若存在未上传成功的 receipt ，需要开定时器重试上传；
+如果要做删除持久化数据，删除的时机应当是收到从服务端发回的二次验证请求的响应时，确认服务端已和苹果完成通信之后（服务端返回和苹果连接失败则不应删除已保存的receiptData），若 IAP 交易不频繁，可考虑不删除持久化的 receipt data。  
 
-```JSON
-{
-"receipt": {
-            "original_purchase_date_pst":"2015-06-03 04:00:37 America/Los_Angeles",
-            "purchase_date_ms":"1433329237329",
-            "unique_identifier":"secret9f135e2cd8f7dda951a15c01cd2220c60b",
-            "original_transaction_id":"1000000157783770",
-            "bvrs":"2.6.0",
-            "transaction_id":"1000000157783770",
-            "quantity":"1",
-            "unique_vendor_identifier":"SECRETCD-89AD-45C4-8937-359CCA9E8F36",
-            "item_id":"SECRET509",
-            "product_id":"com.your.iap.product.id",
-            "purchase_date":"2015-06-03 11:00:37 Etc/GMT",
-            "original_purchase_date":"2015-06-03 11:00:37 Etc/GMT",
-            "purchase_date_pst":"2015-06-03 04:00:37 America/Los_Angeles",
-            "bid":"com.your.app.bundle.id",
-            "original_purchase_date_ms":"1433329237329"
-            },
-"status": 0
-}
-```
-第5点中提到过，后台需要在发起支付前针对每一笔支付生成一个订单。服务端使用客户端发来的receiptData得到苹果的二次验证返回时，首先比较订单中的商品和返回值中的 product_id 是否对应，若不一致则用户用作弊手段传了另一个商品的 receiptData 过来，视本次支付无效。若一致，则需要判断返回值中的unique_identifier是否被使用过；若未被使用过，则视此次交易完成，并将此unique_identifier标记为已使用；若使用过，则用户使用作弊手段传了之前购买时的 receiptData 过来。  
+####2. 客户端仅使用appStoreReceiptURL获取receipt  
+
+客户端每次交易完成从 appStoreReceiptURL 读取出 data 上传给服务器。同时有上传请求正在进行的话，持久化一个标记，表示有未完成的上传，在全部上传完成后将此标记置为上传结束。如果标记存在，需要开定时器重试上传。
+
+### 服务端数据安全  
+
+服务端安全包含两部分：防止已扣款却购买无效；防止作弊。目前想到最圆的实践是：  
+1. 在从客户端上传的 receipt data 中解析出的数据（包括本地解析或经苹果服务器解析）中，从全部交易记录中找到所有未被标记为已使用的交易记录，作为集合A。  
+2. 枚举当前用户的全部待支付订单，匹配集合A中的交易记录中product id相同的项，并将此交易记录的 transaction id 记录下，标记为已使用；并将此订单标记为已支付，并发放道具。  
+3. 线上环境仅在审核期间允许使用sandbox环境做二次验证，防止上线后内部同事使用sandbox test user免费充值道具到线上环境。需注意审核期间必须开启 sandbox 环境验证，不然会被 rejected。  
+
+### 其他安全问题
+
+1. 尽量使用纯 HTTPS 接口上传 receipt，并严格校验 SSL 证书，防止中间人攻击。  
+2. 越狱后有木马会盗取用户的支付，如果必要，需要提醒用户越狱风险。  
 
 ## 7.切换线上/测试环境
 
@@ -462,6 +499,11 @@ Receipt data 经过 App Store 证书签名，所以第三方无法凭空生成�
 而调用苹果接口时连接的是线上环境还是测试环境，猜测是由编译 App 的证书决定的。目前看来，开发证书编译后，连接的是苹果的 Sandbox 环境；AppStore 上下载的则是连接苹果的线上环境。  
 
 另外再次强调，除非少量必要的自己线上环境的测试需要连接苹果的 Sandbox 验证服务之外，自己服务端的二次验证 API 应该严格做到自己的环境是线上环境，则连接苹果的线上环境二次验证接口。防止监守自盗的情况出现。  
+
+## 8.提交审核
+
+如果是初次提交审核，IAP 商品要和第一个支持 IAP 的版本一起提交。审核期间要允许 sandbox 环境二次验证。  
+后续新增的 IAP 商品则没有此限制，可以随时提交审核。  
 
 Over
 
