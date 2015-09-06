@@ -22,8 +22,10 @@ Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。
 [Metal Shading Language Guide](https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalShadingLanguageGuide/Introduction/Introduction.html)  
 [Metal Framework Reference](https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalFrameworkReference/index.html)  
 
+<!--more-->
+
 ### 支持 Swift2
-这个后面详细说。  
+这个话题太大了就不详细介绍了。  
 
 ### Force Touch APIs for Safari
 OS X 从10.10.3开始支持 Force Touch。  
