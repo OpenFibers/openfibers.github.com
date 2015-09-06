@@ -496,7 +496,7 @@ Receipt data 经过 App Store 证书签名，所以第三方无法凭空生成�
 #define APP_STORE_VERIFY_RECEIPT_URL        [NSURL URLWithString:@"https://buy.itunes.apple.com/verifyReceipt"]
 ```
 
-而调用苹果接口时连接的是线上环境还是测试环境，猜测是由编译 App 的证书决定的。目前看来，开发证书编译后，连接的是苹果的 Sandbox 环境；AppStore 上下载的则是连接苹果的线上环境。  
+而在Cocoa中调用苹果接口时，开发证书、Beta测试证书、提交证书编译出的App连接的都是Sandbox环境；只有上线后的App连接的是线上环境。
 
 另外再次强调，除非少量必要的自己线上环境的测试需要连接苹果的 Sandbox 验证服务之外，自己服务端的二次验证 API 应该严格做到自己的环境是线上环境，则连接苹果的线上环境二次验证接口。防止监守自盗的情况出现。  
 
@@ -506,4 +506,5 @@ Receipt data 经过 App Store 证书签名，所以第三方无法凭空生成�
 后续新增的 IAP 商品则没有此限制，可以随时提交审核。  
 
 Over
+
 
