@@ -77,7 +77,7 @@ iPad 可以同一屏显示两个 App 了。
 [SceneKit](https://developer.apple.com/scenekit/),[SpriteKit](https://developer.apple.com/spritekit/),[Metal](https://developer.apple.com/metal/),[GameplayKit](https://developer.apple.com/library/prerelease/ios/documentation/General/Conceptual/GameplayKit_Guide/index.html#//apple_ref/doc/uid/TP40015172),[ReplayKit](https://developer.apple.com/library/prerelease/ios/samplecode/DemoBots/Introduction/Intro.html),[Model I/O](https://developer.apple.com/library/prerelease/ios/documentation/ModelIO/Reference/ModelIO_Framework/index.html)
 
 ### App Thinning
-App Store 允许用户下载
+允许用户下载App时只下载CPU对应的binary的architecture，和屏幕的scale对应的图片资源。同时iOS9的rom尺寸也大幅下降。  
 
 ### HomeKit
 ### HealthKit
