@@ -18,6 +18,8 @@ Space-separated list of identifiers. Specifies the architectures for which the b
 3. Build Active Architecture Only:  
 Boolean value. Specifies whether the product includes only object code for the native architecture.
 
+<!--more-->
+
 ### 关于Architecture 和 Valid Architecture
 简单来说，Architecture 和 Valid Architecture 的交集，是最终编译的target。  
 举例：Architecture 设置为armv7 arm64，Valid Architecture 设置为 armv7，工程中代码则只会编译到 armv7，然后 link。Architecture 设置为 armv7，Valid Architecture 设置为 armv7 arm64，工程中代码也只会编译到 armv7，然后 link。  
