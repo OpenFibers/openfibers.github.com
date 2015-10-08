@@ -3,7 +3,7 @@ layout: post
 title: "Architectures 与 Valid Architectures 在 Xcode 中的设置"
 date: 2015-09-16 10:39:18 +0800
 comments: true
-categories: 
+categories: ["iOS","OSX","Xcode"]
 ---
 
 ### 关于这几个设置项，先看官方说明：  

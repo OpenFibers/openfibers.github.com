@@ -3,7 +3,7 @@ layout: post
 title: "Xcode插件"
 date: 2015-10-04 11:38:06 +0800
 comments: true
-categories: 
+categories: ["Xcode"]
 ---
 
 ### 1. Alcatraz
