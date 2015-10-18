@@ -81,7 +81,7 @@ vim /etc/init.d/proxy_vps
 
 在里面填入如下内容（在极路由上直接启动autossh会失败，先sleep一会就能启动了，不知为何）：  
 ```bash
-#!/bin/sh /etc/rc.common
+\#!/bin/sh /etc/rc.common
 START=99
 start()
 {
