@@ -3,7 +3,7 @@ layout: post
 title: "在OpenWRT上搭建ssh代理"
 date: 2015-09-12 14:21:41 +0800
 comments: true
-categories: ["SSH","OSX","翻墙"]
+categories: ["VPS","SSH","OSX","翻墙"]
 ---
 
 首先为何要用ssh代理，而不是ShadowSocks或VPN：GFW会针对ShadowSocks或各种VPN协议做解析，却不一定有勇气禁止全部ssh连接（国家曾经有次物理断开到国外的全部网络连接造成了巨大经济损失）。  

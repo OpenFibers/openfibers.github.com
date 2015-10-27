@@ -3,7 +3,7 @@ layout: post
 title: "在Debian VPS上安装dnsmasq解决DNS污染"
 date: 2015-10-18 23:34:24 +0800
 comments: true
-categories: ["翻墙"]
+categories: ["VPS", "翻墙"]
 ---
 
 ### 1. 安装
