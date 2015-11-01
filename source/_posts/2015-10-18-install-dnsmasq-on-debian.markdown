@@ -6,6 +6,8 @@ comments: true
 categories: ["VPS", "翻墙"]
 ---
 
+warning: 我的有台DNS因为装了dnsmasq没做加密，被服务商提示有被DDoS攻击风险，强制断线了。  
+
 ### 1. 安装
 
 首先连上VPS，安装dnsmasq：  
