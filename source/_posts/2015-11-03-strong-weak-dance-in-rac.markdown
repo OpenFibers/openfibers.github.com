@@ -3,7 +3,7 @@ layout: post
 title: "Strong-weak dance in RAC"
 date: 2015-11-03 10:12:32 +0800
 comments: true
-categories: 
+categories: ['iOS', 'RAC']
 ---
 
 今天在工程中发现了RAC导致的retain cycle:  
