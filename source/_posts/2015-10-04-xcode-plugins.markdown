@@ -23,15 +23,17 @@ Log 的 filter，支持正则，响应式交互，尚有崩溃，不过值得一
 
 ### 4. Clang-Format
 
-一键格式化脏乱差代码。  
+一键格式化脏乱差代码。还支持自动按段落排序#import "headers"。  
 安装后在工程中建立 .clang-format 文件，在其中配置代码格式，再使用此插件格式化代码。  
-另刚修复了和 oh-my-zsh 同时使用的一处 crash，建议更新到最新。  
+前几天发pr修复了和 oh-my-zsh 同时使用的一处 crash，作者刚刚merge了，建议更新到最新。  
 推荐格式：  
 
 ```
 BasedOnStyle: WebKit
 BreakBeforeBraces: Allman
 PointerAlignment: Right
+IndentCaseLabels: true
+AlignAfterOpenBracket: true
 ```
 
 [Github地址](https://github.com/travisjeffery/ClangFormat-Xcode)
