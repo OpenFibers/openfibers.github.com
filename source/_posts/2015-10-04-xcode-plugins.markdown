@@ -8,7 +8,7 @@ categories: ["Xcode"]
 
 ### 1. Alcatraz
 
-其他插件的 package manager, 其他插件从这个里面安装既可。  
+其他插件的 package manager, 可以从此插件中搜索、安装、删除其他插件。  
 [Github地址](https://github.com/supermarin/Alcatraz)
 
 ### 2. VVDocumenter-Xcode
