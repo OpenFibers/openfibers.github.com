@@ -3,7 +3,7 @@ layout: post
 title: "OSX各种实现毛玻璃效果窗口的方式与比较"
 date: 2015-04-27 19:22:15 +0800
 comments: true
-categories: ["OSX"]
+categories: ["OSX", "AppKit", "Cocoa"]
 published: true
 ---
 

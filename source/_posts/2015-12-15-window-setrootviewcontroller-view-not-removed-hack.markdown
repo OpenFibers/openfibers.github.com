@@ -3,7 +3,7 @@ layout: post
 title: "[UIWindow setRootViewController:]后view无限叠加的问题修复"
 date: 2015-12-15 17:22:34 +0800
 comments: true
-categories: ['iOS']
+categories: ['iOS', 'UIKit']
 ---
 
 工程中有时会直接修改window.rootViewController，来导航到新的页面。  
