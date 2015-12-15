@@ -10,7 +10,7 @@ categories: ['iOS', 'UIKit']
 
 尝试了各种方案，挑选了一种体验较好的。在`textViewDidChanged:`中，检测到正在编辑的区域在文字最下行，无动画滚动到结尾：  
 
-```
+```objective-c
 - (void)textViewDidChange:(UITextView *)textView
 {
     //hack for iOS8

@@ -20,7 +20,7 @@ Stack Overflow上也有多个对于此问题的讨论，比如[UIWindow setRootV
 
 实践了一下，因为工程中root window是继承自UIWindow的子类，所以直接重写了此类的`setRootViewController:`方法：  
 
-```
+```objective-c
 //hack of setRootViewController: old rootViewController's view never removed from window
 - (void)setRootViewController:(UIViewController *)rootViewController
 {
