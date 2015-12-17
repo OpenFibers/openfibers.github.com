@@ -12,3 +12,6 @@ Preferences -> Profiles -> Text -> Antialias text 打开（视网膜屏安装10.
 
 ### Safari command+数字键开启书签栏页面
 Preferences -> Tabs -> Use command-1 through command-9 to switch tabs 关闭（10.11默认改为切换tab了）  
+
+
+Over

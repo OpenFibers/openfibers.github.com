@@ -60,3 +60,5 @@ cat /etc/resolv.conf
 ```
 
 3. 打开Network Utility，在Lookup选项卡中可测试域名查询到的IP地址。  
+
+Over

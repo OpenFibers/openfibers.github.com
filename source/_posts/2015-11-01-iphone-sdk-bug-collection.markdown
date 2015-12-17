@@ -14,3 +14,5 @@ categories: ['iPhone', 'iOS', 'UIKit']
 
 3. window.rootViewController设置后，老的rootViewController的view仍然贴在window上：  
 参考[[UIWindow setRootViewController:]后view无限叠加的问题修复](http://openfibers.github.io/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/)。  
+
+Over

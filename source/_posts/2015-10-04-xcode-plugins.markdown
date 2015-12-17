@@ -41,4 +41,6 @@ AlignAfterOpenBracket: true
 ### 5. FuzzyAutocomplete
 
 代码自动补全的增强工具，输入反应稍微减慢，不装其他输入增强工具时卡顿尚可接受，值得一用。  
-[Github地址](https://github.com/FuzzyAutocomplete/FuzzyAutocompletePlugin)
+[Github地址](https://github.com/FuzzyAutocomplete/FuzzyAutocompletePlugin)  
+
+Over

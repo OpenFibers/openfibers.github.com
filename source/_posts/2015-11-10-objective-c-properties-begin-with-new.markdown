@@ -22,3 +22,5 @@ categories: ['objective-c','iOS','OSX']
 
 
 参考帖子：[http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios](http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios)  
+
+Over

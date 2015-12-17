@@ -27,3 +27,5 @@ pod update
 ```
 
 参考[mbinna/podforceupdate.sh](https://gist.github.com/mbinna/4202236)。  
+
+Over

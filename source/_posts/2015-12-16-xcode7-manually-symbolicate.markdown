@@ -64,3 +64,5 @@ UUID: 5105C8AA-D5A1-31B7-A0B5-309EB899F43F (arm64) Crash.app.dSYM/Contents/Resou
 将 UUID 去掉减号'-'在 crash log 中搜索，如果 crash log 中 binary image 的 UUID 和可执行文件、dSYM的build UUID一致，则可以确定此 crash log 崩溃自此 build。否则 crash log 和此 build 不匹配。  
 
 {% img left /images/blog/xcode7_manually_symbolicate1/xcode7_manually_symbolicate3.JPG %}  
+
+Over  
