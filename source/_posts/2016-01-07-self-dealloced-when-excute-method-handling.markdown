@@ -3,7 +3,7 @@ layout: post
 title: "self在执行方法的过程中dealloc引起的崩溃处理"
 date: 2016-01-07 11:27:54 +0800
 comments: true
-categories: 
+categories: ['objective-c','iOS','OSX']
 ---
 
 ### 场景和产生原因
