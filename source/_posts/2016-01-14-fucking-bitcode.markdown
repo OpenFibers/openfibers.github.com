@@ -86,6 +86,6 @@ Architectures in the fat file: libFooLibrary.a are: i386 x86_64 armv7 armv7s arm
 
 ### 4. 包的体积不降反增
 
-花了这么大力气，总算成功上传Test Flight了，却发现原本37M的包体积变成了64M，却不知为何。一口老血喷了出来。所以你如果看完了本文，还要坚持尝试Bit Code的话，请做好充分的心理准备。  
+花了这么大力气，总算成功上传Test Flight了，却发现原本31.7M的包体积变成了64M，却不知为何。一口老血喷了出来。所以你如果看完了本文，还要坚持尝试Bit Code的话，请做好充分的心理准备。  
 
 Over
