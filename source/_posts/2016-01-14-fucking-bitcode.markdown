@@ -1,13 +1,12 @@
 ---
 layout: post
-title: "日了狗的BitCode"
+title: "App/Framework/Static Library开启BitCode，既踩坑笔记"
 date: 2016-01-14 18:06:54 +0800
 comments: true
 categories: ['iOS', 'Xcode', 'BitCode']
 ---
 
-苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。  
-对于App开发者，建议在苹果做出改进之前暂时不要使用此技术。友情提示，现在最新版本iOS为9.2，Xcode为7.2。  
+苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。  
 
 下面介绍一下如何开启BitCode，以及我掉的坑有哪些。  
 
@@ -84,8 +83,30 @@ Architectures in the fat file: libFooLibrary.a are: i386 x86_64 armv7 armv7s arm
 
 然后将 Framework 或（static library 和 public headers）加入到App工程中，开启App Target的BitCode，Archive编译，上传iTunes Connect测试是否能正常处理。如果是Framework的话，还需在App Target->General->Embedded Binaries中加入此Framework，否则会出现error。   
 
-### 4. 包的体积不降反增
+### 4. 包的体积变化
 
-花了这么大力气，总算成功上传Test Flight了，却发现原本31.7M的包体积变成了64M，却不知为何。一口老血喷了出来。所以你如果看完了本文，还要坚持尝试Bit Code的话，请做好充分的心理准备。  
+花了这么大力气，总算成功上传Test Flight了，但在TestFlight中，原本31.7M的包体积变成了64.1M：  
+
+关闭BitCode，TestFlight中显示如下： 
+
+{% img left /images/blog/fucking_bitcode/2.TestFlightDisableBitCode.PNG 375 164 %}  
+
+开启BitCode，TestFlight中显示如下：
+
+{% img left /images/blog/fucking_bitcode/3.TestFlightEnableBitCode.PNG 375 164 %}  
+
+一口老血差点喷了出来。但是检查了可执行文件的大小，发现实际上用户下载的文件尺寸变小了。  
+
+关闭BitCode，可执行文件尺寸为 20,741,664 Bytes：
+
+{% img left /images/blog/fucking_bitcode/4.FileSizeDisableBitCode.PNG 446 259 %}  
+
+开启BitCode，可执行文件尺寸为 9,374,768 Bytes：  
+
+{% img left /images/blog/fucking_bitcode/5.FileSizeEnableBitCode.PNG 446 259 %}  
+
+占用硬盘空间小了不少。但是根据苹果的说法，随着尺寸的减小，可执行文件载入进内存的耗时也会减小，对于启动速度是会有提升的，但实际测试中，开启与不开启BitCode，从点击Icon到显示主界面，时间均在0.7秒左右，对于我的App提升不明显，或者说完全看不出来。  
+理论上代码越多、工程越大，启用BitCode的优势越明显。  
+结论是BitCode还是值得一用的，只是苹果在开启BitCode的路上留了不少坑，如果决定使用这个新feature，请做好充分的心理准备。  
 
 Over
