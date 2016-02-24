@@ -14,7 +14,7 @@ categories: ['Xcode', 'lldb', 'iOS', 'OSX']
 
 实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入
 
-```
+```bash
 expr @import UIKit
 ```
 
@@ -24,7 +24,7 @@ expr @import UIKit
 
 在开发Mac App时也是一样的，比如不导入AppKit则无法打印frame属性，手动导入AppKit即可：  
 
-```
+```bash
 expr @import AppKit
 ```
 
@@ -39,6 +39,8 @@ expr @import AppKit
 在main中断时执行`expr @import UIKit`，并自动continue:  
 
 {% img left /images/blog/lldb_auto_import/lldb_auto_import5.png 647 370 %}  
+
+然后在工程启动时就会自动导入UIKit到lldb了。  
 
 ## 全局自动导入
 
