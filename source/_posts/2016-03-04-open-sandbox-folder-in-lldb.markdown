@@ -9,7 +9,6 @@ categories: ['Xcode', 'iOS', 'OSX', 'lldb']
 打开~/.lldbinit，在里面加入一行：  
 ```bash
 command alias sb script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]]);
-//_
 ```
 
 然后中断时，在lldb里打sb回车，就能打开模拟器当前运行的app的沙箱路径了。  
@@ -42,7 +41,6 @@ lldb.frame.EvaluateExpression("NSHomeDirectory()")
 
 //return
 '(NSPathStore2 *) $1 = 0x00007fdbc4c1a6d0 @"/Users/openthread/Library/Developer/CoreSimulator/Devices/5D48B08A-44C2-4AC5-B52D-725150EA1091/data/Containers/Data/Application/8331B6D2-FC68-4523-8093-94FD9487FF74"'
-//_
 ```
 
 我们用引号split这个pystring，取数组中第一个元素，就是path：
@@ -53,7 +51,6 @@ lldb.frame.EvaluateExpression("NSHomeDirectory()")
 
 //return
 '/Users/openthread/Library/Developer/CoreSimulator/Devices/5D48B08A-44C2-4AC5-B52D-725150EA1091/data/Containers/Data/Application/8331B6D2-FC68-4523-8093-94FD9487FF74'
-//_
 ```
 
 然后在python中使用call调用shell的open，就可以打开沙箱路径了：
@@ -65,14 +62,12 @@ from subprocess import call; call(["open", pathOfSandbox)
 这些命令可以连起来在lldb中执行：  
 ```
 (lldb) script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]])
-//_
 ```
 
 然而实在太长了，于是我们在lldb中加了个alias：  
 
 ```bash
 (lldb) command alias sb script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]])
-//_
 ```
 
 ### 扩展
