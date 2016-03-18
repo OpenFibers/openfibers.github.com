@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Debug iOS https traffic"
+title: "对iOS设备的HTTPS请求抓包（使用BurpSuite）"
 date: 2016-03-18 14:39:33 +0800
 comments: true
 categories: ['iOS', 'debug', 'BurpSuite']
