@@ -86,7 +86,10 @@ BurpSuite是一个常用的调试工具。
 ## 使用tcpdump抓包
 
 我们经常会用tcpdump抓取各种协议的网络包。  
-新版的Macbook/Air/Pro只有一块Wifi，没有RJ45接口，我们可以用USB线连接手机，建立Remote Virtual Interface(RVI)，然后对此RVI抓包。  
+iOS5之后，可以使用Remote Virtual Interface(RVI)建立虚拟网卡进行抓包，好处是：  
+
+* 新版的Macbook/Air/Pro只有一块Wifi，没有RJ45接口，我们用USB线连接手机就可以完成抓包。  
+* 使用RVI不管是蜂窝数据还是Wifi，网络报文都能抓的到，而以往用Wifi把流量导入电脑抓包无法抓取蜂窝数据下的报文。  
 
 #### 1. 建立RVI
 
@@ -123,6 +126,13 @@ $ sudo tcpdump -i rvi0 -w trace.pcap
 ```
 
 然后在手机上进行操作，操作结束后在terminal里按control+c，结束抓包。然后trace.pcap就是生成的抓包记录。  
+
+之后断开rvi连接：  
+
+```bash
+$ rvictl -s a1fad5xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxc60b
+Stopping device a1fad59f135e2cd8f7dda951a15c01cd2220c60b [SUCCEEDED]
+```
 
 我们可以将pcap文件转换成纯文本格式查看：  
 
