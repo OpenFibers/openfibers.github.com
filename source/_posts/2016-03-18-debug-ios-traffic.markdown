@@ -142,4 +142,8 @@ tcpdump -n -e -x -vvv -r trace.pcap > trace.txt
 
 不过一般还是用wireshark直接打开pcap文件查看比较方便。  
 
+相关资源：  
+
+[Apple Technical Q&A 1176 : Getting a Packet Trace](https://developer.apple.com/library/mac/qa/qa1176/_index.html)
+
 Over
