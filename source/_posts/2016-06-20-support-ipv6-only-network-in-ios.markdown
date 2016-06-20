@@ -47,7 +47,7 @@ categories: [iOS, network, ipv6]
 
 - 如果有条件，自己创建网络连接，检查错误状态来代替Reachability（这成本有点大，苹果有点站着说话不腰疼）。
 
-##### 4. 不能避免使用网络检查，则正确使用Reachability API
+#### 4. 不能避免使用网络检查，则正确使用Reachability API
 - 不要传递0.0.0.0到**SCNetworkReachabilityCreateWithAddress**。这只会检查网络中是否有router，并不代表真正能连接到互联网。  
 - 不要传递169.254.0.0（自分配的本地地址）到**SCNetworkReachabilityCreateWithAddress**来检查Wi-Fi是否激活。如需检查是否连接到Wi-Fi，请使用**kSCNetworkReachabilityFlagsIsWWAN**。
 
