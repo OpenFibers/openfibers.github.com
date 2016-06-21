@@ -87,7 +87,8 @@ kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6
 
 如果app需要连接到没有域名的IPv4-only服务器，请使用*getaddrinfo*处理IPv4地址，好处是当app处于IPv6-only网络时，*getaddrinfo*会生成一个对应的IPv6地址。
 
-下面的代码展示了如何使用*getaddrinfo*正确处理IPv4地址。内存中有4字节存储了一个IPv4地址（{192, 0, 2, 1}），代码将其转换称了string（"192.0.2.1"），然后使用*getaddrinfo*生成了对应的IPv6地址（存储了"64:ff9b::192.0.2.1"的sockaddr_in6结构体），然后尝试连接到此IPv6地址。Demo可以[点此下载](https://github.com/OpenFibers/openfibers.github.com/raw/source/source/images/blog/support_ipv6_only_network_in_ios/ipv6_test.zip)：
+下面的代码展示了如何使用*getaddrinfo*正确处理IP地址。内存中*ipv4_or_ipv6_str*存储了一个IP地址（可以是IPv4或IPv6），然后使用*getaddrinfo*生成了自适应IPv4/IPv6的sockaddr，然后尝试连接到此地址。  
+此处有一坑。苹果修改了*getaddrinfo*以兼容两种网络，但是NAT64下有个bug：第二个参数传port number string，生成的sockaddr的sin_port/sin6_port始终为0；unix原始版本的getaddrinfo则没有这个问题。按照官方文档做法直接在*getaddrinfo*设置port number string是死活连不上的，建议参考下面代码40行/46行的hack方式，在*getaddrinfo*后手动设置port number给*sockaddr*。Demo可以[点此下载](https://github.com/OpenFibers/openfibers.github.com/raw/source/source/images/blog/support_ipv6_only_network_in_ios/ipv6_test.zip)：
 
 ```c
 #include <sys/socket.h>
