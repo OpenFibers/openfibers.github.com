@@ -87,7 +87,7 @@ kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6
 
 如果app需要连接到没有域名的IPv4-only服务器，请使用*getaddrinfo*处理IPv4地址，好处是当app处于IPv6-only网络时，*getaddrinfo*会生成一个对应的IPv6地址。
 
-下面的代码展示了如何使用*getaddrinfo*正确处理IPv4地址。内存中有4字节存储了一个IPv4地址（{192, 0, 2, 1}），代码将其转换称了string（"192.0.2.1"），然后使用*getaddrinfo*生成了对应的IPv6地址（存储了"64:ff9b::192.0.2.1"的sockaddr_in6结构体），然后尝试连接到此IPv6地址：
+下面的代码展示了如何使用*getaddrinfo*正确处理IPv4地址。内存中有4字节存储了一个IPv4地址（{192, 0, 2, 1}），代码将其转换称了string（"192.0.2.1"），然后使用*getaddrinfo*生成了对应的IPv6地址（存储了"64:ff9b::192.0.2.1"的sockaddr_in6结构体），然后尝试连接到此IPv6地址。Demo可以[点此下载](https://github.com/OpenFibers/openfibers.github.com/raw/source/source/images/blog/support_ipv6_only_network_in_ios/ipv6_test.zip)：
 
 ```c
 #include <sys/socket.h>
@@ -95,44 +95,69 @@ kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6
 #include <arpa/inet.h>
 #include <err.h>
  
-    uint8_t ipv4[4] = {192, 0, 2, 1};
     struct addrinfo hints, *res, *res0;
     int error, s;
     const char *cause = NULL;
- 
-    char ipv4_str_buf[INET_ADDRSTRLEN] = { 0 };
-    const char *ipv4_str = inet_ntop(AF_INET, &ipv4, ipv4_str_buf, sizeof(ipv4_str_buf));
- 
+    
+    const char *ipv4_or_ipv6_str = "192.0.2.1";//or IPv6 address string is well
+    NSUInteger port = 80;//port of connecting server
+
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = PF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_DEFAULT;
-    error = getaddrinfo(ipv4_str, "http", &hints, &res0);
-    if (error) {
+    error = getaddrinfo(ipv4_or_ipv6_str, NULL, &hints, &res0);
+    if (error)
+    {
         errx(1, "%s", gai_strerror(error));
         /*NOTREACHED*/
     }
     s = -1;
-    for (res = res0; res; res = res->ai_next) {
-        s = socket(res->ai_family, res->ai_socktype,
+    for (res = res0; res; res = res->ai_next)
+    {
+        s = socket(res->ai_family,
+                   res->ai_socktype,
                    res->ai_protocol);
-        if (s < 0) {
+        if (s < 0)
+        {
             cause = "socket";
             continue;
         }
- 
-        if (connect(s, res->ai_addr, res->ai_addrlen) < 0) {
+        
+        switch(res->ai_addr->sa_family)
+        {
+            case AF_INET:
+            {
+                struct sockaddr_in *v4sa = (struct sockaddr_in *)res->ai_addr;
+                v4sa->sin_port = htons(port);
+            }
+                break;
+            case AF_INET6:
+            {
+                struct sockaddr_in6 *v6sa = (struct sockaddr_in6 *)res->ai_addr;
+                v6sa->sin6_port = htons(port);
+            }
+                break;
+        }
+        
+        if (connect(s, res->ai_addr, res->ai_addrlen) < 0)
+        {
             cause = "connect";
             close(s);
             s = -1;
             continue;
         }
- 
+        
         break;  /* okay we got one */
     }
-    if (s < 0) {
+    if (s < 0)
+    {
         err(1, "%s", cause);
         /*NOTREACHED*/
+    }
+    else
+    {
+        printf("connected");
     }
     freeaddrinfo(res0);
 ```
