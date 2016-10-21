@@ -1,19 +1,19 @@
 ---
 layout: post
-title: "Message app开发文档（Stickers与Messages Extension）"
+title: "Messages Framework 开发文档（Sticker Packs 与 iMessage Apps）"
 date: 2016-10-22 04:22:11 +0800
 comments: true
-categories: [iOS, Messages extension, Message app]
+categories: [iOS, Messages extension, iMessage apps]
 ---
 
-## Messages App 概述
+## 概述
 
-开发者可以为 iOS 10 创建 Messages app extension。用户在其中可以发送文字、表情、媒体文件、交互式消息（交互式消息即 interactive messages，是一种允许被对话的参与者更新状态的消息）。  
+开发者可以为 iOS 10 的 Messages app 创建 extension。用户在其中可以发送文字、表情、媒体文件、交互式消息（交互式消息即 interactive messages，是一种允许被对话的参与者更新状态的消息）。  
 
-第三方软件可以使用 Messages framework 创建两种 app extension: 表情包（Sticker packs）和 Message apps。这两种 app extension 都可以作为现有主 app 的 extension 来发布，也可以单独发布。  
+第三方软件可以使用 Messages framework 创建两种 app extension: 表情包（Sticker packs）和 iMessage apps。这两种 app extension 都可以作为现有主 app 的 extension 来发布，也可以单独发布。  
 
 **为了方便理解后文内容，强烈建议先玩一下：**  
-1. Message表情比如知乎刘看山  
+1. Sticker pack 比如知乎刘看山  
 2. GamePigeon中的台球  
 3. 大众点评的订电影票  
 
@@ -41,11 +41,11 @@ Messages 仅支持三种尺寸的表情。表情被显示在 grid-based browser�
 
 更多关于创建 sticker packs 的话题，参考[Creating Stickers with Motion](https://developer.apple.com/support/stickers/motion/)。  
 
-## Message Apps 简介
+## iMessage Apps 简介
 
-Message apps 可以用来：  
+iMessage apps 可以用来：  
 
-* 在Messages app呈现自定义UI：参考 [MSMessagesAppViewController](https://developer.apple.com/reference/messages/msmessagesappviewcontroller?language=objc)。
+* 在 Messages app 中呈现自定义UI：参考 [MSMessagesAppViewController](https://developer.apple.com/reference/messages/msmessagesappviewcontroller?language=objc)。
 
 * 创建自定义或动态 sticker browser：参考 [MSStickerBrowserViewController](https://developer.apple.com/reference/messages/msstickerbrowserviewcontroller?language=objc)。
 
