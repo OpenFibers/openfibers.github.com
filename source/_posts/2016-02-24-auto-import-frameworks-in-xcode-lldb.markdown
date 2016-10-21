@@ -3,7 +3,7 @@ layout: post
 title: "Xcode/lldb自动导入UIKit"
 date: 2016-02-24 10:22:27 +0800
 comments: true
-categories: ['Xcode', 'lldb', 'iOS', 'OSX']
+categories: ['Xcode', 'lldb', 'iOS', 'macOS']
 ---
 
 ## lldb导入UIKit

@@ -3,7 +3,7 @@ layout: post
 title: "GCD异步同步互转"
 date: 2016-01-26 17:32:35 +0800
 comments: true
-categories: ['iOS', 'OSX', 'GCD']
+categories: ['iOS', 'macOS', 'GCD']
 ---
 
 ## 同步转异步

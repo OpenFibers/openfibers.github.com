@@ -3,7 +3,7 @@ layout: post
 title: "objective-c中property以new开头报错"
 date: 2015-11-10 15:11:27 +0800
 comments: true
-categories: ['objective-c','iOS','OSX']
+categories: ['objective-c','iOS','macOS']
 ---
 
 在ARC中，属性名使用new开头会报错。比如说更改密码中原始密码的输入框叫`oldPasswordTextField`，可以；新密码的输入框叫`newPasswordTextField`，对不起，不行，编译错误。  

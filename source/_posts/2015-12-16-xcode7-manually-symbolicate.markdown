@@ -3,7 +3,7 @@ layout: post
 title: "Xcode7 中手动 Symbolicate Crash Log"
 date: 2015-12-16 10:45:23 +0800
 comments: true
-categories: ['iOS', 'OSX', 'Xcode']
+categories: ['iOS', 'macOS', 'Xcode']
 ---
 
 Xcode7的Organizer集成了查看崩溃日志的功能，若Xcode可以定位到crash的build，则可以直接在Organizer中查看崩溃是在具体哪一行。  

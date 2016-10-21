@@ -3,7 +3,7 @@ layout: post
 title: "如何优雅的使用60%键盘----在所有App中使用Control+P、N、B、F代替上下左右"
 date: 2015-03-23 11:12:37 +0800
 comments: true
-categories: ["键盘", "OSX"]
+categories: ["键盘", "macOS"]
 ---
 
 最近新宠是各种GH60，都没有独立方向键，按FN组合键是非常远的，刷固件修改按键也颇为不便，用软件修改就方便多了。  

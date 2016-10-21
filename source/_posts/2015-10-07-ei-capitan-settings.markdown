@@ -3,7 +3,7 @@ layout: post
 title: "10.11 EI Capitan兼容老使用习惯的一些设置"
 date: 2015-10-07 14:40:37 +0800
 comments: true
-categories: ["OSX"]
+categories: ["macOS"]
 ---
 
 

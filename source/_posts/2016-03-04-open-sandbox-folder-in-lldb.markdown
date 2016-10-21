@@ -3,7 +3,7 @@ layout: post
 title: "在lldb中一键打开模拟器sandbox路径"
 date: 2016-03-04 10:39:55 +0800
 comments: true
-categories: ['Xcode', 'iOS', 'OSX', 'lldb']
+categories: ['Xcode', 'iOS', 'macOS', 'lldb']
 ---
 
 打开~/.lldbinit，在里面加入一行：  

@@ -3,7 +3,7 @@ layout: post
 title: "objective-c使用运行时dump Class的方法列表"
 date: 2016-04-12 14:38:48 +0800
 comments: true
-categories: ['iOS', 'OSX', 'objective-c', 'runtime']
+categories: ['iOS', 'macOS', 'objective-c', 'runtime']
 ---
 
 最近需要对UIWebView内请求的静态文件做缓存，还要把Gif替换成静态图以节约CPU资源等，于是查了一下私有API可不可以抓取UIWebView内的请求打个标记，以便NSURLProtocol中可以准确判断是不是UIWebView发出的请求。  
