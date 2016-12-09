@@ -19,7 +19,7 @@ Thread 0 Crashed:
 2   _dispatch_gate_wait_slow + 56
 3   dispatch_once_f + 124
 4   +[OTPolicyCenter sharedInstance] (once.h:68)
-7   +[OTWebViewUtil completeUrlScheme:] (WVWebViewUtil.m:26)
+7   +[OTWebViewUtil completeUrlScheme:] (OTWebViewUtil.m:26)
 ...
 30  start + 4
 ```
@@ -98,8 +98,8 @@ Thread 18:
 9   -[NSNotificationCenter postNotificationName:object:userInfo:] + 68
 10  -[CTTelephonyNetworkInfo queryDataMode] + 408
 11  -[CTTelephonyNetworkInfo init] + 336
-12  -[OTPolicyCenter init] (NWPolicyCenter.m:52)
-13  __31+[NWPolicyCenter sharedInstance]_block_invoke (NWPolicyCenter.m:43)
+12  -[OTPolicyCenter init] (OTPolicyCenter.m:52)
+13  __31+[OTPolicyCenter sharedInstance]_block_invoke (OTPolicyCenter.m:43)
 14  _dispatch_client_callout + 16
 15  dispatch_once_f + 56
 16  +[OTPolicyCenter sharedInstance] (once.h:68)
@@ -141,6 +141,8 @@ Thread 18:
 ```
 
 当然此时线程18上如果不是发了一个阻塞式的通知，而是做了一些其他的需要在主线程执行并同步返回的事，也会造成死锁。  
+
+{% img left /images/blog/dispatch_once_deadlock/dispatch_once_deadlock.jpg 592 %}  
 
 ### 解决方案
 

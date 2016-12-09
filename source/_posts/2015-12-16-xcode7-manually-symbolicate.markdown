@@ -1,13 +1,13 @@
 ---
 layout: post
-title: "Xcode7 中手动 Symbolicate Crash Log"
+title: "Xcode 中手动 Symbolicate Crash Log"
 date: 2015-12-16 10:45:23 +0800
 comments: true
 categories: ['iOS', 'macOS', 'Xcode']
 ---
 
-Xcode7的Organizer集成了查看崩溃日志的功能，若Xcode可以定位到crash的build，则可以直接在Organizer中查看崩溃是在具体哪一行。  
-但是不能自动定位到build的情况也非常常见，此时地址不能自动转换成符号：  
+从 Xcode7 开始 Organizer 集成了查看崩溃日志的功能，若 Xcode 可以定位到 crash 的 build，则可以直接在 Organizer 中查看崩溃是在具体哪一行。  
+但是不能自动定位到 build 的情况也非常常见，此时地址不能自动转换成符号：  
 
 {% img left /images/blog/xcode7_manually_symbolicate1/xcode7_manually_symbolicate1.JPG %}  
 
@@ -28,6 +28,11 @@ export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
 ```
 
 #### 3. 为了方便，把Xcode提供的symbolicatecrash工具加一个alias
+
+Xcode8 :  
+```
+alias symbolicatecrash='/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources/symbolicatecrash'
+```
 
 Xcode7 / Xcode6 :  
 ```
