@@ -14,7 +14,7 @@ footer: true
 曾在淘宝移动做移动开发，师从[@xinquan](http://weibo.com/xinquan)和[@gaosboy](http://weibo.com/jiajungao)。  
 后在淘宝一拆三时期离开淘宝加入网易。  
 参与了网易云音乐产品初创。云音乐Mac端初代作者，云音乐iPhone端、iPad端架构师。  
-15年9月份加入Rush，继续寻找改变世界的可能。  
+16年9月份加入AliExpress，继续寻找改变世界的可能。  
 专注于Cocoa native app和hybrid app。  
 
 ### 技能
