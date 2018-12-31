@@ -15,18 +15,40 @@ import talib as ta
 import matplotlib.pyplot as plt
 ```
 
+Pandas 里有两种常用的结构，一种叫`DataFrame`，作为二维的一张表格；另一种叫`Series`，是一维数组。  
+`DataFrame`取单行和单列得到的都是`Series`类型的对象。  
+
 ### 追加数据
 
 ```
 df = df.append(series, ignore_index=True)
 ```
 
-### 获取名为 close 的 column，作为 series
+### 获取最后一列数据
+
+```
+series = df.iloc[-1]
+```
+
+### 获取名为 close 的 column
 
 ```
 series = df.close
 或者
 series = df['close']
+```
+
+### 取 series 中单个元素
+
+```
+close: float = series.close
+close: float = series['close']
+```
+
+### series 转 list
+
+```
+series.list()
 ```
 
 <!--more-->
