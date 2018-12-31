@@ -38,6 +38,8 @@ series = df.close
 series = df['close']
 ```
 
+<!--more-->
+
 ### 取 series 中单个元素
 
 ```
@@ -50,8 +52,6 @@ close: float = series['close']
 ```
 series.list()
 ```
-
-<!--more-->
 
 ### series 转 np array
 
