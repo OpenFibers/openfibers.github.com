@@ -38,7 +38,14 @@ def get_max_draw_down(in_list: list):
 缺陷：由于标准差是正直，所以无法区分上行风险和下行风险。  
 优点：大概就是韭菜们喜闻乐见，不只是中国的韭菜，全世界都是。向韭菜介绍的时候，韭菜能听懂。一说索提诺，啥玩意啊这是，一说夏普，ojbk这意思啊。  
 
+<!--more-->
+
 ### 索提诺比率(Sortino Ratio)
 
 索提诺率：计算方法和夏普率相似，但是用低于目标收益率的收益率或亏损时的收益率所计算出的“下行标准差”取代了正常的标准差。  
 
+多种参数python计算 参考：  
+
+[Measures of Risk-adjusted Return](http://www.turingfinance.com/computational-investing-with-python-week-one/)
+
+Over
