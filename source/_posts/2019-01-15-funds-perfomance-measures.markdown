@@ -38,13 +38,40 @@ def get_max_draw_down(in_list: list):
 缺陷：由于标准差是正直，所以无法区分上行风险和下行风险。  
 优点：国内外知名度高。  
 
+```
+import numpy
+
+def sharpe_ratio(returns, risk_free_rate=0.0):
+    mean = numpy.mean(returns)
+    return (mean - risk_free_rate) / numpy.std(returns)
+```
+
+
 <!--more-->
 
 ### 索提诺比率(Sortino Ratio)
 
 索提诺率：计算方法和夏普率相似，但是用低于目标收益率的收益率或亏损时的收益率所计算出的“下行标准差”取代了正常的标准差。和夏普比率一样，在同种时间跨度下，越高越好。  
 
-多种参数python计算 参考：  
+
+```
+import numpy
+import math
+
+def lpm(returns, threshold, order):
+    threshold_array = numpy.empty(len(returns))
+    threshold_array.fill(threshold)
+    diff = threshold_array - returns
+    diff = diff.clip(min=0)
+    return numpy.sum(diff ** order) / len(returns)
+
+def sortino_ratio(returns, risk_free_rate=0.0, target=0):
+    mean = numpy.mean(returns)
+    return (mean - risk_free_rate) / math.sqrt(lpm(returns, target, 2))
+```
+
+
+更多参数 python 计算，参考：  
 
 [Measures of Risk-adjusted Return](http://www.turingfinance.com/computational-investing-with-python-week-one/)
 
