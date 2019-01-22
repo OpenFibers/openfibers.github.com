@@ -46,6 +46,20 @@ def sharpe_ratio(returns, risk_free_rate=0.0):
     return (mean - risk_free_rate) / numpy.std(returns)
 ```
 
+其中 returns 为每条 ohlc 的变化率，比如 [0.02, 0.03, -0.03, ...]
+
+可以通过历史净值列表（equity）生成 returns：
+
+```
+def returns_from_equity(in_equity: list):
+    returns_np = numpy.array(in_equity)
+    returns_np = returns_np[1:] / returns_np[:-1]
+    returns_np = returns_np - 1
+    return returns_np
+```
+
+然后把返回值代入下一步计算。
+
 
 <!--more-->
 
@@ -76,3 +90,5 @@ def sortino_ratio(returns, risk_free_rate=0.0, target=0):
 [Measures of Risk-adjusted Return](http://www.turingfinance.com/computational-investing-with-python-week-one/)
 
 Over
+
+
