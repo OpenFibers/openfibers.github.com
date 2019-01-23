@@ -48,7 +48,8 @@ def sharpe_ratio(returns, risk_free_rate=0.0):
     return (mean - risk_free_rate) / numpy.std(returns)
 ```
 
-其中 returns 为每条 ohlc 的变化率，比如 [0.02, 0.03, -0.03, ...]
+其中 returns 为每条 ohlc 的变化率，比如 [0.02, 0.03, -0.03, ...]  
+risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1%，传入的是4小时returns，这里应该传入 1% / (365 * 24 / 4)  
 
 可以通过历史净值列表（equity）生成 returns：
 
