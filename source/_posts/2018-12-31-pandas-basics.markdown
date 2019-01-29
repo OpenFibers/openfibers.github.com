@@ -3,7 +3,7 @@ layout: post
 title: "pandas的一些基础用法"
 date: 2018-12-31 13:53:58 +0800
 comments: true
-categories: 
+categories: [python, pandas, fin-tech]
 ---
 
 首先我们导入一些‘业界标准’库

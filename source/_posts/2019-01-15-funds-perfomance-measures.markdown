@@ -3,7 +3,7 @@ layout: post
 title: "评价基金性能的常用指标"
 date: 2019-01-15 12:19:56 +0800
 comments: true
-categories: 
+categories: [python, numpy, fin-tech]
 ---
 
 

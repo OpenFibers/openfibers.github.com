@@ -3,7 +3,7 @@ layout: post
 title: "python talib 的一些基础用法"
 date: 2018-12-31 14:27:06 +0800
 comments: true
-categories: 
+categories: [python, ta-lib, fin-tech]
 ---
 
 首先还是导入一些业界标准库：

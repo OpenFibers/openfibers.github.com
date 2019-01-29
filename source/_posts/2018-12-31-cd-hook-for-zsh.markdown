@@ -3,7 +3,7 @@ layout: post
 title: "zsh中对cd命令的hook"
 date: 2018-12-31 12:45:47 +0800
 comments: true
-categories: 
+categories: [shell, macOS]
 ---
 
 zsh中预留了一个`chpwd()`用于hook各种cd命令，包括`cd` `pushd` `popd`等。
