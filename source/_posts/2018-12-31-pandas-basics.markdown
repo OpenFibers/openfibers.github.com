@@ -8,7 +8,7 @@ categories: [python, pandas, fin-tech]
 
 首先我们导入一些‘业界标准’库
 
-```
+```python
 import pandas as pd
 import numpy as np
 import talib as ta
@@ -20,19 +20,19 @@ Pandas 里有两种常用的结构，一种叫`DataFrame`，作为二维的一�
 
 ### 追加数据
 
-```
+```python
 df = df.append(series, ignore_index=True)
 ```
 
 ### 获取最后一列数据
 
-```
+```python
 series = df.iloc[-1]
 ```
 
 ### 获取名为 close 的 column
 
-```
+```python
 series = df.close
 或者
 series = df['close']
@@ -42,20 +42,20 @@ series = df['close']
 
 ### 取 series 中单个元素
 
-```
+```python
 close: float = series.close
 close: float = series['close']
 ```
 
 ### series 转 list
 
-```
+```python
 series.list()
 ```
 
 ### series 转 np array
 
-```
+```python
 np_array = np.array(series)
 或
 np_array = np.array(df.close)
@@ -65,13 +65,13 @@ np_array = np.array(df['close'])
 
 ### 结合 talib 计算
 
-```
+```python
 ta.RSI(np.array(bars.close))
 ```
 
 ### 可视化
 
-```
+```python
 df = pd.DataFrame({
     'close': ... ,
     'open': ... ,

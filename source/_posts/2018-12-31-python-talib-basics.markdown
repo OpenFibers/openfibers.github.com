@@ -8,7 +8,7 @@ categories: [python, ta-lib, fin-tech]
 
 首先还是导入一些业界标准库：
 
-```
+```python
 import pandas as pd
 import numpy as np
 import talib as ta
@@ -16,26 +16,26 @@ import talib as ta
 
 
 ### 计算RSI
-```
+```python
 close = np.array(bars.close)
 print(ta.RSI(close))  # 默认15根bars
 ```
 
 ### 计算MA
 
-```
+```python
 ta.MA(close)  # 默认 30 根 bars，即 MA30
 ```
 
 ### 设置计算用的时长，比如计算 MA5
 
-```
+```python
 ta.MA(close, timeperiod=5)
 ```
 
 ### 计算 EMA11 和 EMA22
 
-```
+```python
 ta.EMA(close, timeperiod=11)
 ta.EMA(close, timeperiod=22)
 ```
