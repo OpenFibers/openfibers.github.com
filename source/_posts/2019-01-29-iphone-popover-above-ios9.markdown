@@ -11,7 +11,8 @@ categories: [iOS]
 {% img left /images/blog/iphone_popover/iphone_popover.jpg %}  
 
 OTPopoverMenuViewController.h:  
-```
+
+```objective-c
 @interface OTPopoverMenuViewController : UIViewController
 
 - (void)presentInController:(UIViewController *)controller
@@ -27,7 +28,8 @@ OTPopoverMenuViewController.h:
 <!--more-->
 
 OTPopoverMenuViewController.m:  
-```
+
+```objective-c
 #import "OTPopoverMenuViewController.h"
 
 @interface OTPopoverMenuViewController () <UIPopoverPresentationControllerDelegate>
@@ -86,7 +88,7 @@ OTPopoverMenuViewController.m:
 
 调用:  
 
-```
+```objective-c
 OTPopoverMenuViewController *controller = [[OTPopoverMenuViewController alloc] init];
 [controller presentInController:self sourceView:view];
 //或
