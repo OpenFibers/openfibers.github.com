@@ -14,7 +14,17 @@ categories: [python, numpy, fin-tech, AI]
 比原生 Python 快 10 倍左右。  
 
 # numexpr
-比原生 Python 快 25 倍左右。  
+
+```python
+import numpy as np 
+import numexpr as ne  
+N = 10 ** 5
+a = np.random.uniform(-1, 1, N)
+b = np.random.uniform(-1, 1, N)
+ne.evaluate('a ** 2 + b ** 2')
+```
+
+比 Numpy 快 2 到 10 倍。
 
 <!--more-->
 
@@ -61,5 +71,7 @@ x_cpu = np.ones((5, 4, 3), dtype=np.float32)
 with cupy.cuda.Device(1):
     x_gpu = cupy.array(x_cpu)
 ```
+
+更多并发骚操作，参考[Python并行编程](https://python-parallel-programmning-cookbook.readthedocs.io/zh_CN/latest/index.html)。
 
 Over
