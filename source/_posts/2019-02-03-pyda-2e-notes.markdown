@@ -24,7 +24,7 @@ Out[13]: int
 
 使用`isinstance()`检查实例是否为某种类型：  
 
-```python
+```
 In [23]: a = 5; b = 4.5 
 In [24]: isinstance(a, (int, float)) 
 Out[24]: True 
@@ -34,7 +34,7 @@ Out[25]: True
 
 使用`getattr()`反射对象的属性：  
 
-```python
+```
 In [1]: a = 'foo'
 In [27]: getattr(a, 'split') 
 Out[27]: <function str.split>
@@ -48,7 +48,7 @@ Out[27]: <function str.split>
 
 用这个功能编写可以接受多种输入类型的函数。常见的例子是编写一个函数可以接受任意类型的序列（list、tuple、ndarray）或是迭代器。你可先检验对象是否是列表（或是NUmPy数组），如果不是的话，将其转变成列表：
 
-```python
+```
 if not isinstance(x, list) and isiterable(x):
      x = list(x)
 ```
@@ -57,14 +57,14 @@ if not isinstance(x, list) and isiterable(x):
 
 在字符串的单引号前面加r，可以避免字符串内的\产生转义：  
 
-```python
+```
 In [69]: s = r'this\has\no\special\characters' 
 In [70]: s Out[70]: 'this\\has\\no\\special\\characters'
 ```
 
 ### 字符串格式化
 
-```python
+```
 In [74]: template = '{0:.2f} {1:s} are worth US${2:d}'
 In [75]: template.format(4.5560, 'Argentine Pesos', 1) 
 Out[75]: '4.56 Argentine Pesos are worth US$1'
@@ -79,7 +79,7 @@ Out[75]: '4.56 Argentine Pesos are worth US$1'
 
 使用`encode('utf-8')`将其转换成 unicode 字节码：  
 
-```python
+```
 In [76]: val = "español" 
 In [78]: val_utf8 = val.encode('utf-8') 
 In [79]: val_utf8 
@@ -91,14 +91,14 @@ Out[80]: bytes
 
 使用`decode('utf-8')`将 unicode 字节码转回 str：  
 
-```python
+```
 In [81]: val_utf8.decode('utf-8') 
 Out[81]: 'español'
 ```
 
 可以在引号前面加b，表示直接生成unicode字节码：  
 
-```python
+```
 In [85]: bytes_val = b'this is bytes' 
 In [86]: bytes_val 
 Out[86]: b'this is bytes' 
@@ -111,7 +111,7 @@ Out[88]: 'this is bytes'
 
 #### 连续比较：  
 
-```python
+```
 In [120]: 4 > 3 > 2 > 1 
 Out[120]: True
 ```
@@ -121,7 +121,7 @@ Out[120]: True
 
 range函数返回一个迭代器，它产生一个均匀分布的整数序列，产生的序列不包括终点。虽然range可以产生任意大的数，但任意时刻耗用的内存却很小。： 
 
-```python
+```
 In [122]: range(10) 
 Out[122]: range(0, 10) 
 In [123]: list(range(10)) 
@@ -130,7 +130,7 @@ Out[123]: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 range的三个参数是（起点，终点，步进）： 
 
-```python
+```
 In [124]: list(range(0, 20, 2)) 
 Out[124]: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18] 
 In [125]: list(range(5, 0, -1)) 
@@ -139,7 +139,7 @@ Out[125]: [5, 4, 3, 2, 1]
 
 #### 三元表达式：  
 
-```python
+```
 value = true-expr if condition else false-expr
 ```
 
@@ -150,7 +150,7 @@ value = true-expr if condition else false-expr
 
 元组是一个固定长度，不可改变的Python序列对象。创建元组的最简单方式，是用逗号分隔一列值： 
 
-```python
+```
 In [1]: tup = 4, 5, 6 
 In [2]: tup 
 Out[2]: (4, 5, 6)
@@ -158,7 +158,7 @@ Out[2]: (4, 5, 6)
 
 用  tuple 可以将任意序列或迭代器转换成元组，元组可以使用下标访问对象： 
 
-```python
+```
 In [5]: tuple([4, 0, 2]) 
 Out[5]: (4, 0, 2) 
 In [6]: tup = tuple('string') 
@@ -171,14 +171,14 @@ Out[8]: 's'
 
 可以用加号运算符将元组串联起来： 
 
-```python
+```
 In [13]: (4, None, 'foo') + (6, 0) + ('bar',)
 Out[13]: (4, None, 'foo', 6, 0, 'bar')
 ```
 
 元组乘以一个整数，像列表一样，会将几个元组的复制串联起来；对象本身并没有被复制，只是引用了它。： 
 
-```python
+```
 In [14]: ('foo', 'bar') * 4 
 Out[14]: ('foo', 'bar', 'foo', 'bar', 'foo', 'bar', 'foo', 'bar') 
 ```
@@ -187,7 +187,7 @@ Out[14]: ('foo', 'bar', 'foo', 'bar', 'foo', 'bar', 'foo', 'bar')
 
 如果你想将元组赋值给类似元组的变量，Python会试图拆分等号右边的值： 
 
-```python
+```
 In [15]: tup = (4, 5, 6) 
 In [16]: a, b, c = tup 
 In [17]: b 
@@ -195,7 +195,7 @@ Out[17]: 5
 ```
 
 即使含有元组的元组也会被拆分： 
-```python
+```
 In [18]: tup = 4, 5, (6, 7) 
 In [19]: a, b, (c, d) = tup 
 In [20]: d 
@@ -204,7 +204,7 @@ Out[20]: 7
 
 用这个功能，swap工作变得很简单：  
 
-```python
+```
 In [21]: a, b = 1, 2 
 In [22]: a 
 Out[22]: 1 
@@ -235,13 +235,96 @@ In [33]: a, b, *_ = values
 
 ### 列表
 
+添加:  
 
+```
+In [45]: b_list.append('dwarf') 
+In [46]: b_list 
+Out[46]: ['foo', 'peekaboo', 'baz', 'dwarf']  insert 可以在特定的位置插入元素： 
+```
 
+插入：  
 
+```
+In [47]: b_list.insert(1, 'red') 
+In [48]: b_list 
+Out[48]: ['foo', 'red', 'peekaboo', 'baz', 'dwarf']
+```
 
+弹出：
 
+```
+In [49]: b_list.pop(2)
+Out[49]: 'peekaboo'
+In [50]: b_list
+Out[50]: ['foo', 'red', 'baz', 'dwarf'] 
+```
 
+删除，remove 会先寻找第一个值并除去：
 
+```
+In [52]: b_list
+Out[52]: ['foo', 'red', 'baz', 'dwarf', 'foo']
+In [53]: b_list.remove('foo')
+In [54]: b_list
+Out[54]: ['red', 'baz', 'dwarf', 'foo']
+```
+
+### 串联和组合列表
+
+与元组类似，可以用加号将两个列表串联起来：
+
+```
+In [57]: [4, None, 'foo'] + [7, 8, (2, 3)]
+Out[57]: [4, None, 'foo', 7, 8, (2, 3)] 
+```
+
+如果已经定义了一个列表，用 extend 方法可以追加多个元素：
+
+```
+In [58]: x = [4, None, 'foo']
+In [59]: x.extend([7, 8, (2, 3)])
+In [60]: x
+Out[60]: [4, None, 'foo', 7, 8, (2, 3)]
+```
+
+通过加法将列表串联的计算量较大，因为要新建一个列表，并且要复制对象。用 extend 追加元素，尤其是到一个大列表中，更为可取。
+
+### 排序
+
+你可以用 sort 函数将一个列表原地排序（不创建新的对象）：
+
+```
+In [61]: a = [7, 2, 5, 1, 3]
+In [62]: a.sort()
+In [63]: a
+Out[63]: [1, 2, 3, 5, 7]  
+```
+
+针对key进行排序。例如，我们可以按长度对字符串进行排序：
+
+```
+In [64]: b = ['saw', 'small', 'He', 'foxes', 'six']
+In [65]: b.sort(key=len)
+In [66]: b
+Out[66]: ['He', 'saw', 'six', 'small', 'foxes']
+```
+
+bisect 模块支持二分查找，和向已排序的列表插入值。bisect.bisect 可以找到插入值后仍保证排序的位置，bisect.insort 是向这个位置插入值：
+
+```
+In [67]: import bisect
+In [68]: c = [1, 2, 2, 2, 3, 4, 7]
+In [69]: bisect.bisect(c, 2)
+Out[69]: 4
+In [70]: bisect.bisect(c, 5)
+Out[70]: 6
+In [71]: bisect.insort(c, 6)
+In [72]: c
+Out[72]: [1, 2, 2, 2, 3, 4, 6, 7]
+```
+
+### 切片
 
 
 
