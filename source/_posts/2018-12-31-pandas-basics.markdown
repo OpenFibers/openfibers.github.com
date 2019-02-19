@@ -30,6 +30,13 @@ df = df.append(series, ignore_index=True)
 series = df.iloc[-1]
 ```
 
+### 按行遍历
+
+```python
+for i in df.index:
+    print(df.iloc[i])
+```
+
 ### 获取名为 close 的 column
 
 ```python
