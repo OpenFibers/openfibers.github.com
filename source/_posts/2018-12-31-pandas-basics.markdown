@@ -37,6 +37,13 @@ for i in df.index:
     print(df.iloc[i])
 ```
 
+### 前十行组成子DataFrame
+
+```python
+for i in df.index:
+    print(df.iloc[0:10])  # 含下标0到9的元素，不含下标10的元素
+```
+
 ### 获取名为 close 的 column
 
 ```python
