@@ -47,11 +47,18 @@ series = df['close']
 
 <!--more-->
 
-### 取 series 中单个元素
+### 取某行（series）中单个元素
 
 ```python
+series = df.iloc[0]
 close: float = series.close
 close: float = series['close']
+```
+
+或
+
+```python
+df.iloc[0]['close']
 ```
 
 ### series 转 list
