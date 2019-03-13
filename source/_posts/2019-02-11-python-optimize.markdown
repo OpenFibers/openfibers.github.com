@@ -30,15 +30,35 @@ ne.evaluate('a ** 2 + b ** 2')
 
 # 多线程与多进程并发
 
+由于全局解释器的存在，多线程基本没用，用线程池最多优化个5%顶天了。
+
+直接上进程池。进程池的好处是：  
+    1) CPU 层面不受全局解释器的负面影响，可以发挥处理器的最大性能；  
+    2) 内存层面，如果同一进程一直执行大内存操作（稍微大点的 DataFrame），进程会一直申请内存不释放(python 用完的对象的内存会留给后面的 python 对象使用，不会还给系统)。而单独的进程结束的时候，系统会释放掉进程分配的内存。参考以下两个链接：  
+        * [Why doesn't Python release the memory when I delete a large object?](http://effbot.org/pyfaq/why-doesnt-python-release-the-memory-when-i-delete-a-large-object.htm)  
+        * [https://stackoverflow.com/questions/15455048/releasing-memory-in-python](https://stackoverflow.com/questions/15455048/releasing-memory-in-python)
+
 ```python
-concurrent.futures.ThreadPoolExecutor(cpu_count)
-# 或者
-concurrent.futures.ProcessPoolExecutor(cpu_count)
+import multiprocessing
+
+def single_job(param):
+    print(param)
+
+if __name__ == '__main__':
+    cpu_count_m = multiprocessing.cpu_count()
+    pool = multiprocessing.Pool(cpu_count_m)
+    result_m = pool.map(single_job, [param])
+    pool.close()
+    pool.join()
 ```
+
+在4代i5上（双核四线程），测试了一个原本单进程执行的287秒的操作，设置进程池数量为2，最终时间为187秒（提升53%），进程池数量为4，最终时间为127秒（提升126%）。也就是线程池数量设置直接用`multiprocessing.cpu_count()`即可，不必考虑物理核数。  
+内存从原本的峰值10+G降到了0.6G。4代i7（四核八线程）跑起来会更快（懒的测没测大概四倍多吧），内存峰值也稍微会多一点（1.2G）。老电脑没到期，8代i7要9月份才能换到，性能应该强更多了吧。。。。  
 
 # CuPy
 使用 CUDA 计算，直接将 numpy 替换成 cupy。  
 比原生 Python 快 250 倍左右。  
+问题就是 Macbook Pro 新款都是 A 卡，真、苹果与狗不得入内。  
 
 # 多显卡
 
