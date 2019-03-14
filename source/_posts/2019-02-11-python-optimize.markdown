@@ -55,6 +55,22 @@ if __name__ == '__main__':
 在4代i5上（双核四线程），测试了一个原本单进程执行的287秒的操作，设置进程池数量为2，最终时间为187秒（提升53%），进程池数量为4，最终时间为127秒（提升126%）。也就是线程池数量设置直接用`multiprocessing.cpu_count()`即可，不必考虑物理核数。  
 内存从原本的峰值10+G降到了0.6G。4代i7（四核八线程）跑起来会更快（懒的测没测大概四倍多吧），内存峰值也稍微会多一点（1.2G）。老电脑没到期，8代i7要9月份才能换到，性能应该强更多了吧。。。。  
 
+#### matplot 无法在进程池绘制问题
+
+如果弹 The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec(). 错误：
+
+```
+The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
+Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
+The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
+```
+
+不用把fork进程的数据回主进程渲染。直接更新 matplot 到 3.0.3 以上版本：  
+
+```
+pip3 install matplotlib --upgrade
+```
+
 # CuPy
 使用 CUDA 计算，直接将 numpy 替换成 cupy。  
 比原生 Python 快 250 倍左右。  
