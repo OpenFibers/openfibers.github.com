@@ -13,6 +13,9 @@ categories: [python, numpy, fin-tech, AI]
 # Numpy
 比原生 Python 快 10 倍左右。  
 
+# list.append() 代替 df = df.append()
+如果有频繁的 append 操作，使用 list 而非 df，CPU 内存都提升很大。3600行的回测，df 改为 list，运行时间从 49 秒降低至 13.35 秒，性能提升 267%。
+
 # numexpr
 
 ```python
