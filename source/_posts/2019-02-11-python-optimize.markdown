@@ -9,6 +9,51 @@ categories: [python, numpy, fin-tech, AI]
 # Cython
 将 Python 翻译成 c/c++ 再编译执行。  
 比原生 Python 快 1.5 倍左右。  
+缺点是要写个 makefile
+
+# pypy
+
+优点是无需像 cython 一样需要修改代码，写 makefile 和 main，缺点是有些三方库不支持。  
+
+安装：  
+
+```bash
+brew install pypy3
+```
+
+然后安装 pypy pip。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理：  
+
+```bash
+pypy3 -m ensurepip
+export ALL_PROXY=
+pypy3 -m pip install pip --upgrade
+pypy3 -m pip install setuptools --upgrade
+```
+
+安装依赖（举个例子）：  
+
+```bash
+pypy3 -m pip install numpy
+pypy3 -m pip install TA-Lib
+pypy3 -m pip install pandas
+```
+
+如果 macOS 遇到 pypy 安装 numpy 时提示：  
+
+```bash
+Checking for cc... ld: library not found for -lgcc_s.10.4
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+...
+RuntimeError: Broken toolchain: cannot link a simple C program
+```
+
+尝试下面命令后再次重试安装 numpy：  
+
+```bash
+cd /usr/local/lib 
+sudo ln -s ../../lib/libSystem.B.dylib libgcc_s.10.4.dylib
+cd -
+```
 
 # Numpy
 比原生 Python 快 10 倍左右。  
@@ -81,23 +126,12 @@ vprof -c h hard_work.py # code heatmap (first call below)
 vprof -c p hard_work.py # code profiling (second call below)
 ```
 
-如果不使用 cython 首先要安装 pypy：
+如果不使用 cython 而是 pypy：
 
-```
-brew install pypy3
-```
-
-然后是 pypy pip:
-
-```
-pypy3 -m ensurepip
-```
-
-然后是 pip 更新以及安装 vprof。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理： 
+使用 pypy pip 安装 vprof。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理： 
 
 ```
 export ALL_PROXY=
-pypy3 -m pip install pip --upgrade
 pypy3 -m pip install vprof
 ```
 
