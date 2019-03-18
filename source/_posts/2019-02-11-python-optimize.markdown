@@ -30,11 +30,22 @@ pypy3 -m pip install pip --upgrade
 pypy3 -m pip install setuptools --upgrade
 ```
 
-安装依赖（举个例子）：  
+将 pypy3 path 加入 $PATH 不然安装 tables 的时候报 warning:  
+
+```bash
+export PATH=$PATH:/usr/local/share/pypy3
+```
+
+安装依赖（举点例子）：  
 
 ```bash
 pypy3 -m pip install numpy
 pypy3 -m pip install TA-Lib
+pypy3 -m pip install requests
+pypy3 -m pip install ccxt
+pypy3 -m pip install tables
+pypy3 -m pip install matplotlib
+pypy3 -m pip install coloredlogs
 pypy3 -m pip install pandas
 ```
 
