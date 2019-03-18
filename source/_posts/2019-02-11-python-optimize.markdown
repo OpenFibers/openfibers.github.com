@@ -13,9 +13,6 @@ categories: [python, numpy, fin-tech, AI]
 # Numpy
 比原生 Python 快 10 倍左右。  
 
-# list.append() 代替 df = df.append()
-如果有频繁的 append 操作，使用 list 而非 df，CPU 耗时、内存消耗都降低很多。3600 行的回测运行 10 次，df 改为 list，运行时间从 49 秒降低至 13.35 秒，性能提升 267%。
-
 # numexpr
 
 ```python
@@ -30,6 +27,86 @@ ne.evaluate('a ** 2 + b ** 2')
 比 Numpy 快 2 到 10 倍。
 
 <!--more-->
+
+# Pandas: list.append() 代替 df = df.append()
+如果有频繁的 append 操作，使用 list 而非 df，CPU 耗时、内存消耗都降低很多。3600 行的回测运行 10 次，df 改为 list，运行时间从 49 秒降低至 13.35 秒，性能提升 267%。
+
+# CPU 耗时分析
+
+## pprofile
+
+```bash
+pip3 install pprofile
+pprofile hard_work.py | grep -v 0.00% > hard_work.log    
+```
+
+结果如下：
+
+```
+Command line: hard_work.py
+Total duration: 12.2936s
+File: /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py
+File duration: 2.11106s (17.17%)
+Line #|      Hits|         Time| Time per hit|      %|Source code
+------+----------+-------------+-------------+-------+-----------
+(call)|         1|   0.00452113|   0.00452113|  0.04%|# <frozen importlib._bootstrap>:1009 _handle_fromlist
+(call)|         8|   0.00171661|  0.000214577|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py:72 __init__
+(call)|         1|    0.0330989|    0.0330989|  0.27%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:250 _setup_queues
+(call)|         1|    0.0355132|    0.0355132|  0.29%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:227 _repopulate_pool
+(call)|         1|  0.000757217|  0.000757217|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:758 __init__
+(call)|         1|   0.00308776|   0.00308776|  0.03%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:829 start
+(call)|         1|  0.000803709|  0.000803709|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:829 start
+   218|         8|   0.00123382|  0.000154227|  0.01%|            worker = self._pool[i]
+(call)|         8|   0.00212884|  0.000266105|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:152 Process
+(call)|         8|    0.0311823|   0.00389779|  0.25%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py:101 start
+(call)|         1|   0.00201011|   0.00201011|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:212 _join_exited_workers
+(call)|         1|    0.0309622|    0.0309622|  0.25%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/context.py:109 SimpleQueue
+(call)|         1|   0.00208473|   0.00208473|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/context.py:109 SimpleQueue
+(call)|         1|   0.00138021|   0.00138021|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:650 get
+   411|        19|  0.000627041|  3.30022e-05|  0.01%|        while thread._state == RUN or (pool._cache and thread._state != TERMINATE):
+   412|        19|    0.0777183|   0.00409043|  0.63%|            pool._maintain_pool()
+(call)|         1|   0.00205207|   0.00205207|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:244 _maintain_pool
+   413|        18|      2.02267|     0.112371| 16.45%|            time.sleep(0.1)
+   422|         1|   0.00222588|   0.00222588|  0.02%|        for taskseq, set_length in iter(taskqueue.get, None):
+(call)|         1|   0.00127983|   0.00127983|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:534 wait
+(call)|         1|    0.0013001|    0.0013001|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:647 wait
+```
+
+## vprof
+
+如果使用 cython，直接：
+
+```bash
+vprof -c h hard_work.py # code heatmap (first call below)
+vprof -c p hard_work.py # code profiling (second call below)
+```
+
+如果不使用 cython 首先要安装 pypy：
+
+```
+brew install pypy3
+```
+
+然后是 pypy pip:
+
+```
+pypy3 -m ensurepip
+```
+
+然后是 pip 更新以及安装 vprof。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理： 
+
+```
+export ALL_PROXY=
+pypy3 -m pip install pip --upgrade
+pypy3 -m pip install vprof
+```
+
+然后 pypy3 下要安装原有的 pip 各种依赖，最后跑 vprof：
+
+```bash
+pypy3 -m vprof -c h hard_work.py # code heatmap (first call below)
+pypy3 -m vprof -c p hard_work.py # code profiling (second call below)
+```
 
 # 多线程与多进程并发
 
