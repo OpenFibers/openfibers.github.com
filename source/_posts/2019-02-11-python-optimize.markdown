@@ -84,8 +84,9 @@ ne.evaluate('a ** 2 + b ** 2')
 
 <!--more-->
 
-# Pandas: list.append() 代替 df = df.append()
-如果有频繁的 append 操作，使用 list 而非 df，CPU 耗时、内存消耗都降低很多。3600 行的回测运行 10 次，df 改为 list，运行时间从 49 秒降低至 13.35 秒，性能提升 267%。
+# Pandas: 避免大量 df.append() 或 df.iloc() 调用
+如果有频繁的 append 操作，使用 list 而非 df，CPU 耗时、内存消耗都降低很多。3600 行的回测运行 10 次，df 改为 list，运行时间从 49 秒降低至 13.35 秒，性能提升 267%。  
+如果有频繁的 iloc 操作，想办法使用 list + dict 代替 iloc + key 取数，还是刚才那个 3600 行跑 10 次，14.5 秒缩短到 9 秒，性能提升 55%。
 
 # CPU 耗时分析
 
