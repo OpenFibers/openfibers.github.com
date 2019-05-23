@@ -6,22 +6,21 @@ comments: true
 categories: 
 ---
 
-### 从 macOS 10.14 制作安装 U 盘
+## 从 macOS 10.14 制作安装 U 盘
 
-1. 下载好 iso 之后，将 iso 改名为 ~/Downloads/manjaro-kde.iso
-2. 然后将 iso 转换成 dmg:  
+下载好 iso 之后，将 iso 改名为 ~/Downloads/manjaro-kde.iso，然后将 iso 转换成 dmg:  
 
 ```
 hdiutil convert -format UDRW -o ~/Downloads/manjaro ~/Downloads/manjaro-kde.iso
 ```
 
-3. 看一下 U 盘是 disk几：
+看一下 U 盘是 disk几：  
 
 ```
 diskutil list
 ```
 
-4. 假设 U 盘是 disk9，分区，unmount，再写入镜像
+假设 U 盘是 disk9，分区，unmount，再写入镜像：  
 
 ```
 diskutil partitionDisk disk9 1 GPT HFS+ newdisk R
@@ -29,11 +28,13 @@ diskutil unmountDisk /dev/disk9
 sudo dd if=/Users/openthread/Downloads/manjaro.dmg of=/dev/rdisk9 bs=1m
 ```
 
-5. U盘插到 pc，重启，安装
+U盘插到 pc，重启，安装
 
-### 安装好以后
+<!--more-->
 
-* 系统更新：  
+## 安装好以后
+
+### 系统更新：  
 
 ```
 sudo pacman -Syu
@@ -41,15 +42,17 @@ sudo pacman -Syu
 
 然后打开 Octopi，系统更新应该没有了
 
-* 看看有没有没驱动的硬件
+### 看看有没有没驱动的硬件
 
-* 设置清华源：  
+### 设置国内源：  
+
+清华源：  
 
 ```
 sudo pacman-mirrors -i -c China -m rank # 弹框后选择清华的源，确认
 ```
 
-* 设置华科源，更改信任设置（以便安装 chrome、搜狗拼音、微信、QQ 等软件）
+华科源，更改信任设置（以便安装 chrome、搜狗拼音、微信、QQ 等软件）  
 
 ```
 sudo vi /etc/pacman.conf
@@ -63,19 +66,19 @@ SigLevel = Optional TrustedOnly
 Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
 ```
 
-* 更新软件缓存，更新 keyring
+更新软件缓存，更新 keyring：  
 
 ```
 sudo pacman -Syy && sudo pacman-S archlinuxcn-keyring
 ```
 
-* Chrome
+### Chrome
 
 ```
 sudo pacman-S google-chrome
 ```
 
-* 搜狗拼音
+### 搜狗拼音
 
 ```
 sudo pacman -S fcitx-im     # 全部安装
@@ -93,7 +96,7 @@ export XMODIFIERS=”@im=fcitx”
 
 重启后 ctrl + 空格 应该能切换输入法了。
 
-* 网易云音乐  
+### 网易云音乐  
 
 安装：  
 ```
@@ -106,15 +109,15 @@ sudo pacman -S netease-cloud-music
 netease-cloud-music
 ```
 
-* Dota2
+### Dota2
 
 直接用自带的 steam 装就完事
 
-* 微信
+### 微信
 
-* Sublime Text 2
+### Sublime Text 2
 
-* Pycharm
+### Pycharm
 
-* IntelliJ IDEA
+### IntelliJ IDEA
 
