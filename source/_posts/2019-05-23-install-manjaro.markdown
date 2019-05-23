@@ -148,3 +148,12 @@ sudo pacman -S pycharm-community-edition
 sudo pacman -S intellij-idea-community-edition
 ```
 
+### shadowsocks
+
+```
+sudo pacman -S shadowsocks-libev
+sudo pacman -S shadowsocks-qt5
+```
+
+然后 chrome 在 extension store 安装 Proxy SwitchyOmega，并配置。
+
