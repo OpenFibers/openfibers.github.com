@@ -34,25 +34,9 @@ U盘插到 pc，重启，安装
 
 ## 安装好以后
 
-### 系统更新  
-
-```
-sudo pacman -Syu
-```
-
-然后打开 Octopi，系统更新应该没有了
-
-### 看看有没有没驱动的硬件
-
 ### 设置国内源  
 
-清华源：  
-
-```
-sudo pacman-mirrors -i -c China -m rank # 弹框后选择清华的源，确认
-```
-
-华科源，更改信任设置（以便安装 chrome、搜狗拼音、微信、QQ 等软件）  
+华科源（比清华的快很多），更改信任设置（以便安装 chrome、搜狗拼音、微信、QQ 等软件）  
 
 ```
 sudo vi /etc/pacman.conf
@@ -69,8 +53,24 @@ Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
 更新软件缓存，更新 keyring：  
 
 ```
-sudo pacman -Syy && sudo pacman-S archlinuxcn-keyring
+sudo pacman -Syy && sudo pacman -S archlinuxcn-keyring
 ```
+
+切换默认源：  
+
+```
+sudo pacman-mirrors -i -c China -m rank # 弹框后选择华科的源，点击确认
+```
+
+### 系统更新  
+
+```
+sudo pacman -Syu
+```
+
+然后打开 Octopi，系统更新应该没有了
+
+### 看看有没有没驱动的硬件
 
 ### Chrome
 
