@@ -34,7 +34,7 @@ U盘插到 pc，重启，安装
 
 ## 安装好以后
 
-### 系统更新：  
+### 系统更新  
 
 ```
 sudo pacman -Syu
@@ -44,7 +44,7 @@ sudo pacman -Syu
 
 ### 看看有没有没驱动的硬件
 
-### 设置国内源：  
+### 设置国内源  
 
 清华源：  
 
@@ -114,6 +114,18 @@ netease-cloud-music
 直接用自带的 steam 装就完事
 
 ### 微信
+
+安装：  
+
+```
+sudo pacman -S electronic-wechat
+```
+
+启动：  
+
+```
+electronic-wechat
+```
 
 ### Sublime Text 2
 
