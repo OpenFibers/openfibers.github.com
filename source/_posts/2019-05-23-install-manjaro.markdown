@@ -75,26 +75,27 @@ sudo pacman -Syu
 ### Chrome
 
 ```
-sudo pacman-S google-chrome
+sudo pacman -S google-chrome
 ```
 
-### 搜狗拼音
+### Google 拼音
 
 ```
 sudo pacman -S fcitx-im     # 全部安装
 sudo pacman -S fcitx-configtool
-sudo pacman -S fcitx-sogoupinyin
+sudo pacman -S fcitx-googlepinyin
 ```
 
 然后`vi ~/.xprofile`，加入：  
 
 ```
+export LC_ALL=zh_CN.UTF-8
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=”@im=fcitx”
 ```
 
-重启后 ctrl + 空格 应该能切换输入法了。
+注销重新登录，打开 Fcitx Configuration，启用 google pinyin。这时候语言会变成中文，如果想换回原语言，注释掉 `export LC_ALL=zh_CN.UTF-8`，注销再登录回来即可。
 
 ### 网易云音乐  
 
@@ -127,9 +128,23 @@ sudo pacman -S electronic-wechat
 electronic-wechat
 ```
 
+### Vim
+
+```
+sudo pacman -S vim
+```
+
 ### Sublime Text 2
 
 ### Pycharm
 
+```
+sudo pacman -S pycharm-community-edition
+```
+
 ### IntelliJ IDEA
+
+```
+sudo pacman -S intellij-idea-community-edition
+```
 
