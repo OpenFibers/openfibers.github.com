@@ -33,8 +33,29 @@ sudo dd if=/Users/openthread/Downloads/manjaro.dmg of=/dev/rdisk9 bs=1m
 
 ### 安装好以后
 
-系统更新：
+* 系统更新：  
 
 ```
 sudo pacman -Syu
 ```
+
+* 设置清华源：  
+
+```
+sudo pacman-mirrors -i -c China -m rank # 弹框后选择清华的源，确认
+```
+
+* 设置华科源，更改信任设置（以便安装 chrome、搜狗拼音、微信、QQ 等软件）
+
+* chrome
+
+* 搜狗拼音
+
+* 网易云音乐  
+
+```
+sudo pacman -S netease-cloud-music
+netease-cloud-music
+```
+
+
