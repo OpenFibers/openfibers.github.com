@@ -140,17 +140,6 @@ sudo pacman -S vim
 sudo pacman -S yaourt
 ```
 
-
-### Sublime Text 3
-
-安装：  
-
-```
-curl -O https://download.sublimetext.com/sublimehq-pub.gpg && sudo pacman-key --add sublimehq-pub.gpg && sudo pacman-key --lsign-key 8A8F901A && rm sublimehq-pub.gpg
-echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" | sudo tee -a /etc/pacman.conf
-sudo pacman -Syu sublime-text
-```
-
 ### Python3 + Pycharm
 
 ```
@@ -192,6 +181,16 @@ fc-cache --force --verbose
 ### 蓝牙
 
 没搞定
+
+### Sublime Text 3
+
+安装：  
+
+```
+curl -O https://download.sublimetext.com/sublimehq-pub.gpg && sudo pacman-key --add sublimehq-pub.gpg && sudo pacman-key --lsign-key 8A8F901A && rm sublimehq-pub.gpg
+echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" | sudo tee -a /etc/pacman.conf
+sudo pacman -Syu sublime-text
+```
 
 <!-- 
 3207 激活
