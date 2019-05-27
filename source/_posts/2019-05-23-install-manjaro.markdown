@@ -193,10 +193,16 @@ E36B85CC 84991F19 7575D828 470A92AB
 
  -->
 
-### Pycharm
+### Python3 + Pycharm
 
 ```
 sudo pacman -S pycharm-community-edition
+```
+
+清华 pypi 源：  
+
+```
+pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ### IntelliJ IDEA
@@ -224,3 +230,7 @@ yaourt -S ttf-meslo
 yaourt -S cairo-coloredemoji
 fc-cache --force --verbose
 ```
+
+### 蓝牙
+
+没搞定
