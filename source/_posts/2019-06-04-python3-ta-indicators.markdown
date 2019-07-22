@@ -9,8 +9,11 @@ categories:
 ```python
 import pandas as pd
 import numpy as np
+```
 
+<!--more-->
 
+```python
 # Pivot Points, Supports and Resistances
 def PPSR(df):
     PP = pd.Series((df['High'] + df['Low'] + df['Close']) / 3)
