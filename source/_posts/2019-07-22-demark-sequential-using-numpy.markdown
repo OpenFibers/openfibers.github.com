@@ -12,21 +12,21 @@ import numpy as np
 <!--more-->
 
 ```python
-def np_shift(xs, n):
-    e = np.empty_like(xs)
+def np_shift(np_array: np.array, n: int, fill=np.nan):
+    e = np.empty_like(np_array)
     if n >= 0:
-        e[:n] = np.nan
-        e[n:] = xs[:-n]
+        e[:n] = fill
+        e[n:] = np_array[:-n]
     else:
-        e[n:] = np.nan
-        e[:n] = xs[-n:]
+        e[n:] = fill
+        e[:n] = np_array[-n:]
     return e
 
 
 def td_sequential(close: list) -> np.array:
     shift_const: int = 4
     close_np = np.array(close)
-    close_shift = np_shift(close_np, shift_const)
+    close_shift = np_shift(close_np, shift_const, 0)
     compare_array = close_np > close_shift
     result = np.empty(len(close_np), int)
     counting_number: int = 0
