@@ -13,7 +13,7 @@ Activity Monitor 查一下相关几个进程的 pid:
 lsof 看一下 pid 相关的 file handle:  
 
 ```
-lsof -p pid_of_McAfee -Fn | Mc
+lsof -p pid_of_McAfee -Fn | grep Mc
 lsof -p pid_of_Symantec -Fn | grep Sym
 ```
 
