@@ -6,11 +6,17 @@ comments: true
 categories: 
 ---
 
+# Env
 
-# Install
+macOS 10.15 | python 3.8.2 | torch 1.4.0 | torchvision 0.5.0
+
+# Install via pip
+
+macOS binary 安装不支持 CUDA，如果需要 CUDA 请翻阅官网 install via source 安装指引。  
 
 ```bash
 pip3 install torch
+pip3 install torchvision
 ```
 
 安装成功后发现报错：
