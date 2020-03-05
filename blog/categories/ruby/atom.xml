@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ruby | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[在Windows上安装Ruby]]></title>
+    <link href="http://openfibers.github.io/blog/2015/03/04/install-ruby-on-windows/"/>
+    <updated>2015-03-04T22:18:27+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/03/04/install-ruby-on-windows</id>
+    <content type="html"><![CDATA[<p>Mac上使用RVM[<a href="https://rvm.io">https://rvm.io</a>]安装与管理各种版本的Ruby是非常简单易行的。今天心血来潮想在Windows上写Octopress，安装了Ruby，似乎已经没有13年的时候那么难装了。</p>
+
+<ol>
+<li><p>下载安装包
+访问<a href="http://rubyinstaller.org/downloads/">RubyInstaller下载页</a>，找到适合版本的Ruby Installer和Development Kit。</p></li>
+<li><p>安装RubyInstaller：基本上只要双击安装包一直点下一步就可以了。</p></li>
+<li><p>安装Development Kit：双击解压下载到的7z自解压文件，将其解压到自己喜欢的路径下。</p></li>
+<li><p>按照<a href="https://github.com/oneclick/rubyinstaller/wiki/Development-Kit">Development Kit Wiki</a>的指引步骤完成Development Kit安装。<br/>
+一般首次安装只要执行以下命令就可以了：</p></li>
+</ol>
+
+
+<pre><code class="batch">$ ruby dk.rb init
+$ ruby dk.rb install
+</code></pre>
+
+<ol>
+<li>检查是否安装成功</li>
+</ol>
+
+
+<pre><code class="batch">$ gem install json --platform=ruby
+# 成功则最后一行显示 1 gem installed
+$ ruby -rubygems -e "require 'json'; puts JSON.load('[42]').inspect"
+# 安装成功则显示 [42]
+</code></pre>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

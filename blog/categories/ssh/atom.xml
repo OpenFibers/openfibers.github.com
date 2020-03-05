@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ssh | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/ssh/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[在OpenWRT上搭建ssh代理]]></title>
+    <link href="http://openfibers.github.io/blog/2015/09/12/ssh-proxy-on-openwrt/"/>
+    <updated>2015-09-12T14:21:41+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/09/12/ssh-proxy-on-openwrt</id>
+    <content type="html"><![CDATA[<p>首先为何要用ssh代理，而不是ShadowSocks或VPN：GFW会针对ShadowSocks或各种VPN协议做解析，却不一定有勇气禁止全部ssh连接（国家曾经有次物理断开到国外的全部网络连接造成了巨大经济损失）。</p>
+
+<p>前段时间开发了<a href="http://github.com/openfibers/sshmole">SSHMole</a>，用作OS X上的ssh代理客户端。然而MAC给iPhone开ssh代理，或在iPhone上直接开ssh代理还是很麻烦的。所以在家里路由器上开了个ssh -D。</p>
+
+<h3>0. 首先要有一台VPS</h3>
+
+<p>没有的话到<a href="http://vpsadd.com">vpsadd</a>买一台。</p>
+
+<h3>1. OpenWRT上安装ssh-client, openssh-keygen</h3>
+
+<p>登录到OpenWRT，移除ssh到dropbear的软连接
+<code>
+mv ssh dropbear-ssh
+mv scp dropbear-scp
+</code></p>
+
+<!--more-->
+
+
+<p>安装：<br/>
+<code>bash
+opkg install openssh-client openssh-keygen
+</code></p>
+
+<p>在极路由上，openssh-keygen需要加入其他软件源（我是懒得装了，直接在OS X里生成了identity，scp到了OpenWRT和VPS上）；另外极路由默认已安装openssh-client了，直接将其软链到ssh和scp:<br/>
+<code>
+ln -s /usr/bin/openssh-ssh /usr/bin/ssh
+ln -s /usr/bin/openssh-scp /usr/bin/scp
+</code></p>
+
+<h3>2. 在OpenWRT生成rsa密钥对，复制到VPS</h3>
+
+<p>生成identity：</p>
+
+<pre><code class="bash">ssh-keygen -b 1024 -t rsa
+</code></pre>
+
+<p>复制id_rsa.pub到VPS的~/.ssh/openwrt.pub：</p>
+
+<pre><code class="bash">scp ~/.ssh/id_rsa.pub username@vps_host:~/.ssh/openwrt.pub
+</code></pre>
+
+<p>然后连接到vps后，将openwrt.pub加入到authorized_keys：</p>
+
+<pre><code class="bash">cat ~/.ssh/openwrt.pub &gt;&gt; ~/.ssh/authorized_keys
+</code></pre>
+
+<p>回到openwrt，测试ssh是否能免密码登录：<br/>
+<code>bash
+ssh user@vps_host -i ~/.ssh/id_rsa
+</code></p>
+
+<h3>3. 安装autossh</h3>
+
+<pre><code class="bash">opkg install autossh
+</code></pre>
+
+<p>测试autossh是否能正常启动：<br/>
+<code>
+autossh -M20000 -f -i ~/.ssh/id_rsa -Ng -D 7080 user@vps_host
+ps|grep autossh
+</code></p>
+
+<h3>4. 设置autossh开机启动</h3>
+
+<p>在init.d下建立文件proxy_vps：<br/>
+<code>
+touch /etc/init.d/proxy_vps
+chmod +x /etc/init.d/proxy_vps
+vim /etc/init.d/proxy_vps
+</code></p>
+
+<p>在里面填入如下内容（在极路由上直接启动autossh会失败，先sleep一会就能启动了，不知为何）：<br/>
+<code>bash
+\#!/bin/sh /etc/rc.common
+START=99
+start()
+{
+    sleep 5
+    autossh -M20000 -f -i ~/.ssh/id_rsa -Ng -D 7080 user@vps_host
+}
+stop()
+{
+    killall autossh
+}
+</code></p>
+
+<p>然后启用开机自动运行：<br/>
+<code>bash
+/etc/init.d/proxy_vps enable
+</code></p>
+
+<h3>5. 增加pac文件</h3>
+
+<p>OpenWRT自带uHTTPd，直接将pac文件scp到/www下即可：</p>
+
+<pre><code class="bash">scp blacklist.pac root@openwrt:/www
+</code></pre>
+
+<p>然后给pac起个短点的名字：</p>
+
+<pre><code>ln -s /www/blacklist.pac /www/b
+</code></pre>
+
+<p>再在路由器的hosts里给路由器起个短域名，极路由已经默认起了好几个了，比如t就是。<br/>
+在浏览器中访问 <a href="http://t/b">http://t/b</a> 试试看能不能下载到刚才上传的pac文件，如果可以，在设备中设置自动代理为 <a href="http://t/b">http://t/b</a> 即可。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

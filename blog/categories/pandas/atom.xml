@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: pandas | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/pandas/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[pandas的一些基础用法]]></title>
+    <link href="http://openfibers.github.io/blog/2018/12/31/pandas-basics/"/>
+    <updated>2018-12-31T13:53:58+08:00</updated>
+    <id>http://openfibers.github.io/blog/2018/12/31/pandas-basics</id>
+    <content type="html"><![CDATA[<p>首先我们导入一些‘业界标准’库</p>
+
+<pre><code class="python">import pandas as pd
+import numpy as np
+import talib as ta
+import matplotlib.pyplot as plt
+</code></pre>
+
+<p>Pandas 里有两种常用的结构，一种叫<code>DataFrame</code>，作为二维的一张表格；另一种叫<code>Series</code>，是一维数组。<br/>
+<code>DataFrame</code>取单行和单列得到的都是<code>Series</code>类型的对象。</p>
+
+<h3>追加数据</h3>
+
+<pre><code class="python">df = df.append(series, ignore_index=True)
+</code></pre>
+
+<h3>获取最后一列数据</h3>
+
+<pre><code class="python">series = df.iloc[-1]
+</code></pre>
+
+<h3>按行遍历</h3>
+
+<pre><code class="python">for i in df.index:
+    print(df.iloc[i])
+</code></pre>
+
+<h3>前十行组成子DataFrame</h3>
+
+<pre><code class="python">for i in df.index:
+    print(df.iloc[0:10])  # 含下标0到9的元素，不含下标10的元素
+</code></pre>
+
+<h3>获取名为 close 的 column</h3>
+
+<pre><code class="python">series = df.close
+或者
+series = df['close']
+</code></pre>
+
+<!--more-->
+
+
+<h3>取某行（series）中单个元素</h3>
+
+<pre><code class="python">series = df.iloc[0]
+close: float = series.close
+close: float = series['close']
+</code></pre>
+
+<p>或</p>
+
+<pre><code class="python">df.iloc[0]['close']
+</code></pre>
+
+<h3>series 转 list</h3>
+
+<pre><code class="python">series.list()
+</code></pre>
+
+<h3>series 转 np array</h3>
+
+<pre><code class="python">np_array = np.array(series)
+或
+np_array = np.array(df.close)
+或
+np_array = np.array(df['close'])
+</code></pre>
+
+<h3>结合 talib 计算</h3>
+
+<pre><code class="python">ta.RSI(np.array(bars.close))
+</code></pre>
+
+<h3>可视化</h3>
+
+<pre><code class="python">df = pd.DataFrame({
+    'close': ... ,
+    'open': ... ,
+    'high': ... ,
+    'low': ... ,
+    'timestamp', ...
+})
+
+# figure 1
+df.plot(x='timestamp', y=['close', 'high', 'low'])  # 展示 close high low 三个属性
+
+# figure 2
+df.plot(x='timestamp')  # 展示全部属性
+
+# 展示上面两幅绘制过的图
+plt.show()
+</code></pre>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

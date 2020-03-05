@@ -1,0 +1,779 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="warning: 我的有台DNS因为装了dnsmasq没做加密，被服务商提示有被DDoS攻击风险，强制断线了。 1. 安装 首先连上VPS，安装dnsmasq： 1
+sudo apt-get install dnsmasq 我的VPS连接debian的APT服务器IPv6地址连不上， &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/10/18/install-dnsmasq-on-debian/">
+		
+			在Debian VPS上安装dnsmasq解决DNS污染</a>
+	</h2>
+	<div class="entry-content">
+		<p>warning: 我的有台DNS因为装了dnsmasq没做加密，被服务商提示有被DDoS攻击风险，强制断线了。</p>
+
+<h3>1. 安装</h3>
+
+<p>首先连上VPS，安装dnsmasq：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install dnsmasq
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我的VPS连接debian的APT服务器IPv6地址连不上，如果同样卡在连接 <a href="http://http.debian.net">http://http.debian.net</a> 不动的话，建议关掉IPv6再重试安装。</p>
+
+<h3>2. 配置</h3>
+
+<p>打开配置文件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/dnsmasq.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>填入以下设置，将google的服务器作为上级DNS：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>server 8.8.8.8
+</span><span class='line'>server 8.8.4.4
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>较新版本dnsmasq只破DNS污染，无需特殊服务的话，没必要更改其他设置，直接重启即可：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>service dnsmasq restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2015/10/18/install-dnsmasq-on-debian/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-18T23:34:24+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/10/18/install-dnsmasq-on-debian/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/10/07/ei-capitan-settings/">
+		
+			10.11 EI Capitan兼容老使用习惯的一些设置</a>
+	</h2>
+	<div class="entry-content">
+		<h3>Terminal在非视网膜屏幕的字体平滑</h3>
+
+<p>Preferences -> Profiles -> Text -> Antialias text 打开（视网膜屏安装10.11时默认关闭了）</p>
+
+<h3>Safari command+数字键开启书签栏页面</h3>
+
+<p>Preferences -> Tabs -> Use command-1 through command-9 to switch tabs 关闭（10.11默认改为切换tab了）</p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-07T14:40:37+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/10/07/ei-capitan-settings/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/10/04/xcode-plugins/">
+		
+			Xcode插件</a>
+	</h2>
+	<div class="entry-content">
+		<h3>1. Alcatraz</h3>
+
+<p>其他插件的 package manager, 可以从此插件中搜索、安装、删除其他插件。<br/>
+<a href="https://github.com/supermarin/Alcatraz">Github地址</a></p>
+
+<h3>2. VVDocumenter-Xcode</h3>
+
+<p>///生成 Javadoc-Style 注释，可被 Xcode 识别，可生成文档。<br/>
+<a href="https://github.com/onevcat/VVDocumenter-Xcode">Github地址</a></p>
+
+<h3>3. MCLog</h3>
+
+<p>Log 的 filter，支持正则，响应式交互，尚有崩溃，不过值得一用。<br/>
+<a href="https://github.com/yuhua-chen/MCLog">Github地址</a></p>
+
+<h3>4. Clang-Format</h3>
+
+<p>一键格式化脏乱差代码。还支持自动按段落排序#import &ldquo;headers&#8221;。<br/>
+安装后在工程中建立 .clang-format 文件，在其中配置代码格式，再使用此插件格式化代码。<br/>
+前几天发pr修复了和 oh-my-zsh 同时使用的一处 crash，作者刚刚merge了，建议更新到最新。<br/>
+推荐格式：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>BasedOnStyle: WebKit
+</span><span class='line'>BreakBeforeBraces: Allman
+</span><span class='line'>PointerAlignment: Right
+</span><span class='line'>IndentCaseLabels: true
+</span><span class='line'>AlignAfterOpenBracket: true</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://github.com/travisjeffery/ClangFormat-Xcode">Github地址</a></p>
+
+<h3>5. FuzzyAutocomplete</h3>
+
+<p>代码自动补全的增强工具，输入反应稍微减慢，不装其他输入增强工具时卡顿尚可接受，值得一用。<br/>
+<a href="https://github.com/FuzzyAutocomplete/FuzzyAutocompletePlugin">Github地址</a></p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T11:38:06+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/10/04/xcode-plugins/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/09/16/architecture-settings-in-xcode/">
+		
+			Architectures 与 Valid Architectures 在 Xcode 中的设置</a>
+	</h2>
+	<div class="entry-content">
+		<h3>关于这几个设置项，先看官方说明：</h3>
+
+<ol>
+<li><p>Architecture:<br/>
+Space-separated list of identifiers. Specifies the architectures (ABIs, processor models) to which the binary is targeted. When this build setting specifies more than one architecture, the generated binary may contain object code for each of the specified architectures.</p></li>
+<li><p>Vaild Architecture:<br/>
+Space-separated list of identifiers. Specifies the architectures for which the binary may be built. During the build, this list is intersected with the value of ARCHS build setting; the resulting list specifies the architectures the binary can run on. If the resulting architecture list is empty, the target generates no binary.</p></li>
+<li><p>Build Active Architecture Only:<br/>
+Boolean value. Specifies whether the product includes only object code for the native architecture.</p></li>
+</ol>
+
+
+
+		
+		<a href="/blog/2015/09/16/architecture-settings-in-xcode/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-16T10:39:18+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/09/16/architecture-settings-in-xcode/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/09/12/ssh-proxy-on-openwrt/">
+		
+			在OpenWRT上搭建ssh代理</a>
+	</h2>
+	<div class="entry-content">
+		<p>首先为何要用ssh代理，而不是ShadowSocks或VPN：GFW会针对ShadowSocks或各种VPN协议做解析，却不一定有勇气禁止全部ssh连接（国家曾经有次物理断开到国外的全部网络连接造成了巨大经济损失）。</p>
+
+<p>前段时间开发了<a href="http://github.com/openfibers/sshmole">SSHMole</a>，用作OS X上的ssh代理客户端。然而MAC给iPhone开ssh代理，或在iPhone上直接开ssh代理还是很麻烦的。所以在家里路由器上开了个ssh -D。</p>
+
+<h3>0. 首先要有一台VPS</h3>
+
+<p>没有的话到<a href="http://vpsadd.com">vpsadd</a>买一台。</p>
+
+<h3>1. OpenWRT上安装ssh-client, openssh-keygen</h3>
+
+<p>登录到OpenWRT，移除ssh到dropbear的软连接</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mv ssh dropbear-ssh
+</span><span class='line'>mv scp dropbear-scp</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2015/09/12/ssh-proxy-on-openwrt/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-12T14:21:41+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/ssh/'>ssh</a>, <a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/09/12/ssh-proxy-on-openwrt/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/09/06/fuck-cocoapods/">
+		
+			安装指定版本的CocoaPods</a>
+	</h2>
+	<div class="entry-content">
+		<p>在同事机器上，pod 工作的很正常，到了我的机器上，就 link error，原因是他的 pod 自动生成的.a 和我的 pod 自动生成的 .a 带的前缀不一样。</p>
+
+
+		
+		<a href="/blog/2015/09/06/fuck-cocoapods/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-06T10:50:14+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/cocoapods/'>cocoapods</a>, <a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/09/06/fuck-cocoapods/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/06/19/wwdc-2015-features/">
+		
+			WWDC 2015 带来的新玩法</a>
+	</h2>
+	<div class="entry-content">
+		<p>WWDC 2015 更新了五大产品线：OS X EI，iOS 9，watchOS 2，Xcode 7，Swift 2.</p>
+
+<h2>1. OS X EI</h2>
+
+<h3>Metal APIs</h3>
+
+<p>Metal是一个开销极低的一种访问 GPU 的框架。<br/>
+Metal framework 提供了 GPU 加速的先进的3D渲染和数据并行计算能力。<br/>
+Metal 提供了流水线式的 API（streamlined API），预编译着色器（precompiled shaders），以及高性能的多线程支持。这些 features 可以帮助你把你的游戏或 app 的性能提升一个档次。<br/>
+Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。</p>
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/metal/">Metal Home Page</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40014221-CH1-SW1">Metal Programming Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalShadingLanguageGuide/Introduction/Introduction.html">Metal Shading Language Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalFrameworkReference/index.html">Metal Framework Reference</a></p>
+
+
+		
+		<a href="/blog/2015/06/19/wwdc-2015-features/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-06-19T15:07:10+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/wwdc/'>wwdc</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/06/19/wwdc-2015-features/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/04/27/transparent-window-in-osx/">
+		
+			OSX各种实现毛玻璃效果窗口的方式与比较</a>
+	</h2>
+	<div class="entry-content">
+		<p>毛玻璃窗体是10.10中新增的效果. 比如Finder的左边栏.<br/>
+本文只对10.8, 10.9, 10.10三个版本进行讨论. 我的App未对10.6和10.7做任何支持, 此处也不予讨论.</p>
+
+<h2>第一种方式: NSVisualEffectView</h2>
+
+<p>这是10.10中新开放的API, 只能在10.10的runtime上使用.<br/>
+如果需要上架App Store, 这也是在10.10上完成毛玻璃效果的唯一方式.<br/>
+首先为NSView增加扩展:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//Returns NSVisualEffectView</span>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">Class</span> <span class="n">vibrantClass</span><span class="o">=</span><span class="n">NSClassFromString</span><span class="p">(</span><span class="s">@&quot;NSVisualEffectView&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">vibrantClass</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">NSVisualEffectView</span> <span class="o">*</span><span class="n">vibrant</span><span class="o">=</span><span class="p">[[</span><span class="n">vibrantClass</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFrame</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setAutoresizingMask</span><span class="p">:</span><span class="n">NSViewWidthSizable</span><span class="o">|</span><span class="n">NSViewHeightSizable</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setBlendingMode</span><span class="p">:</span><span class="n">mode</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="nb">self</span> <span class="nl">addSubview</span><span class="p">:</span><span class="n">vibrant</span> <span class="nl">positioned</span><span class="p">:</span><span class="n">NSWindowBelow</span> <span class="nl">relativeTo</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="n">vibrant</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2015/04/27/transparent-window-in-osx/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-04-27T19:22:15+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/appkit/'>appkit</a>, <a class='category' href='/blog/categories/cocoa/'>cocoa</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/04/27/transparent-window-in-osx/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/03/23/using-karabiner-to-change-key/">
+		
+			如何优雅的使用60%键盘&#8212;-在所有App中使用Control+P、N、B、F代替上下左右</a>
+	</h2>
+	<div class="entry-content">
+		<p>最近新宠是各种GH60，都没有独立方向键，按FN组合键是非常远的，刷固件修改按键也颇为不便，用软件修改就方便多了。<br/>
+经常有软件不支持Control+P、N、B、F做上下左右操作，于是想到直接把Control+P、N、B、F改为上下左右。</p>
+
+<p>OSX上可以用<a href="https://pqrs.org/osx/karabiner/">Karabiner</a>自定义按键，可定制程度非常高，其前身是Keymap4MacBook，<a href="https://github.com/tekezo/Karabiner">已开源在https://github.com/tekezo/Karabiner</a>。</p>
+
+<p>首先从官网下载一个最新版并安装好。我需要将将control+P、N、B、F修改为上下左右，在预置中找不到相应设置。直接在Misc &amp; Uninstall页面点击Open private.xml，修改这个配置文件可以完成各种高度可定制化改键。</p>
+
+
+		
+		<a href="/blog/2015/03/23/using-karabiner-to-change-key/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-23T11:12:37+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/jian-pan/'>键盘</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/03/23/using-karabiner-to-change-key/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/03/17/make-a-hhkb-layout-gh60/">
+		
+			HHKB布局的GH60</a>
+	</h2>
+	<div class="entry-content">
+		<p>很喜欢HHKB的键位，但是静电容的手感不是太喜欢，type-s一直在吃灰。于是萌生了做一把HHKB布局的GH60的想法。<br/>
+GH60富有富玩法，穷有穷玩法，这次是最穷的玩法。200块钱的洋垃圾键帽，60块钱的poker2外壳，改好弹簧的内胆400块钱，35块钱的屏蔽滑块，总共700搞定。</p>
+
+<p><img class="left" src="/images/blog/GH60_HHKB/keyboard2.JPG"></p>
+
+
+		
+		<a href="/blog/2015/03/17/make-a-hhkb-layout-gh60/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-17T11:21:49+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/jian-pan/'>键盘</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/03/17/make-a-hhkb-layout-gh60/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+<nav id="pagenavi">
+    
+        
+            <a href="/blog/posts/4" class="prev">Prev</a>
+        
+    
+    
+        <a href="/blog/posts/6" class="next">Next</a>
+    
+    <div class="center"><a href="/blog/archives">Blog Archives</a></div>
+</nav>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: numpy | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/numpy/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Python/Numpy 性能优化]]></title>
+    <link href="http://openfibers.github.io/blog/2019/02/11/python-optimize/"/>
+    <updated>2019-02-11T10:53:30+08:00</updated>
+    <id>http://openfibers.github.io/blog/2019/02/11/python-optimize</id>
+    <content type="html"><![CDATA[<h1>Cython</h1>
+
+<p>将 Python 翻译成 c/c++ 再编译执行。<br/>
+比原生 Python 快 1.5 倍左右。<br/>
+缺点是要写个 makefile</p>
+
+<h1>pypy</h1>
+
+<p>优点是无需像 cython 一样需要修改代码，写 makefile 和 main，缺点是有些三方库不支持。</p>
+
+<p>安装：</p>
+
+<pre><code class="bash">brew install pypy3
+</code></pre>
+
+<p>然后安装 pypy pip。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理：</p>
+
+<pre><code class="bash">pypy3 -m ensurepip
+export ALL_PROXY=
+pypy3 -m pip install pip --upgrade
+pypy3 -m pip install setuptools --upgrade
+</code></pre>
+
+<p>将 pypy3 path 加入 $PATH 不然安装 tables 的时候报 warning:</p>
+
+<pre><code class="bash">export PATH=$PATH:/usr/local/share/pypy3
+</code></pre>
+
+<p>安装依赖（举点例子）：</p>
+
+<pre><code class="bash">pypy3 -m pip install numpy
+pypy3 -m pip install TA-Lib
+pypy3 -m pip install requests
+pypy3 -m pip install ccxt
+pypy3 -m pip install tables
+pypy3 -m pip install matplotlib
+pypy3 -m pip install coloredlogs
+pypy3 -m pip install pandas
+</code></pre>
+
+<p>如果 macOS 遇到 pypy 安装 numpy 时提示：</p>
+
+<pre><code class="bash">Checking for cc... ld: library not found for -lgcc_s.10.4
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+...
+RuntimeError: Broken toolchain: cannot link a simple C program
+</code></pre>
+
+<p>尝试下面命令后再次重试安装 numpy：</p>
+
+<pre><code class="bash">cd /usr/local/lib 
+sudo ln -s ../../lib/libSystem.B.dylib libgcc_s.10.4.dylib
+cd -
+</code></pre>
+
+<h1>Numpy</h1>
+
+<p>比原生 Python 快 10 倍左右。</p>
+
+<h1>numexpr</h1>
+
+<pre><code class="python">import numpy as np 
+import numexpr as ne  
+N = 10 ** 5
+a = np.random.uniform(-1, 1, N)
+b = np.random.uniform(-1, 1, N)
+ne.evaluate('a ** 2 + b ** 2')
+</code></pre>
+
+<p>比 Numpy 快 2 到 10 倍。</p>
+
+<!--more-->
+
+
+<h1>Pandas: 避免大量 df.append() 或 df.iloc() 调用</h1>
+
+<p>如果有频繁的 append 操作，使用 list 而非 df，CPU 耗时、内存消耗都降低很多。3600 行的回测运行 10 次，df 改为 list，运行时间从 49 秒降低至 13.35 秒，性能提升 267%。<br/>
+如果有频繁的 iloc 操作，想办法使用 list + dict 代替 iloc + key 取数，还是刚才那个 3600 行跑 10 次，14.5 秒缩短到 9 秒，性能提升 55%。</p>
+
+<h1>CPU 耗时分析</h1>
+
+<h2>pprofile</h2>
+
+<pre><code class="bash">pip3 install pprofile
+pprofile hard_work.py | grep -v 0.00% &gt; hard_work.log    
+</code></pre>
+
+<p>结果如下：</p>
+
+<pre><code>Command line: hard_work.py
+Total duration: 12.2936s
+File: /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py
+File duration: 2.11106s (17.17%)
+Line #|      Hits|         Time| Time per hit|      %|Source code
+------+----------+-------------+-------------+-------+-----------
+(call)|         1|   0.00452113|   0.00452113|  0.04%|# &lt;frozen importlib._bootstrap&gt;:1009 _handle_fromlist
+(call)|         8|   0.00171661|  0.000214577|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py:72 __init__
+(call)|         1|    0.0330989|    0.0330989|  0.27%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:250 _setup_queues
+(call)|         1|    0.0355132|    0.0355132|  0.29%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:227 _repopulate_pool
+(call)|         1|  0.000757217|  0.000757217|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:758 __init__
+(call)|         1|   0.00308776|   0.00308776|  0.03%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:829 start
+(call)|         1|  0.000803709|  0.000803709|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:829 start
+   218|         8|   0.00123382|  0.000154227|  0.01%|            worker = self._pool[i]
+(call)|         8|   0.00212884|  0.000266105|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:152 Process
+(call)|         8|    0.0311823|   0.00389779|  0.25%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py:101 start
+(call)|         1|   0.00201011|   0.00201011|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:212 _join_exited_workers
+(call)|         1|    0.0309622|    0.0309622|  0.25%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/context.py:109 SimpleQueue
+(call)|         1|   0.00208473|   0.00208473|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/context.py:109 SimpleQueue
+(call)|         1|   0.00138021|   0.00138021|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:650 get
+   411|        19|  0.000627041|  3.30022e-05|  0.01%|        while thread._state == RUN or (pool._cache and thread._state != TERMINATE):
+   412|        19|    0.0777183|   0.00409043|  0.63%|            pool._maintain_pool()
+(call)|         1|   0.00205207|   0.00205207|  0.02%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:244 _maintain_pool
+   413|        18|      2.02267|     0.112371| 16.45%|            time.sleep(0.1)
+   422|         1|   0.00222588|   0.00222588|  0.02%|        for taskseq, set_length in iter(taskqueue.get, None):
+(call)|         1|   0.00127983|   0.00127983|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:534 wait
+(call)|         1|    0.0013001|    0.0013001|  0.01%|# /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:647 wait
+</code></pre>
+
+<h2>vprof</h2>
+
+<p>如果使用 cython，直接：</p>
+
+<pre><code class="bash">vprof -c h hard_work.py # code heatmap (first call below)
+vprof -c p hard_work.py # code profiling (second call below)
+</code></pre>
+
+<p>如果不使用 cython 而是 pypy：</p>
+
+<p>使用 pypy pip 安装 vprof。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理：</p>
+
+<pre><code>export ALL_PROXY=
+pypy3 -m pip install vprof
+</code></pre>
+
+<p>然后 pypy3 下要安装原有的 pip 各种依赖，最后跑 vprof：</p>
+
+<pre><code class="bash">pypy3 -m vprof -c h hard_work.py # code heatmap (first call below)
+pypy3 -m vprof -c p hard_work.py # code profiling (second call below)
+</code></pre>
+
+<h1>多线程与多进程并发</h1>
+
+<p>由于全局解释器的存在，多线程基本没用，用线程池最多优化个5%顶天了。</p>
+
+<p>直接上进程池。进程池的好处是：<br/>
+    1) CPU 层面不受全局解释器的负面影响，可以发挥处理器的最大性能；<br/>
+    2) 内存层面，如果同一进程一直执行大内存操作（稍微大点的 DataFrame），进程会一直申请内存不释放(python 用完的对象的内存会留给后面的 python 对象使用，不会还给系统)。而单独的进程结束的时候，系统会释放掉进程分配的内存。参考以下两个链接：<br/>
+        * <a href="http://effbot.org/pyfaq/why-doesnt-python-release-the-memory-when-i-delete-a-large-object.htm">Why doesn&rsquo;t Python release the memory when I delete a large object?</a><br/>
+        * <a href="https://stackoverflow.com/questions/15455048/releasing-memory-in-python">https://stackoverflow.com/questions/15455048/releasing-memory-in-python</a></p>
+
+<pre><code class="python">import multiprocessing
+
+def single_job(param):
+    print(param)
+
+if __name__ == '__main__':
+    cpu_count_m = multiprocessing.cpu_count()
+    pool = multiprocessing.Pool(cpu_count_m)
+    result_m = pool.map(single_job, [param])
+    pool.close()
+    pool.join()
+</code></pre>
+
+<p>在4代i5上（双核四线程），测试了一个原本单进程执行的287秒的操作，设置进程池数量为2，最终时间为187秒（提升53%），进程池数量为4，最终时间为127秒（提升126%）。也就是线程池数量设置直接用<code>multiprocessing.cpu_count()</code>即可，不必考虑物理核数。<br/>
+内存从原本的峰值10+G降到了0.6G。4代i7（四核八线程）跑起来会更快（懒的测没测大概四倍多吧），内存峰值也稍微会多一点（1.2G）。老电脑没到期，8代i7要9月份才能换到，性能应该强更多了吧。。。。</p>
+
+<h4>matplot 无法在进程池绘制问题</h4>
+
+<p>如果弹 The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec(). 错误：</p>
+
+<pre><code>The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
+Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
+The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
+</code></pre>
+
+<p>不用把fork进程的数据回主进程渲染。直接更新 matplot 到 3.0.3 以上版本：</p>
+
+<pre><code>pip3 install matplotlib --upgrade
+</code></pre>
+
+<h1>CuPy</h1>
+
+<p>使用 CUDA 计算，直接将 numpy 替换成 cupy。<br/>
+比原生 Python 快 250 倍左右。<br/>
+问题就是 Macbook Pro 新款都是 A 卡，真、苹果与狗不得入内。</p>
+
+<h1>多显卡</h1>
+
+<p>使用 cupy.cuda.Device(cuda_index) 切换显卡设备：</p>
+
+<pre><code class="python">with cupy.cuda.Device(1):
+    x_on_gpu1 = cupy.array([1, 2, 3, 4, 5])
+</code></pre>
+
+<p>这里 x_on_gpu1 将在 GPU 1 上分配。</p>
+
+<h1>使用 Chainer 简化主存/显存切换</h1>
+
+<p>本小节内容摘自 <a href="https://bennix.github.io/blog/2017/12/14/chain_gpu/">在Chainer中使用GPU</a>，更多详细信息请参考原文。</p>
+
+<p>Chainer将CuPy的默认分配器更改为内存池，因此用户可以直接使用CuPy的功能而不需要处理内存分配器。</p>
+
+<p>Chainer提供了一些方便的功能来自动切换和选择设备。例如，chainer.cuda.to_gpu（）函数将numpy.ndarray对象复制到指定的设备：</p>
+
+<pre><code class="python">x_cpu = np.ones((5, 4, 3), dtype=np.float32)
+x_gpu = cuda.to_gpu(x_cpu, device=1)
+</code></pre>
+
+<p>它相当于使用CuPy的以下代码：</p>
+
+<pre><code class="python">x_cpu = np.ones((5, 4, 3), dtype=np.float32)
+with cupy.cuda.Device(1):
+    x_gpu = cupy.array(x_cpu)
+</code></pre>
+
+<p>更多并发骚操作，参考<a href="https://python-parallel-programmning-cookbook.readthedocs.io/zh_CN/latest/index.html">Python并行编程</a>。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[利用pandas进行数据分析第二版 笔记]]></title>
+    <link href="http://openfibers.github.io/blog/2019/02/03/pyda-2e-notes/"/>
+    <updated>2019-02-03T16:10:22+08:00</updated>
+    <id>http://openfibers.github.io/blog/2019/02/03/pyda-2e-notes</id>
+    <content type="html"><![CDATA[<p>先放书的链接： <a href="https://www.amazon.cn/dp/B07G2PK49V">https://www.amazon.cn/dp/B07G2PK49V</a></p>
+
+<!--more-->
+
+
+<h1>第二章 Python 语法基础</h1>
+
+<h3>强类型/动态性</h3>
+
+<p>使用<code>type()</code>判断类型：</p>
+
+<pre><code class="python">In [12]: a = 5 
+In [13]: type(a)
+Out[13]: int
+</code></pre>
+
+<p>使用<code>isinstance()</code>检查实例是否为某种类型：</p>
+
+<pre><code>In [23]: a = 5; b = 4.5 
+In [24]: isinstance(a, (int, float)) 
+Out[24]: True 
+In [25]: isinstance(b, (int, float)) 
+Out[25]: True
+</code></pre>
+
+<p>使用<code>getattr()</code>反射对象的属性：</p>
+
+<pre><code>In [1]: a = 'foo'
+In [27]: getattr(a, 'split') 
+Out[27]: &lt;function str.split&gt;
+</code></pre>
+
+<p>除此之外可以使用<code>hasattr</code>和<code>setattr</code>判断是否有属性和对属性赋值。</p>
+
+<h3>鸭子类型</h3>
+
+<p>经常地，你可能不关心对象的类型，只关心对象是否有某些方法或用途。这通常被称为“鸭子类型”，来自“走起来像鸭子、叫起来像鸭子，那么它就是鸭子”的说法。例如，你可以通过验证一个对象是否遵循迭代协议，判断它是可迭代的。对于许多对象，这意味着它有一个 <code>__iter__</code> 魔术方法，其它更好的判断方法是使用 iter 函数：</p>
+
+<p>用这个功能编写可以接受多种输入类型的函数。常见的例子是编写一个函数可以接受任意类型的序列（list、tuple、ndarray）或是迭代器。你可先检验对象是否是列表（或是NUmPy数组），如果不是的话，将其转变成列表：</p>
+
+<pre><code>if not isinstance(x, list) and isiterable(x):
+     x = list(x)
+</code></pre>
+
+<h3>禁止字符串内转义序列</h3>
+
+<p>在字符串的单引号前面加r，可以避免字符串内的\产生转义：</p>
+
+<pre><code>In [69]: s = r'this\has\no\special\characters' 
+In [70]: s Out[70]: 'this\\has\\no\\special\\characters'
+</code></pre>
+
+<h3>字符串格式化</h3>
+
+<pre><code>In [74]: template = '{0:.2f} {1:s} are worth US${2:d}'
+In [75]: template.format(4.5560, 'Argentine Pesos', 1) 
+Out[75]: '4.56 Argentine Pesos are worth US$1'
+</code></pre>
+
+<p>在这个字符串中:<br/>
+{0:.2f} 表示格式化第一个参数为带有两位小数的浮点数。<br/>
+{1:s} 表示格式化第二个参数为字符串。  
+{2:d} 表示格式化第三个参数为一个整数。</p>
+
+<h3>字符串编码</h3>
+
+<p>使用<code>encode('utf-8')</code>将其转换成 unicode 字节码：</p>
+
+<pre><code>In [76]: val = "español" 
+In [78]: val_utf8 = val.encode('utf-8') 
+In [79]: val_utf8 
+Out[79]: b'espa\xc3\xb1ol' 
+
+In [80]: type(val_utf8) 
+Out[80]: bytes
+</code></pre>
+
+<p>使用<code>decode('utf-8')</code>将 unicode 字节码转回 str：</p>
+
+<pre><code>In [81]: val_utf8.decode('utf-8') 
+Out[81]: 'español'
+</code></pre>
+
+<p>可以在引号前面加b，表示直接生成unicode字节码：</p>
+
+<pre><code>In [85]: bytes_val = b'this is bytes' 
+In [86]: bytes_val 
+Out[86]: b'this is bytes' 
+In [87]: decoded = bytes_val.decode('utf8') 
+In [88]: decoded  # this is str (Unicode) now 
+Out[88]: 'this is bytes'
+</code></pre>
+
+<h3>Control Flow</h3>
+
+<h4>连续比较：</h4>
+
+<pre><code>In [120]: 4 &gt; 3 &gt; 2 &gt; 1 
+Out[120]: True
+</code></pre>
+
+<h4>range:</h4>
+
+<p>range函数返回一个迭代器，它产生一个均匀分布的整数序列，产生的序列不包括终点。虽然range可以产生任意大的数，但任意时刻耗用的内存却很小。：</p>
+
+<pre><code>In [122]: range(10) 
+Out[122]: range(0, 10) 
+In [123]: list(range(10)) 
+Out[123]: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] 
+</code></pre>
+
+<p>range的三个参数是（起点，终点，步进）：</p>
+
+<pre><code>In [124]: list(range(0, 20, 2)) 
+Out[124]: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18] 
+In [125]: list(range(5, 0, -1)) 
+Out[125]: [5, 4, 3, 2, 1]
+</code></pre>
+
+<h4>三元表达式：</h4>
+
+<pre><code>value = true-expr if condition else false-expr
+</code></pre>
+
+<h1>第三章 Python的数据结构、函数和文件</h1>
+
+<h3>元组</h3>
+
+<p>元组是一个固定长度，不可改变的Python序列对象。创建元组的最简单方式，是用逗号分隔一列值：</p>
+
+<pre><code>In [1]: tup = 4, 5, 6 
+In [2]: tup 
+Out[2]: (4, 5, 6)
+</code></pre>
+
+<p>用  tuple 可以将任意序列或迭代器转换成元组，元组可以使用下标访问对象：</p>
+
+<pre><code>In [5]: tuple([4, 0, 2]) 
+Out[5]: (4, 0, 2) 
+In [6]: tup = tuple('string') 
+In [7]: tup 
+Out[7]: ('s', 't', 'r', 'i', 'n', 'g')
+
+In [8]: tup[0] 
+Out[8]: 's'
+</code></pre>
+
+<p>可以用加号运算符将元组串联起来：</p>
+
+<pre><code>In [13]: (4, None, 'foo') + (6, 0) + ('bar',)
+Out[13]: (4, None, 'foo', 6, 0, 'bar')
+</code></pre>
+
+<p>元组乘以一个整数，像列表一样，会将几个元组的复制串联起来；对象本身并没有被复制，只是引用了它。：</p>
+
+<pre><code>In [14]: ('foo', 'bar') * 4 
+Out[14]: ('foo', 'bar', 'foo', 'bar', 'foo', 'bar', 'foo', 'bar') 
+</code></pre>
+
+<h3>拆分元组</h3>
+
+<p>如果你想将元组赋值给类似元组的变量，Python会试图拆分等号右边的值：</p>
+
+<pre><code>In [15]: tup = (4, 5, 6) 
+In [16]: a, b, c = tup 
+In [17]: b 
+Out[17]: 5 
+</code></pre>
+
+<p>即使含有元组的元组也会被拆分：
+<code>
+In [18]: tup = 4, 5, (6, 7)
+In [19]: a, b, (c, d) = tup
+In [20]: d
+Out[20]: 7
+</code></p>
+
+<p>用这个功能，swap工作变得很简单：</p>
+
+<pre><code>In [21]: a, b = 1, 2 
+In [22]: a 
+Out[22]: 1 
+In [23]: b 
+Out[23]: 2 
+In [24]: b, a = a, b 
+In [25]: a 
+Out[25]: 2 
+In [26]: b 
+Out[26]: 1
+</code></pre>
+
+<p>或是从元组中摘取元素：</p>
+
+<pre><code>In [29]: values = 1, 2, 3, 4, 5 In [30]: a, b, *rest = values 
+In [31]: a, b 
+Out[31]: (1, 2) 
+In [32]: rest 
+Out[32]: [3, 4, 5]
+</code></pre>
+
+<p>或者：</p>
+
+<pre><code>In [33]: a, b, *_ = values
+</code></pre>
+
+<h3>列表</h3>
+
+<p>添加:</p>
+
+<pre><code>In [45]: b_list.append('dwarf') 
+In [46]: b_list 
+Out[46]: ['foo', 'peekaboo', 'baz', 'dwarf']  insert 可以在特定的位置插入元素： 
+</code></pre>
+
+<p>插入：</p>
+
+<pre><code>In [47]: b_list.insert(1, 'red') 
+In [48]: b_list 
+Out[48]: ['foo', 'red', 'peekaboo', 'baz', 'dwarf']
+</code></pre>
+
+<p>弹出：</p>
+
+<pre><code>In [49]: b_list.pop(2)
+Out[49]: 'peekaboo'
+In [50]: b_list
+Out[50]: ['foo', 'red', 'baz', 'dwarf'] 
+</code></pre>
+
+<p>删除，remove 会先寻找第一个值并除去：</p>
+
+<pre><code>In [52]: b_list
+Out[52]: ['foo', 'red', 'baz', 'dwarf', 'foo']
+In [53]: b_list.remove('foo')
+In [54]: b_list
+Out[54]: ['red', 'baz', 'dwarf', 'foo']
+</code></pre>
+
+<h3>串联和组合列表</h3>
+
+<p>与元组类似，可以用加号将两个列表串联起来：</p>
+
+<pre><code>In [57]: [4, None, 'foo'] + [7, 8, (2, 3)]
+Out[57]: [4, None, 'foo', 7, 8, (2, 3)] 
+</code></pre>
+
+<p>如果已经定义了一个列表，用 extend 方法可以追加多个元素：</p>
+
+<pre><code>In [58]: x = [4, None, 'foo']
+In [59]: x.extend([7, 8, (2, 3)])
+In [60]: x
+Out[60]: [4, None, 'foo', 7, 8, (2, 3)]
+</code></pre>
+
+<p>通过加法将列表串联的计算量较大，因为要新建一个列表，并且要复制对象。用 extend 追加元素，尤其是到一个大列表中，更为可取。</p>
+
+<h3>排序</h3>
+
+<p>你可以用 sort 函数将一个列表原地排序（不创建新的对象）：</p>
+
+<pre><code>In [61]: a = [7, 2, 5, 1, 3]
+In [62]: a.sort()
+In [63]: a
+Out[63]: [1, 2, 3, 5, 7]  
+</code></pre>
+
+<p>针对key进行排序。例如，我们可以按长度对字符串进行排序：</p>
+
+<pre><code>In [64]: b = ['saw', 'small', 'He', 'foxes', 'six']
+In [65]: b.sort(key=len)
+In [66]: b
+Out[66]: ['He', 'saw', 'six', 'small', 'foxes']
+</code></pre>
+
+<p>bisect 模块支持二分查找，和向已排序的列表插入值。bisect.bisect 可以找到插入值后仍保证排序的位置，bisect.insort 是向这个位置插入值：</p>
+
+<pre><code>In [67]: import bisect
+In [68]: c = [1, 2, 2, 2, 3, 4, 7]
+In [69]: bisect.bisect(c, 2)
+Out[69]: 4
+In [70]: bisect.bisect(c, 5)
+Out[70]: 6
+In [71]: bisect.insort(c, 6)
+In [72]: c
+Out[72]: [1, 2, 2, 2, 3, 4, 6, 7]
+</code></pre>
+
+<h3>切片</h3>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[评价基金性能的常用指标]]></title>
+    <link href="http://openfibers.github.io/blog/2019/01/15/funds-perfomance-measures/"/>
+    <updated>2019-01-15T12:19:56+08:00</updated>
+    <id>http://openfibers.github.io/blog/2019/01/15/funds-perfomance-measures</id>
+    <content type="html"><![CDATA[<h3>最大回撤（Max Draw Down）</h3>
+
+<p>最大回撤为：在选定周期内任一历史时点往后推，产品净值走到最低点时的收益率回撤幅度的最大值。</p>
+
+<p>其计算的时间复杂度是O(n)的。有些O(n<sup>2</sup>)的写法比较业余。</p>
+
+<p>python:
+<code>python
+def get_max_draw_down(in_list: list):
+    dd_list = []
+    max_so_far = in_list[0]
+    for i in range(len(in_list)):
+        if in_list[i] &gt; max_so_far:
+            dd = 0
+            dd_list.append(dd)
+            max_so_far = in_list[i]
+        else:
+            current = in_list[i]
+            dd = (max_so_far - current) / max_so_far
+            dd_list.append(dd)
+    mdd = max(dd_list)
+    return mdd
+</code></p>
+
+<h3>夏普比率(Sharpe Ratio)</h3>
+
+<p>评价单位承担的风险可以取得多少正向收益。在同种时间跨度下，越高越好。</p>
+
+<h4>计算方法：</h4>
+
+<ul>
+<li>平均收益率超过无风险收益率的部分除以收益率的标准差。</li>
+<li>如果通过高频夏普率（比如1d）推测低频夏普率(一般是年)，若每年有255个交易日，一般是再乘上根号下255。像币圈高频夏普率（4h）推导年，则是再乘上根号下 365 * 24 / 4。
+
+<h4>缺陷：</h4></li>
+<li>由于标准差是正值，所以无法区分上行风险和下行风险。
+
+<h4>优点：</h4></li>
+<li>国内外知名度高。</li>
+</ul>
+
+
+<p>附两个知乎的讲解链接：<br/>
+<a href="https://www.zhihu.com/question/264210987/answer/421333614">夏普率越高越好吗？ - 石川的回答 - 知乎</a><br/>
+<a href="https://www.zhihu.com/question/38316057/answer/75848881">求问基金风险指标的计算：夏普比率，索提诺比率，阿尔法系数等？ - 财小鲸之秦岭的回答 - 知乎</a></p>
+
+<pre><code>import numpy
+
+def sharpe_ratio(returns, risk_free_rate=0.0):
+    mean = numpy.mean(returns)
+    return (mean - risk_free_rate) / numpy.std(returns)
+</code></pre>
+
+<p>其中 returns 为每条 ohlc 的变化率，比如 [0.02, 0.03, -0.03, &hellip;]<br/>
+risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1%，传入的是4小时returns，这里应该传入 1% / (365 * 24 / 4)</p>
+
+<p>可以通过历史净值列表（equity）生成 returns：</p>
+
+<pre><code>def returns_from_equity(in_equity: list):
+    returns_np = numpy.array(in_equity)
+    returns_np = returns_np[1:] / returns_np[:-1]
+    returns_np = returns_np - 1
+    return returns_np
+</code></pre>
+
+<p>然后把返回值代入下一步计算。</p>
+
+<!--more-->
+
+
+<h3>索提诺比率(Sortino Ratio)</h3>
+
+<p>计算方法和夏普率相似，但是用低于目标收益率的收益率或亏损时的收益率所计算出的“下行标准差”取代了正常的标准差。和夏普比率一样，在同种时间跨度下，越高越好。</p>
+
+<pre><code>import numpy
+import math
+
+def lpm(returns, threshold, order):
+    threshold_array = numpy.empty(len(returns))
+    threshold_array.fill(threshold)
+    diff = threshold_array - returns
+    diff = diff.clip(min=0)
+    return numpy.sum(diff ** order) / len(returns)
+
+def sortino_ratio(returns, risk_free_rate=0.0, target=0):
+    mean = numpy.mean(returns)
+    return (mean - risk_free_rate) / math.sqrt(lpm(returns, target, 2))
+</code></pre>
+
+<p>更多参数 python 计算，参考：</p>
+
+<p><a href="http://www.turingfinance.com/computational-investing-with-python-week-one/">Measures of Risk-adjusted Return</a></p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

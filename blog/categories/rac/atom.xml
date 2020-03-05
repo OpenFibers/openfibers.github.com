@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: rac | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/rac/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Strong-weak dance 错误两则]]></title>
+    <link href="http://openfibers.github.io/blog/2015/11/03/strong-weak-dance-mistakes/"/>
+    <updated>2015-11-03T10:12:32+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/11/03/strong-weak-dance-mistakes</id>
+    <content type="html"><![CDATA[<h2>第一则：RAC中strong-weak dance不完整造成内存泄露</h2>
+
+<p>今天在工程中发现了RAC导致的retain cycle:</p>
+
+<pre><code class="objective-c">@weakify(self)
+[RACObserve(self, fooProperty) subscribeNext:^(id fooProperty) {
+    [self doSomething];
+}];
+</code></pre>
+
+<p>相对于正常的RAC用法:</p>
+
+<pre><code>@weakify(self)
+[RACObserve(self, fooProperty) subscribeNext:^(id fooProperty) {
+    @strongify(self)
+    [self doSomething];
+}];
+</code></pre>
+
+<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，strong-weak dance是必须做的，不做strong-weak dance就会循环引用。</p>
+
+<!--more-->
+
+
+<h3>1. 为何RAC以外的block可以不使用strong-weak dance</h3>
+
+<p>然而对于「传统」的strong-weak dance来说，如果不需避免block体执行过程中self中途变空，不strong回来也是非常正常的做法，换言之，strong-weak dance是保证block执行过程中weakSelf不变空的一种技巧。比如：</p>
+
+<pre><code>//不需避免block体执行过程中weakSelf中途变空，可以这样用
+__weak id weakSelf = self;
+[RACObserve(self, fooProperty) subscribeNext:^(id fooProperty) {
+    [weakSelf doSomething];
+}];
+</code></pre>
+
+<p>如需避免block体执行过程中weakSelf中途变空，则可以这样：<br/>
+<code>
+//这样可以避免block体执行过程中weakSelf中途变空
+__weak id weakSelf = self;
+[RACObserve(self, fooProperty) subscribeNext:^(id fooProperty) {
+    id strongSelf = weakSelf;
+    [strongSelf doSomething];
+}];
+</code></p>
+
+<h3>2. 为何RAC中不用strong-weak dance就会内存泄露</h3>
+
+<p>参考该贴：<a href="http://stackoverflow.com/questions/21716982/explanation-of-how-weakify-and-strongify-work-in-reactivecocoa-libextobjc">Explanation of how weakify and strongify work in ReactiveCocoa / libextobjc</a></p>
+
+<p>在预处理前的RAC代码：</p>
+
+<pre><code>@weakify(self)
+[[self.searchText.rac_textSignal
+    map:^id(NSString *text) {
+        return [UIColor yellowColor];
+    }]
+    subscribeNext:^(UIColor *color) {
+        @strongify(self)
+        self.searchText.backgroundColor = color;
+    }];
+</code></pre>
+
+<p>预处理后的RAC代码：</p>
+
+<pre><code>@autoreleasepool {} __attribute__((objc_ownership(weak))) __typeof__(self) self_weak_ = (self);
+[[self.searchText.rac_textSignal
+    map:^id(NSString *text) {
+        return [UIColor yellowColor];
+    }]
+    subscribeNext:^(UIColor *color) {
+        @try {} @finally {}
+        __attribute__((objc_ownership(strong))) __typeof__(self) self = self_weak_; // 1
+        self.searchText.backgroundColor = color;  //2
+    }];
+</code></pre>
+
+<p>可以看到<strong>@weakify</strong>在block外声明了一个weak的<strong>self_weak_</strong>，赋值为标准意义的<strong>self</strong>，<strong>@strongify</strong>在block内声明了一个strong的名为<strong>self</strong>的变量，retain了<strong>self_weak_</strong>，覆盖了标准意义的<strong>self</strong>，于是在block内直接使用<strong>self</strong>实际是使用的<strong>strong <strong>typeof</strong>(self) self</strong>，并不是使用的标准意义的<strong>self</strong>，完成了完整的strong-weak dance。<br/>
+ 而删除<strong>@strongify(self)</strong>，在block内则直接使用了标准意义的<strong>self</strong>，造成循环引用。</p>
+
+<h2>第二则 在dealloc中使用strong-weak dance造成崩溃</h2>
+
+<p>此类崩溃其实很容易定位，只要运行到，崩溃是必现的。只怕业务逻辑使得有此dealloc不是每次运行都会进，再加上有稍懒同事提交了以下代码且没测试，就会造成崩溃：</p>
+
+<pre><code>- (void)dealloc
+{
+    __weak typeof (self) weakSelf = self;//此时就会崩溃，已进入dealloc的对象不能再赋给weak指针了
+    [self action:^{
+        [weakSelf doSomeThing];
+    }];
+}
+</code></pre>
+
+<p>模拟器中运行，第三行报错EXC_BAD_INSTRUCTIONS(code=EXC_I386_INVOP)：</p>
+
+<blockquote><p>FooClass dealloced
+objc[16870]: Cannot form weak reference to instance (0x7fc02081ae50) of class FooClass. It is possible that this object was over-released, or is in the process of deallocation.</p></blockquote>
+
+<p>额外的两点提示：<br/>
+1. dealloc中，如果不百分之百确定代码的行为，不要对内存做玩火的操作。<br/>
+2. 想开发一款卓越产品，在开发过程中须建立机制，保证每位开发人员运行测试了他所写的每一行代码。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

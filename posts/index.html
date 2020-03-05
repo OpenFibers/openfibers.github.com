@@ -1,0 +1,4997 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>All Posts - Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="All Posts Pytorch Walkthrough on macOS Env macOS 10.15 | python 3.8.2 | torch 1.4.0 | torchvision 0.5.0 Install via pip macOS binary 安装不支持 CUDA，如果需要 &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><div class="all-posts">
+  <div class="container">
+    <div class="row">
+      <div class="list-title col-md-offset-3 col-md-6">
+        <h4>All Posts</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="article-list">
+    <div class="container">
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2020/03/05/pytorch-walkthrough/">Pytorch Walkthrough on macOS</a></h2>
+  
+  <p>
+    <h1>Env</h1>
+
+
+
+
+<p>macOS 10.15 | python 3.8.2 | torch 1.4.0 | torchvision 0.5.0</p>
+
+
+
+
+<h1>Install via pip</h1>
+
+
+
+
+<p>macOS binary 安装不支持 CUDA，如果需要 CUDA 请翻阅官网 install via source 安装指引。</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pip3 install torch
+</span><span class='line'>pip3 install torchvision
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>安装成功后发现报错：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&gt;&gt;&gt; import torch
+</span><span class='line'>toTraceback <span class="o">(</span>most recent call last<span class="o">)</span>:
+</span><span class='line'>  File <span class="s2">&quot;&lt;stdin&gt;&quot;</span>, line 1, in &lt;module&gt;
+</span><span class='line'>  File <span class="s2">&quot;/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/torch/__init__.py&quot;</span>, line 97, in &lt;module&gt;
+</span><span class='line'>    from torch._C import *
+</span><span class='line'>ImportError: dlopen<span class="o">(</span>/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/torch/_C.cpython-38-darwin.so, 9<span class="o">)</span>: Library not loaded: @rpath/libc++.1.dylib
+</span><span class='line'>  Referenced from: /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/torch/_C.cpython-38-darwin.so
+</span><span class='line'>  Reason: image not found
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p><code>libc++.1.dylib</code> 在 <code>/usr/lib</code> 下，使用 <code>install_name_tool</code> 解决:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>install_name_tool -add_rpath /usr/lib /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/torch/_C.cpython-38-darwin.so
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-03-05T14:25:58+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/09/17/hands-on-ml-readle/">Hands-on-ml-readle</a></h2>
+  
+  <p>
+    <h3>下载数据集</h3>
+
+
+
+
+<p>from sklearn.datasets import fetch_openml</p>
+
+
+
+
+<p>mnist = fetch_openml(&lsquo;mnist_784&rsquo;, data_home=&lsquo;./&rsquo;)  # downloaded from www.openml.org
+print(mnist)</p>
+
+
+
+
+<p>如果提示 SSL: CERTIFICATE_VERIFY_FAILED，需要先更新证书：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo /Applications/Python\ 3.7/Install\ Certificates.command</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-09-17T23:39:52+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/09/16/fix-adjustcontentoffsetifnecessary-make-scroll-view-blink/">修复 _adjustContentOffsetIfNecessary 导致 Scroll View 闪动问题</a></h2>
+  
+  <p>
+    <h3>方法一</h3>
+
+
+
+
+<p>继承 scroll view，override _adjustContentOffsetIfNecessary 到空方法。</p>
+
+
+
+
+<h3>方法二</h3>
+
+
+
+
+<p>swizz scroll view _adjustContentOffsetIfNecessary 到其 category 的一个空方法中。</p>
+
+
+
+
+<h3>方法三</h3>
+
+
+
+
+<p>对应 UIViewController 的 automaticallyAdjustsScrollViewInsets 设置为 NO。</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-09-16T19:50:22+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/09/14/gitbook-install-and-use/">Gitbook Install and Use</a></h2>
+  
+  <p>
+    <h3>首先安装 Node.js</h3>
+
+
+
+
+<p><a href="https://nodejs.org/en/download/">https://nodejs.org/en/download/</a></p>
+
+
+
+
+<h3>然后安装 Gitbook</h3>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo npm install -g gitbook-cli</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>再安装 Calibre</h3>
+
+
+
+
+<p>Gitbook 的电子书格式转换需要调用 Calibre 的命令行工具。</p>
+
+
+
+
+<p><a href="https://calibre-ebook.com">https://calibre-ebook.com</a></p>
+
+
+
+
+<p>然后：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert ~/bin</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>最后切换到书的 git 目录下</h3>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>gitbook mobi ./ ./book-name.mobi</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-09-14T13:01:59+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/08/19/hide-navigation-bar-with-pop-gesture/">单页面隐藏 Navigation Bar，同时保持右滑手势退出页面的终极方案</a></h2>
+  
+  <p>
+    <h3>1. 隐藏 navigation bar</h3>
+
+
+
+
+<p>在需要隐藏 navigation bar 的 view controller 中：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewWillAppear:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">animated</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">super</span> <span class="nl">viewWillAppear</span><span class="p">:</span><span class="n">animated</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">hideNavBar</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidDisappear:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">animated</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">super</span> <span class="nl">viewDidDisappear</span><span class="p">:</span><span class="n">animated</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">showNavBar</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">hideNavBar</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">navigationController</span><span class="p">.</span><span class="n">viewControllers</span><span class="p">.</span><span class="n">lastObject</span> <span class="o">==</span> <span class="nb">self</span><span class="p">)</span> <span class="c1">//避免推出下一个隐藏bar bar的vc过场动画展示了nav bar</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">navigationController</span> <span class="nl">setNavigationBarHidden</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">showNavBar</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">navigationController</span><span class="p">.</span><span class="n">viewControllers</span><span class="p">.</span><span class="n">lastObject</span> <span class="o">==</span> <span class="nb">self</span><span class="p">)</span> <span class="c1">//避免推出下一个隐藏bar bar的vc过场动画展示了nav bar</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">navigationController</span> <span class="nl">setNavigationBarHidden</span><span class="p">:</span><span class="nb">NO</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-08-19T15:15:43+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/08/19/hide-navigation-bar-with-pop-gesture/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/07/30/ios-simulator-keyboard-and-pasteboard-issues-fix/">iOS 模拟器键盘无响应和剪贴板不响应问题修复(Xcode 10.3)</a></h2>
+  
+  <p>
+    <h2>键盘无响应</h2>
+
+
+
+
+<p>iOS Simulator main menu - Hardware - Keyboard<br/>
+首先取消 Use the Same Keyboard Language as macOS<br/>
+点击 Connect Hardware Keyboard</p>
+
+
+
+
+<h2>剪贴板无响应</h2>
+
+
+
+
+<p>iOS Simulator 使用的剪贴板服务挂了，还是 main menu <br/>
+Edit - 取消 Automatically Sync Pasteboard<br/>
+再 Edit - 选中 Automatically Sync Pasteboard</p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-07-30T15:28:07+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/07/30/uninstall-symantec-and-mcafee-on-macos/">macOS 卸载 Symantec 和 McAfee</a></h2>
+  
+  <p>
+    <p>Activity Monitor 查一下相关几个进程的 pid:</p>
+
+
+
+
+<p>。。进程名我忘了记录了，大约就是 Mc 和 Sym 开头的几个进程</p>
+
+
+
+
+<p>lsof 看一下 pid 相关的 file handle:</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>lsof -p pid_of_McAfee -Fn | grep Mc
+</span><span class='line'>lsof -p pid_of_Symantec -Fn | grep Sym</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>记录 McAfee 和 Symantec 的 executable file 位置：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/Applications/Symantec Solutions/*
+</span><span class='line'>/Applications/McAfee Endpoint.app
+</span><span class='line'>/Library/Application Support/Symantec
+</span><span class='line'>/Library/Application Support/McAfee
+</span><span class='line'>/usr/local/McAfee
+</span><span class='line'>/private/var/McAfee</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>关机，长按 command + S, 进入 macOS single user mode, 检查磁盘并挂载磁盘：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>fsck -fy
+</span><span class='line'>mount -uw /</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>删除 McAfee 和 Symantec 相关文件：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rm -rf /Applications/Symantec Solutions/*
+</span><span class='line'>rm -rf /Applications/McAfee Endpoint.app
+</span><span class='line'>rm -rf /Library/Application Support/Symantec
+</span><span class='line'>rm -rf /Library/Application Support/McAfee
+</span><span class='line'>rm -rf /usr/local/McAfee
+</span><span class='line'>rm -rf /private/var/McAfee</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>重启：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>reboot</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>开机 Activity Monitor 里看看还有没有相关进程，如果有，从文章最开始再来一遍。。。</p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-07-30T11:02:04+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/07/22/demark-sequential-using-numpy/">Demark Sequential Using Numpy</a></h2>
+  
+  <p>
+    <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-07-22T15:35:07+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/07/22/demark-sequential-using-numpy/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/07/22/cocoa-pods-branch-ref-bug/">CocoaPods 分支依赖时的 Bug</a></h2>
+  
+  <p>
+    <h3>Pod 1.5.0 分支依赖，分支有新提交后，重新 pod install，pod 不更新</h3>
+
+
+
+
+<p>主工程源码依赖 SDK develop 分支，<code>pod install</code> 和 <code>pod install --fast-mode</code> ，拉下来的 SDK 均不是 develop 分支最新提交，而是上次执行 <code>pod install</code> 时 develop 分支的提交。</p>
+
+
+
+
+<p>清空 <code>./Pods</code> 和 <code>~/Library/Caches/CocoaPods/*</code> 均无效（缓存不在这里）。</p>
+
+
+
+
+<p>由于下载时间太长，不想清掉全量本地库，于是想了一个变通的方法。</p>
+
+
+
+
+<p>SDK 里 <code>gco -b feature/merge_main_proj</code>，主工程依赖 SDK <code>feature/merge_main_proj</code> 分支，重新 <code>pod install --fast-mode</code> 就好了，因为 pods 里没有对 <code>feature/merge_main_proj</code> 的缓存，此时肯定会好。</p>
+
+
+
+
+<p>然后主工程切回对 SDK <code>develop</code> 分支的依赖，重新 <code>pod install --fast-mode</code> 也好了。估计是对一个 pod 的多个分支只有一份缓存（pods 版本 1.5.0）。</p>
+
+
+
+
+<h3>新加的 pod 不更新</h3>
+
+
+
+
+<p>先来一次 <code>pod repo update</code> 再 <code>pod install</code> 。</p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-07-22T15:22:31+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/06/04/python3-ta-indicators/">Python3 一些 Talib 没有的 Indicators</a></h2>
+  
+  <p>
+    <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-06-04T16:05:32+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/06/04/python3-ta-indicators/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/05/28/man-economy-and-country/">人,经济与国家 读书笔记</a></h2>
+  
+  <p>
+    <h1>第一章 人的行动的基本原理</h1>
+
+
+
+
+<h1>第二章 直接交换</h1>
+
+
+
+
+<ol>
+<li><p>投机和供求表</p></li>
+<li><p>库存和总持有需求</p></li>
+<li><p>价格低时,市场的总需求提升;价格高时,市场的总需求降低</p></li>
+<li><p>市场会自行发现一个<strong>均衡价格</strong>,使得总库存需求等于总需求</p></li>
+<li><p>连续的市场与价格的变动</p></li>
+<li><p>大型市场中,打到均衡价格的速度快,投机行为趋向于改善对均衡点的预期,使均衡点快速到来</p></li>
+<li>市场的单一属性改变:
+
+<ol>
+<li>需求表增加,供给表不变,新的均衡价格更高,新的均衡状态下发生的交易量比旧的更多,价格上升,交易量上升</li>
+<li>和1相反,需求增加供给不变,价格下降,交易量下降</li>
+<li>供给表上升,需求表不变,人们愿意从库存中处理更多的库存,新的均衡价格比旧的更低,均衡交易量更多,价格下降,交易量上升</li>
+<li>和3相反,供给下降,需求不变,价格上升,交易量下降</li>
+<li>总结一下,需求和供给都和交易量正相关,需求和价格正相关,供给和价格负相关</li>
+</ol>
+</li>
+</ol>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-05-28T01:02:28+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/05/23/install-manjaro/">Install Manjaro From macOS</a></h2>
+  
+  <p>
+    <h2>从 macOS 10.14 制作安装 U 盘</h2>
+
+
+
+
+<p>下载好 iso 之后，将 iso 改名为 ~/Downloads/manjaro-kde.iso，然后将 iso 转换成 dmg:</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>hdiutil convert -format UDRW -o ~/Downloads/manjaro ~/Downloads/manjaro-kde.iso</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>看一下 U 盘是 disk几：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>diskutil list</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>假设 U 盘是 disk9，分区，unmount，再写入镜像：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>diskutil partitionDisk disk9 1 GPT HFS+ newdisk R
+</span><span class='line'>diskutil unmountDisk /dev/disk9
+</span><span class='line'>sudo dd if=/Users/openthread/Downloads/manjaro.dmg of=/dev/rdisk9 bs=1m</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>U盘插到 pc，重启，安装</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-05-23T11:09:28+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/05/23/install-manjaro/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/05/15/java-and-maven-path/">JDK 和 Maven macOS 的安装与配置</a></h2>
+  
+  <p>
+    <h1>JDK</h1>
+
+
+
+
+<h3>下载安装</h3>
+
+
+
+
+<p>到 <a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">https://www.oracle.com/technetwork/java/javase/downloads/index.html</a> 下载想用的 jdk 版本，需要登录。</p>
+
+
+
+
+<p>下载好以后双击 dmg 安装。</p>
+
+
+
+
+<p>命令行输入 <code>java -version</code> 查看版本。</p>
+
+
+
+
+<h3>配置 JAVA_HOME 环境变量</h3>
+
+
+
+
+<p>安装包没自动配置环境变量，可能是考虑宿主机多个不同 jdk 版本，没替用户做决定，需要手动配置一下。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-05-15T20:53:13+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/05/15/java-and-maven-path/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/02/11/python-optimize/">Python/Numpy 性能优化</a></h2>
+  
+  <p>
+    <h1>Cython</h1>
+
+
+
+
+<p>将 Python 翻译成 c/c++ 再编译执行。<br/>
+比原生 Python 快 1.5 倍左右。<br/>
+缺点是要写个 makefile</p>
+
+
+
+
+<h1>pypy</h1>
+
+
+
+
+<p>优点是无需像 cython 一样需要修改代码，写 makefile 和 main，缺点是有些三方库不支持。</p>
+
+
+
+
+<p>安装：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install pypy3
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>然后安装 pypy pip。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pypy3 -m ensurepip
+</span><span class='line'><span class="nb">export </span><span class="nv">ALL_PROXY</span><span class="o">=</span>
+</span><span class='line'>pypy3 -m pip install pip --upgrade
+</span><span class='line'>pypy3 -m pip install setuptools --upgrade
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>将 pypy3 path 加入 $PATH 不然安装 tables 的时候报 warning:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/usr/local/share/pypy3
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>安装依赖（举点例子）：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pypy3 -m pip install numpy
+</span><span class='line'>pypy3 -m pip install TA-Lib
+</span><span class='line'>pypy3 -m pip install requests
+</span><span class='line'>pypy3 -m pip install ccxt
+</span><span class='line'>pypy3 -m pip install tables
+</span><span class='line'>pypy3 -m pip install matplotlib
+</span><span class='line'>pypy3 -m pip install coloredlogs
+</span><span class='line'>pypy3 -m pip install pandas
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>如果 macOS 遇到 pypy 安装 numpy 时提示：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Checking <span class="k">for</span> cc... ld: library not found <span class="k">for</span> -lgcc_s.10.4
+</span><span class='line'>clang: error: linker <span class="nb">command </span>failed with <span class="nb">exit </span>code <span class="m">1</span> <span class="o">(</span>use -v to see invocation<span class="o">)</span>
+</span><span class='line'>...
+</span><span class='line'>RuntimeError: Broken toolchain: cannot link a simple C program
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>尝试下面命令后再次重试安装 numpy：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> /usr/local/lib
+</span><span class='line'>sudo ln -s ../../lib/libSystem.B.dylib libgcc_s.10.4.dylib
+</span><span class='line'><span class="nb">cd</span> -
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h1>Numpy</h1>
+
+
+
+
+<p>比原生 Python 快 10 倍左右。</p>
+
+
+
+
+<h1>numexpr</h1>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numexpr</span> <span class="kn">as</span> <span class="nn">ne</span>
+</span><span class='line'><span class="n">N</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">5</span>
+</span><span class='line'><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span><span class='line'><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span><span class='line'><span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s">&#39;a ** 2 + b ** 2&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>比 Numpy 快 2 到 10 倍。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-02-11T10:53:30+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ai/'>ai</a>, <a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/numpy/'>numpy</a>, <a class='category' href='/blog/categories/python/'>python</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/02/11/python-optimize/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/02/03/pyda-2e-notes/">利用pandas进行数据分析第二版 笔记</a></h2>
+  
+  <p>
+    <p>先放书的链接： <a href="https://www.amazon.cn/dp/B07G2PK49V">https://www.amazon.cn/dp/B07G2PK49V</a></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-02-03T16:10:22+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ai/'>ai</a>, <a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/numpy/'>numpy</a>, <a class='category' href='/blog/categories/python/'>python</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/02/03/pyda-2e-notes/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/01/29/iphone-popover-above-ios9/">iPhone Popover Above iOS9</a></h2>
+  
+  <p>
+    <p>直接上图上代码。。。</p>
+
+
+
+
+<p><img class="left" src="/images/blog/iphone_popover/iphone_popover.jpg"></p>
+
+
+
+
+<p>OTPopoverMenuViewController.h:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">OTPopoverMenuViewController</span> : <span class="bp">UIViewController</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
+</span><span class='line'>                 <span class="nf">sourceView:</span><span class="p">(</span><span class="bp">UIView</span> <span class="o">*</span><span class="p">)</span><span class="nv">view</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
+</span><span class='line'>              <span class="nf">barButtonItem:</span><span class="p">(</span><span class="bp">UIBarButtonItem</span> <span class="o">*</span><span class="p">)</span><span class="nv">barButtonItem</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-01-29T16:44:13+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/01/29/iphone-popover-above-ios9/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2019/01/15/funds-perfomance-measures/">评价基金性能的常用指标</a></h2>
+  
+  <p>
+    <h3>最大回撤（Max Draw Down）</h3>
+
+
+
+
+<p>最大回撤为：在选定周期内任一历史时点往后推，产品净值走到最低点时的收益率回撤幅度的最大值。</p>
+
+
+
+
+<p>其计算的时间复杂度是O(n)的。有些O(n<sup>2</sup>)的写法比较业余。</p>
+
+
+
+
+<p>python:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">get_max_draw_down</span><span class="p">(</span><span class="n">in_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">dd_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class='line'>    <span class="n">max_so_far</span> <span class="o">=</span> <span class="n">in_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class='line'>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">in_list</span><span class="p">)):</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">in_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_so_far</span><span class="p">:</span>
+</span><span class='line'>            <span class="n">dd</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>            <span class="n">dd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">max_so_far</span> <span class="o">=</span> <span class="n">in_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>            <span class="n">current</span> <span class="o">=</span> <span class="n">in_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+</span><span class='line'>            <span class="n">dd</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_so_far</span> <span class="o">-</span> <span class="n">current</span><span class="p">)</span> <span class="o">/</span> <span class="n">max_so_far</span>
+</span><span class='line'>            <span class="n">dd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">mdd</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dd_list</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">mdd</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>夏普比率(Sharpe Ratio)</h3>
+
+
+
+
+<p>评价单位承担的风险可以取得多少正向收益。在同种时间跨度下，越高越好。</p>
+
+
+
+
+<h4>计算方法：</h4>
+
+
+
+
+<ul>
+<li>平均收益率超过无风险收益率的部分除以收益率的标准差。</li>
+<li>如果通过高频夏普率（比如1d）推测低频夏普率(一般是年)，若每年有255个交易日，一般是再乘上根号下255。像币圈高频夏普率（4h）推导年，则是再乘上根号下 365 * 24 / 4。
+
+<h4>缺陷：</h4></li>
+<li>由于标准差是正值，所以无法区分上行风险和下行风险。
+
+<h4>优点：</h4></li>
+<li>国内外知名度高。</li>
+</ul>
+
+
+
+
+<p>附两个知乎的讲解链接：<br/>
+<a href="https://www.zhihu.com/question/264210987/answer/421333614">夏普率越高越好吗？ - 石川的回答 - 知乎</a><br/>
+<a href="https://www.zhihu.com/question/38316057/answer/75848881">求问基金风险指标的计算：夏普比率，索提诺比率，阿尔法系数等？ - 财小鲸之秦岭的回答 - 知乎</a></p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">sharpe_ratio</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">risk_free_rate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">mean</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">mean</span> <span class="o">-</span> <span class="n">risk_free_rate</span><span class="p">)</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>其中 returns 为每条 ohlc 的变化率，比如 [0.02, 0.03, -0.03, &hellip;]<br/>
+risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1%，传入的是4小时returns，这里应该传入 1% / (365 * 24 / 4)</p>
+
+
+
+
+<p>可以通过历史净值列表（equity）生成 returns：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">returns_from_equity</span><span class="p">(</span><span class="n">in_equity</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">returns_np</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">in_equity</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">returns_np</span> <span class="o">=</span> <span class="n">returns_np</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="n">returns_np</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span class='line'>    <span class="n">returns_np</span> <span class="o">=</span> <span class="n">returns_np</span> <span class="o">-</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">returns_np</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>然后把返回值代入下一步计算。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-01-15T12:19:56+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/numpy/'>numpy</a>, <a class='category' href='/blog/categories/python/'>python</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2019/01/15/funds-perfomance-measures/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2018/12/31/python-talib-basics/">Python Talib 的一些基础用法</a></h2>
+  
+  <p>
+    <p>首先还是导入一些业界标准库：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>计算RSI</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">close</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bars</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">ta</span><span class="o">.</span><span class="n">RSI</span><span class="p">(</span><span class="n">close</span><span class="p">))</span>  <span class="c"># 默认15根bars</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>计算MA</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">)</span>  <span class="c"># 默认 30 根 bars，即 MA30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>设置计算用的时长，比如计算 MA5</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>计算 EMA11 和 EMA22</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</span><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>全部指标和方法列表</h3>
+
+
+
+
+<p><a href="http://mrjbq7.github.io/ta-lib/funcs.html">http://mrjbq7.github.io/ta-lib/funcs.html</a></p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-12-31T14:27:06+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/python/'>python</a>, <a class='category' href='/blog/categories/ta-lib/'>ta-lib</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2018/12/31/pandas-basics/">Pandas的一些基础用法</a></h2>
+  
+  <p>
+    <p>首先我们导入一些‘业界标准’库</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>Pandas 里有两种常用的结构，一种叫<code>DataFrame</code>，作为二维的一张表格；另一种叫<code>Series</code>，是一维数组。<br/>
+<code>DataFrame</code>取单行和单列得到的都是<code>Series</code>类型的对象。</p>
+
+
+
+
+<h3>追加数据</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>获取最后一列数据</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>按行遍历</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>前十行组成子DataFrame</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>  <span class="c"># 含下标0到9的元素，不含下标10的元素</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>获取名为 close 的 column</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">close</span>
+</span><span class='line'><span class="err">或者</span>
+</span><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-12-31T13:53:58+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/pandas/'>pandas</a>, <a class='category' href='/blog/categories/python/'>python</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2018/12/31/pandas-basics/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2018/12/31/cd-hook-for-zsh/">Zsh中对cd命令的hook</a></h2>
+  
+  <p>
+    <p>zsh中预留了一个<code>chpwd()</code>用于hook各种cd命令，包括<code>cd</code> <code>pushd</code> <code>popd</code>等。</p>
+
+
+
+
+<p>首先打开<code>~/.zshrc</code>，增加<code>chpwd</code>函数。作用是在ccproj或其子目录，使用全局代理，否则关闭代理。</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chpwd<span class="o">()</span>
+</span><span class='line'>  <span class="k">case</span> <span class="nv">$PWD</span> in
+</span><span class='line'>      <span class="o">(</span>*/ccproj<span class="o">)</span>
+</span><span class='line'>          <span class="nb">echo </span>using proxy
+</span><span class='line'>          allproxy
+</span><span class='line'>          <span class="p">;;</span>
+</span><span class='line'>      <span class="o">(</span>*/ccproj/*<span class="o">)</span>
+</span><span class='line'>          <span class="nb">echo </span>using proxy
+</span><span class='line'>          allproxy
+</span><span class='line'>          <span class="p">;;</span>
+</span><span class='line'>      <span class="o">(</span>*<span class="o">)</span>
+</span><span class='line'>          noproxy
+</span><span class='line'>          <span class="p">;;</span>
+</span><span class='line'>  <span class="k">esac</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>其中<code>allproxy</code>和<code>noproxy</code>的定义如下:</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-12-31T12:45:47+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/shell/'>shell</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2018/12/31/cd-hook-for-zsh/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/10/22/message-app-development/">Messages Framework 开发文档（Sticker Packs 与 iMessage Apps）</a></h2>
+  
+  <p>
+    <h2>概述</h2>
+
+
+
+
+<p>开发者可以为 iOS 10 的 Messages app 创建 extension。用户在其中可以发送文字、表情、媒体文件、交互式消息（交互式消息即 interactive messages，是一种允许被对话的参与者更新状态的消息）。</p>
+
+
+
+
+<p>第三方软件可以使用 Messages framework 创建两种 app extension: 表情包（Sticker packs）和 iMessage apps。这两种 app extension 都可以作为现有主 app 的 extension 来发布，也可以单独发布。</p>
+
+
+
+
+<p><strong>为了方便理解后文内容，强烈建议先玩一下：</strong><br/>
+1. Sticker pack 比如知乎刘看山<br/>
+2. GamePigeon中的台球<br/>
+3. 大众点评的订电影票</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-10-22T04:22:11+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/imessage-apps/'>imessage apps</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/messages-extension/'>messages extension</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/10/22/message-app-development/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/10/22/deadlock-caused-by-dispatch-once/">Dispatch_once造成的死锁&#8212;-分析、解决与自动检测</a></h2>
+  
+  <p>
+    <h3>现象</h3>
+
+
+
+
+<p>最近遇到了一个死锁crash，主线程在dispatch_once时卡住了：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">Thread</span> <span class="mi">0</span> <span class="nl">name</span><span class="p">:</span>  <span class="n">Dispatch</span> <span class="nl">queue</span><span class="p">:</span> <span class="n">com</span><span class="p">.</span><span class="n">apple</span><span class="p">.</span><span class="n">main</span><span class="o">-</span><span class="kr">thread</span>
+</span><span class='line'><span class="n">Thread</span> <span class="mi">0</span> <span class="nl">Crashed</span><span class="p">:</span>
+</span><span class='line'><span class="mi">0</span>   <span class="n">__ulock_wait</span> <span class="o">+</span> <span class="mi">8</span>
+</span><span class='line'><span class="mi">1</span>   <span class="n">_dispatch_unfair_lock_wait</span> <span class="o">+</span> <span class="mi">48</span>
+</span><span class='line'><span class="mi">2</span>   <span class="n">_dispatch_gate_wait_slow</span> <span class="o">+</span> <span class="mi">56</span>
+</span><span class='line'><span class="mi">3</span>   <span class="n">dispatch_once_f</span> <span class="o">+</span> <span class="mi">124</span>
+</span><span class='line'><span class="mi">4</span>   <span class="o">+</span><span class="p">[</span><span class="n">OTPolicyCenter</span> <span class="n">sharedInstance</span><span class="p">]</span> <span class="p">(</span><span class="n">once</span><span class="p">.</span><span class="nl">h</span><span class="p">:</span><span class="mi">68</span><span class="p">)</span>
+</span><span class='line'><span class="mi">7</span>   <span class="o">+</span><span class="p">[</span><span class="n">OTWebViewUtil</span> <span class="nl">completeUrlScheme</span><span class="p">:]</span> <span class="p">(</span><span class="n">OTWebViewUtil</span><span class="p">.</span><span class="nl">m</span><span class="p">:</span><span class="mi">26</span><span class="p">)</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="mi">30</span>  <span class="n">start</span> <span class="o">+</span> <span class="mi">4</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>卡死的代码很简单，世界上的单例基本上都是这么开的：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">+</span> <span class="p">(</span><span class="n">OTPolicyCenter</span> <span class="o">*</span><span class="p">)</span><span class="nf">sharedInstance</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">dispatch_once_t</span> <span class="n">onceToken</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">onceToken</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">policyCenterInstance</span> <span class="o">=</span> <span class="p">[[</span><span class="n">OTPolicyCenter</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">policyCenterInstance</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-10-22T03:40:14+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/runtime/'>runtime</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/10/22/deadlock-caused-by-dispatch-once/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/06/20/support-ipv6-only-network-in-ios/">检查iOS App是否支持IPv6-only Network</a></h2>
+  
+  <p>
+    <p>从2016年6月1号开始，苹果强制要求上架AppStore的应用支持IPv6-only network。<br/>
+本文分为两部分：通过代码检查是否兼容IPv6-only网络，以及如何搭建IPv6-only网络的测试环境。旨在帮助快速检查app是否支持IPv6-only Network。可以当做<a href="https://developer.apple.com/library/mac/documentation/NetworkingInternetWeb/Conceptual/NetworkingOverview/UnderstandingandPreparingfortheIPv6Transition/UnderstandingandPreparingfortheIPv6Transition.html#//apple_ref/doc/uid/TP40010220-CH213-SW1">Supporting IPv6 DNS64/NAT64 Networks</a>中<strong>Ensuring IPv6 DNS64/NAT64 Compatibility</strong>一节的速成版本。</p>
+
+
+
+
+<h2>通过搭建IPv6-only网络的测试环境测试</h2>
+
+
+
+
+<p>最便捷的检查方式是：找一台Mac，共享Internet到IPv6 DNS64/NAT64网络，然后让待测试设备连接到此网络，并测试app功能是否正常。<br/>
+需注意，OS X 10.11后才支持创建IPv6 DNS64/NAT64网络。如果待测试设备不是iOS或OS X或macOS设备（比如要测试Andr**d上的app是否兼容IPv6-only网络），请确保设备支持<a href="https://tools.ietf.org/html/rfc6106">RFC6106</a>。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-06-20T14:37:10+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/ipv6/'>ipv6</a>, <a class='category' href='/blog/categories/network/'>network</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/06/20/support-ipv6-only-network-in-ios/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/04/12/dump-class-methods-using-runtime/">Objective-c使用运行时dump Class的方法列表</a></h2>
+  
+  <p>
+    <p>最近需要对UIWebView内请求的静态文件做缓存，还要把Gif替换成静态图以节约CPU资源等，于是查了一下私有API可不可以抓取UIWebView内的请求打个标记，以便NSURLProtocol中可以准确判断是不是UIWebView发出的请求。<br/>
+经调试发现hook<code>webThreadWebView:resource:willSendRequest:redirectResponse:fromDataSource:</code>可以做这件事。调试过程就不细说了。</p>
+
+
+
+
+<p>首先是dump类方法列表的函数：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#include &lt;objc/runtime.h&gt;</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">DumpObjcMethods</span><span class="p">(</span><span class="kt">Class</span> <span class="n">clz</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">methodCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Method</span> <span class="o">*</span><span class="n">methods</span> <span class="o">=</span> <span class="n">class_copyMethodList</span><span class="p">(</span><span class="n">clz</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">methodCount</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Found %d methods on &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">methodCount</span><span class="p">,</span> <span class="n">class_getName</span><span class="p">(</span><span class="n">clz</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">methodCount</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">Method</span> <span class="n">method</span> <span class="o">=</span> <span class="n">methods</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&#39;%s&#39; has method named &#39;%s&#39; of encoding &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+</span><span class='line'>               <span class="n">class_getName</span><span class="p">(</span><span class="n">clz</span><span class="p">),</span>
+</span><span class='line'>               <span class="n">sel_getName</span><span class="p">(</span><span class="n">method_getName</span><span class="p">(</span><span class="n">method</span><span class="p">)),</span>
+</span><span class='line'>               <span class="n">method_getTypeEncoding</span><span class="p">(</span><span class="n">method</span><span class="p">));</span>
+</span><span class='line'>        <span class="cm">/**</span>
+</span><span class='line'><span class="cm">         *  Or do whatever you need here...</span>
+</span><span class='line'><span class="cm">         */</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">free</span><span class="p">(</span><span class="n">methods</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-04-12T14:38:48+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>, <a class='category' href='/blog/categories/runtime/'>runtime</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/04/12/dump-class-methods-using-runtime/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/03/18/debug-ios-traffic/">iOS抓包（使用BurpSuite和tcpdump）</a></h2>
+  
+  <p>
+    <h2>Introduce</h2>
+
+
+
+
+<p>开发过程中我们经常会需要对网络请求抓包，本次介绍的是使用BurpSuite抓取HTTP/HTTPS包，以及不越狱使用tcpdump抓取iPhone的网络包。</p>
+
+
+
+
+<h2>使用BurpSuite对HTTP/HTTPS抓包</h2>
+
+
+
+
+<p>开发中我们经常会需要对HTTP/HTTPS请求进行抓包。<br/>
+抓包实际上是在中间机器开了一个代理服务，让需要抓包的请求经过代理，我们就可以看到这些请求了。本质上是中间人攻击。<br/>
+BurpSuite是一个常用的调试工具。</p>
+
+
+
+
+<h4>1. 下载BurpSuite</h4>
+
+
+
+
+<p>从<a href="http://portswigger.net/burp/download.html">BurpSuite</a>官网下载jar包，右键点击，运行：</p>
+
+
+
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_1.jpg" width="947"></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-18T14:39:33+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/burpsuite/'>burpsuite</a>, <a class='category' href='/blog/categories/debug/'>debug</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/tcpdump/'>tcpdump</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/03/18/debug-ios-traffic/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/03/04/open-sandbox-folder-in-lldb/">在lldb中一键打开模拟器sandbox路径</a></h2>
+  
+  <p>
+    <p>打开~/.lldbinit，在里面加入一行：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">command alias </span>sb script from subprocess import call<span class="p">;</span> call<span class="o">([</span><span class="s2">&quot;open&quot;</span>, <span class="s1">&#39;{0:s}&#39;</span>.format<span class="o">(</span>lldb.frame.EvaluateExpression<span class="o">(</span><span class="s2">&quot;NSHomeDirectory()&quot;</span><span class="o">))</span>.split<span class="o">(</span><span class="s2">&quot;\&quot;&quot;</span><span class="o">)[</span>1<span class="o">]])</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>然后中断时，在lldb里打sb回车，就能打开模拟器当前运行的app的沙箱路径了。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-04T10:39:55+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/lldb/'>lldb</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/03/04/open-sandbox-folder-in-lldb/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/02/26/othttprequest/">OTHTTPRequest v2.0 Release</a></h2>
+  
+  <p>
+    <p>这几天重写了OTHTTPRequest的大部分代码，发布了2.0版。<br/>
+改动主要是上传文件功能，以前做的比较粗，是整个文件读到内存再上传的，不能支撑大文件上传，现在multipart/form请求全部改为流上传。此外增加了上传速度计算的功能。</p>
+
+
+
+
+<p>最早做这个的原因是13年5月份做网易云音乐的下载性能优化，ASIHTTPRequest下载文件占用CPU时间太长，而当时iPhone4还有一定占有量，做了这个库来提升下载性能。<br/>
+这次发布2.0，修改上传功能，是因为用ASIHTTPRequest做大文件上传时，进度回调有bug，尝试修结果没修成，于是花了点时间做了这个版本。</p>
+
+
+
+
+<p>和1.0一样，整个框架基于NSURLRequest和NSURLConnection。</p>
+
+
+
+
+<p><a href="https://github.com/openfibers/othttprequest">Github链接</a></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-26T14:49:47+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/network/'>network</a>, <a class='category' href='/blog/categories/othttprequest/'>othttprequest</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/02/26/othttprequest/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/">Xcode/lldb自动导入UIKit</a></h2>
+  
+  <p>
+    <h2>lldb导入UIKit</h2>
+
+
+
+
+<p>使用lldb调试app时，lldb经常提示view.bounds无法打印：</p>
+
+
+
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import1.png" width="428" height="58"></p>
+
+
+
+
+<p>实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import UIKit
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>即可解决：</p>
+
+
+
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import2.png" width="396" height="57"></p>
+
+
+
+
+<p>在开发Mac App时也是一样的，比如不导入AppKit则无法打印frame属性，手动导入AppKit即可：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import AppKit
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import3.png" width="297" height="113"></p>
+
+
+
+
+<h2>工程自动导入</h2>
+
+
+
+
+<p>但是大部分人都换有懒癌，对于每次调试都要手打一行命令是难以接受的。我们可以在main上加个断点：</p>
+
+
+
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import4.png" width="799" height="113"></p>
+
+
+
+
+<p>在main中断时执行<code>expr @import UIKit</code>，并自动continue:</p>
+
+
+
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import5.png" width="647" height="370"></p>
+
+
+
+
+<p>然后在工程启动时就会自动导入UIKit到lldb了。</p>
+
+
+
+
+<h2>全局自动导入</h2>
+
+
+
+
+<p>对于懒癌晚期的患者，每个工程单独配置还是挺麻烦的，可以在lldbinit中设置全局自动导入UIKit。在命令行中执行：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo </span>display @import UIKit &gt;&gt; ~/.lldbinit
+</span><span class='line'><span class="nb">echo </span>display @import AppKit &gt;&gt; ~/.lldbinit
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>再重新启动调试即可（Xcode7测试时无需重启Xcode）。</p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-24T10:22:27+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/lldb/'>lldb</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/01/26/gcd-sync-async/">GCD异步同步互转</a></h2>
+  
+  <p>
+    <h2>同步转异步</h2>
+
+
+
+
+<p>这个是GCD最常见的用法之一，耗时长的操作放在global queue中做，完成之后将结果交给主线程处理：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_BACKGROUND</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>  <span class="kt">id</span> <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">longTimeTask</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>      <span class="p">[</span><span class="nb">self</span> <span class="nl">handleResultOnMainThread</span><span class="p">:</span><span class="n">result</span><span class="p">];</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h2>异步转同步</h2>
+
+
+
+
+<p>这个本人并不常用，偶尔有不得不用的场景。<br/>
+在异步操作开始前create信号量，然后使用dispatch_semaphore_wait等待此信号量。在异步操作完成后对此信号量发送signal:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="kt">dispatch_semaphore_t</span> <span class="n">sema</span> <span class="o">=</span> <span class="n">dispatch_semaphore_create</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">someAsyncTaskWithCallback</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">BOOL</span> <span class="n">successed</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">dispatch_semaphore_signal</span><span class="p">(</span><span class="n">sema</span><span class="p">);</span>
+</span><span class='line'><span class="p">}];</span>
+</span><span class='line'><span class="n">dispatch_semaphore_wait</span><span class="p">(</span><span class="n">sema</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-26T17:32:35+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/gcd/'>gcd</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/01/14/fucking-bitcode/">App/Framework/Static Library开启BitCode，既踩坑笔记</a></h2>
+  
+  <p>
+    <p>苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。</p>
+
+
+
+
+<p>下面介绍一下如何开启BitCode，以及我掉的坑有哪些。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-14T18:06:54+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/bitcode/'>bitcode</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/01/14/fucking-bitcode/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2016/01/07/self-dealloced-when-excute-method-handling/">Self在执行方法的过程中dealloc引起的崩溃处理</a></h2>
+  
+  <p>
+    <h3>场景和产生原因</h3>
+
+
+
+
+<p>在我的一个view controller里（为方便我们成为controller A），有一个doSomething方法，每次调用时，会延迟5秒调用delayAction，如果在5秒之内再次调用，会取消上次的延迟调用delayAction，再在5秒之后调用delayAction。</p>
+
+
+
+
+<p>这在UI操作中是一个稀松平常的需求，代码如下：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">doSomething</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="bp">NSObject</span> <span class="nl">cancelPreviousPerformRequestsWithTarget</span><span class="p">:</span><span class="nb">self</span> <span class="nl">selector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">delayAction</span><span class="p">)</span> <span class="nl">object</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="nl">performSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">delayAction</span><span class="p">)</span> <span class="nl">withObject</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">afterDelay</span><span class="p">:</span><span class="mi">5</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>然而就在某种情况下，这个正常工作的代码崩溃了，原因是第4行代码self已经释放，成为了僵尸指针，调用performSelector时造成了崩溃。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-07T11:27:54+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2016/01/07/self-dealloced-when-excute-method-handling/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/12/30/test-push-notification-with-nomad-cli/">使用nomad cli测试iOS的Push Notification</a></h2>
+  
+  <p>
+    <h3>安装和使用</h3>
+
+
+
+
+<p>Nomad cli是一个ruby工具，涵盖了多项打包，测试功能。<br/>
+首先，安装nomad cli：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem install nomad cli
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>然后即可使用apn push命令发送push了：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>apn push devicetoken8fd63xxxxxxxxxxxxxxxxxxe27bc82a3b313475bb488ee92092d3c -c push_cert.pem -n -m <span class="s2">&quot;A message from openthread&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-30T11:53:21+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/push/'>push</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/12/30/test-push-notification-with-nomad-cli/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/12/16/xcode7-manually-symbolicate/">Xcode 中手动 Symbolicate Crash Log</a></h2>
+  
+  <p>
+    <p>从 Xcode7 开始 Organizer 集成了查看崩溃日志的功能，若 Xcode 可以定位到 crash 的 build，则可以直接在 Organizer 中查看崩溃是在具体哪一行。<br/>
+但是不能自动定位到 build 的情况也非常常见，此时地址不能自动转换成符号：</p>
+
+
+
+
+<p><img class="left" src="/images/blog/xcode7_manually_symbolicate1/xcode7_manually_symbolicate1.JPG"></p>
+
+
+
+
+<p>此时即需要手动转换。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-16T10:45:23+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/12/16/xcode7-manually-symbolicate/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/12/15/controller-without-navigation-bar-push-new-navigation/">不带导航条的UIViewController推出带导航条的UIViewController</a></h2>
+  
+  <p>
+    <p>左侧controller A隐藏导航条，推出右侧controller B显示导航条，类似这个效果：</p>
+
+
+
+
+<p><img class="left" src="/images/blog/push_navigation_bar/push_navigation_bar1.JPG" width="375" height="667"></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-15T17:55:19+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/12/15/controller-without-navigation-bar-push-new-navigation/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/">[UIWindow setRootViewController:]后view无限叠加的问题修复</a></h2>
+  
+  <p>
+    <p>工程中有时会直接修改window.rootViewController，来导航到新的页面。<br/>
+按理说对window的rootViewController属性设好了新值，老的rootViewController被释放了，UIKit应当自动把老的rootViewController的view一并remove掉，然而实测并非如此。<br/>
+在iOS8/9中（更老版本没有测试），当window有rootViewController时，把新的controller赋值给window.rootViewController，老的rootViewController的view还是会留在window上。这些被遗留的view虽然看不见，但是浪费了内存，造成了view泄露；而且view的controller已经dealloc，此时view如果回调或通知controller的话，有造成崩溃的隐患。</p>
+
+
+
+
+<p>多次设置rootViewController后，view结构如图，window上加了多个UILayoutContainerView:</p>
+
+
+
+
+<p><img class="left" src="/images/blog/window_setrootviewcontroller/window_setrootviewcontroller1.JPG"></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-15T17:22:34+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/11/30/uitextview-auto-scroll-in-ios8/">iOS8的UITextView输入光标显示不全的hack</a></h2>
+  
+  <p>
+    <p>在iOS8及以下版本的系统上，在定高的UITextView中，输入内容超过Text View高度后，输入光标有时会在Text View的底部显示不全，如<a href="http://stackoverflow.com/questions/18070537/how-to-make-a-uitextview-scroll-while-typing-editing">how-to-make-a-uitextview-scroll-while-typing-editing</a>中截图所描述。</p>
+
+
+
+
+<p>尝试了各种方案，挑选了一种体验较好的。在<code>textViewDidChanged:</code>中，检测到正在编辑的区域在文字最下行，无动画滚动到结尾：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">textViewDidChange:</span><span class="p">(</span><span class="bp">UITextView</span> <span class="o">*</span><span class="p">)</span><span class="nv">textView</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">//hack for iOS8</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isLessThanIOS9</span><span class="p">)</span><span class="c1">//in iOS9 Apple has already fixed this bug</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="bp">CGRect</span> <span class="n">line</span> <span class="o">=</span> <span class="p">[</span><span class="n">textView</span> <span class="nl">caretRectForPosition</span><span class="p">:</span>
+</span><span class='line'>                       <span class="n">textView</span><span class="p">.</span><span class="n">selectedTextRange</span><span class="p">.</span><span class="n">start</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">CGFloat</span> <span class="n">overflow</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">line</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span>
+</span><span class='line'>        <span class="o">-</span> <span class="p">(</span><span class="n">textView</span><span class="p">.</span><span class="n">contentOffset</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">textView</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span>
+</span><span class='line'>           <span class="o">-</span> <span class="n">textView</span><span class="p">.</span><span class="n">contentInset</span><span class="p">.</span><span class="n">bottom</span> <span class="o">-</span> <span class="n">textView</span><span class="p">.</span><span class="n">contentInset</span><span class="p">.</span><span class="n">top</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">overflow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="c1">//If at the bottom of text view</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">//disable animation. Otherwise, when a input confirm scroll animation is doing, input new text, animation will re-do from animation beginning, which looks strange.</span>
+</span><span class='line'>            <span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationsEnabled</span><span class="p">:</span><span class="nb">NO</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//scroll to text end</span>
+</span><span class='line'>            <span class="p">[</span><span class="n">textView</span> <span class="nl">scrollRangeToVisible</span><span class="p">:</span><span class="n">NSMakeRange</span><span class="p">([</span><span class="n">textView</span><span class="p">.</span><span class="n">text</span> <span class="n">length</span><span class="p">],</span> <span class="mi">0</span><span class="p">)];</span>
+</span><span class='line'>            <span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationsEnabled</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-30T14:47:21+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/11/10/objective-c-properties-begin-with-new/">Objective-c中property以new开头报错</a></h2>
+  
+  <p>
+    <p>在ARC中，属性名使用new开头会报错。比如说更改密码中原始密码的输入框叫<code>oldPasswordTextField</code>，可以；新密码的输入框叫<code>newPasswordTextField</code>，对不起，不行，编译错误。</p>
+
+
+
+
+<p>在ARC出现之前，方法名如果以alloc、copy、init、mutableCopy和new开头，标准做法是返回一个retain count+1的对象。在ARC中，默认声明时强制遵守了这一规范：方法名如果以alloc、copy、init、mutableCopy和new开头，会被隐式声明为attribute((ns_returns_retained))。此行为可被显示声明attribute((ns_returns_not_retained))覆盖。</p>
+
+
+
+
+<p>一般情况下不要使用attribute((ns_returns_not_retained))更改这一行为，除非有什么不得不履行的大义。</p>
+
+
+
+
+<p>引用<a href="http://clang.llvm.org/docs/AutomaticReferenceCounting.html#retained-return-values">Clang 3.5 documentation | Objective-C Automatic Reference Counting | Retained return values</a>:</p>
+
+
+
+
+<blockquote><p>A function or method which returns a retainable object pointer type may be marked as returning a retained value, signifying that the caller expects to take ownership of a +1 retain count.</p>
+
+<p>…</p>
+
+<p>Methods in the alloc, copy, init, mutableCopy, and new families are implicitly marked attribute((ns_returns_retained)). This may be suppressed by explicitly marking the method attribute((ns_returns_not_retained)).</p></blockquote>
+
+
+
+
+<p>参考帖子：<a href="http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios">http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios</a></p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-10T15:11:27+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/11/03/strong-weak-dance-mistakes/">Strong-weak Dance 错误两则</a></h2>
+  
+  <p>
+    <h2>第一则：RAC中strong-weak dance不完整造成内存泄露</h2>
+
+
+
+
+<p>今天在工程中发现了RAC导致的retain cycle:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>相对于正常的RAC用法:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，strong-weak dance是必须做的，不做strong-weak dance就会循环引用。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-03T10:12:32+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/rac/'>rac</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/11/03/strong-weak-dance-mistakes/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/11/01/iphone-sdk-bug-collection/">iPhone SDK Bug Collection</a></h2>
+  
+  <p>
+    <ol>
+<li><p>convertRect:fromView 返回乘以screen scale以后的结果：<br/>
+在iOS8上，view如果未添加到任何window，调用此方法可能会出现此后果。</p></li>
+<li><p>定高UITextView输入时，文字超过text view高度，输入光标被遮挡或截断，显示不全，继续输入时正在输入的内容也被遮挡:<br/>
+参考<a href="http://openfibers.github.io/blog/2015/11/30/uitextview-auto-scroll-in-ios8/">iOS8的UITextView输入光标显示不全的hack</a>。</p></li>
+<li><p>window.rootViewController设置后，老的rootViewController的view仍然贴在window上：<br/>
+参考<a href="http://openfibers.github.io/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/">[UIWindow setRootViewController:]后view无限叠加的问题修复</a>。</p></li>
+</ol>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-01T21:01:42+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/iphone/'>iphone</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/10/27/install-3proxy-on-debian/">在Debina VPS上安装3proxy，支持HTTP、HTTPS、SOCKS代理</a></h2>
+  
+  <p>
+    <p><a href="https://3proxy.ru/">3proxy</a>是俄罗斯人写的代理软件。</p>
+
+
+
+
+<p>首先在debian上安装，推荐<a href="https://github.com/benjamin74/3proxy">安装脚本</a>：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget --no-check-certificate https://raw.github.com/benjamin74/3proxy/master/3proxyinstaller.sh
+</span><span class='line'>chmod +x 3proxyinstaller.sh
+</span><span class='line'>./3proxyinstaller.sh
+</span><span class='line'>  </span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>然后编辑设置：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/3proxy/3proxy.cfg</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>修改登录帐号密码，将users行改为如下内容，后面即可使用用户名user1/密码passwd1，或用户名user2/密码passwd2登录：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>users user1:CL:passwd1
+</span><span class='line'>users user2:CL:passwd2</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>修改代理端口，在3128端口开启HTTP和HTTPS代理，1080端口开启SOCKS代理：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>proxy -a -p3128
+</span><span class='line'>socks -a -p1080</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>启动3proxy：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/3proxy/3proxy /etc/3proxy/3proxy.cfg &</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>另外安装脚本已经自带开机启动设置了。</p>
+
+
+
+
+<p>更多设置参考<a href="https://3proxy.ru/doc/man3/3proxy.cfg.3.html">3proxy manual</a></p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-27T11:26:27+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/10/18/install-dnsmasq-on-debian/">在Debian VPS上安装dnsmasq解决DNS污染</a></h2>
+  
+  <p>
+    <p>warning: 我的有台DNS因为装了dnsmasq没做加密，被服务商提示有被DDoS攻击风险，强制断线了。</p>
+
+
+
+
+<h3>1. 安装</h3>
+
+
+
+
+<p>首先连上VPS，安装dnsmasq：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get install dnsmasq
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>我的VPS连接debian的APT服务器IPv6地址连不上，如果同样卡在连接 <a href="http://http.debian.net">http://http.debian.net</a> 不动的话，建议关掉IPv6再重试安装。</p>
+
+
+
+
+<h3>2. 配置</h3>
+
+
+
+
+<p>打开配置文件：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>vim /etc/dnsmasq.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>填入以下设置，将google的服务器作为上级DNS：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>server 8.8.8.8
+</span><span class='line'>server 8.8.4.4
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>较新版本dnsmasq只破DNS污染，无需特殊服务的话，没必要更改其他设置，直接重启即可：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>service dnsmasq restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-18T23:34:24+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/10/18/install-dnsmasq-on-debian/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/10/07/ei-capitan-settings/">10.11 EI Capitan兼容老使用习惯的一些设置</a></h2>
+  
+  <p>
+    <h3>Terminal在非视网膜屏幕的字体平滑</h3>
+
+
+
+
+<p>Preferences -> Profiles -> Text -> Antialias text 打开（视网膜屏安装10.11时默认关闭了）</p>
+
+
+
+
+<h3>Safari command+数字键开启书签栏页面</h3>
+
+
+
+
+<p>Preferences -> Tabs -> Use command-1 through command-9 to switch tabs 关闭（10.11默认改为切换tab了）</p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-07T14:40:37+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/10/04/xcode-plugins/">Xcode插件</a></h2>
+  
+  <p>
+    <h3>1. Alcatraz</h3>
+
+
+
+
+<p>其他插件的 package manager, 可以从此插件中搜索、安装、删除其他插件。<br/>
+<a href="https://github.com/supermarin/Alcatraz">Github地址</a></p>
+
+
+
+
+<h3>2. VVDocumenter-Xcode</h3>
+
+
+
+
+<p>///生成 Javadoc-Style 注释，可被 Xcode 识别，可生成文档。<br/>
+<a href="https://github.com/onevcat/VVDocumenter-Xcode">Github地址</a></p>
+
+
+
+
+<h3>3. MCLog</h3>
+
+
+
+
+<p>Log 的 filter，支持正则，响应式交互，尚有崩溃，不过值得一用。<br/>
+<a href="https://github.com/yuhua-chen/MCLog">Github地址</a></p>
+
+
+
+
+<h3>4. Clang-Format</h3>
+
+
+
+
+<p>一键格式化脏乱差代码。还支持自动按段落排序#import &ldquo;headers&#8221;。<br/>
+安装后在工程中建立 .clang-format 文件，在其中配置代码格式，再使用此插件格式化代码。<br/>
+前几天发pr修复了和 oh-my-zsh 同时使用的一处 crash，作者刚刚merge了，建议更新到最新。<br/>
+推荐格式：</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>BasedOnStyle: WebKit
+</span><span class='line'>BreakBeforeBraces: Allman
+</span><span class='line'>PointerAlignment: Right
+</span><span class='line'>IndentCaseLabels: true
+</span><span class='line'>AlignAfterOpenBracket: true</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p><a href="https://github.com/travisjeffery/ClangFormat-Xcode">Github地址</a></p>
+
+
+
+
+<h3>5. FuzzyAutocomplete</h3>
+
+
+
+
+<p>代码自动补全的增强工具，输入反应稍微减慢，不装其他输入增强工具时卡顿尚可接受，值得一用。<br/>
+<a href="https://github.com/FuzzyAutocomplete/FuzzyAutocompletePlugin">Github地址</a></p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T11:38:06+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/09/16/architecture-settings-in-xcode/">Architectures 与 Valid Architectures 在 Xcode 中的设置</a></h2>
+  
+  <p>
+    <h3>关于这几个设置项，先看官方说明：</h3>
+
+
+
+
+<ol>
+<li><p>Architecture:<br/>
+Space-separated list of identifiers. Specifies the architectures (ABIs, processor models) to which the binary is targeted. When this build setting specifies more than one architecture, the generated binary may contain object code for each of the specified architectures.</p></li>
+<li><p>Vaild Architecture:<br/>
+Space-separated list of identifiers. Specifies the architectures for which the binary may be built. During the build, this list is intersected with the value of ARCHS build setting; the resulting list specifies the architectures the binary can run on. If the resulting architecture list is empty, the target generates no binary.</p></li>
+<li><p>Build Active Architecture Only:<br/>
+Boolean value. Specifies whether the product includes only object code for the native architecture.</p></li>
+</ol>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-16T10:39:18+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/09/16/architecture-settings-in-xcode/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/09/12/ssh-proxy-on-openwrt/">在OpenWRT上搭建ssh代理</a></h2>
+  
+  <p>
+    <p>首先为何要用ssh代理，而不是ShadowSocks或VPN：GFW会针对ShadowSocks或各种VPN协议做解析，却不一定有勇气禁止全部ssh连接（国家曾经有次物理断开到国外的全部网络连接造成了巨大经济损失）。</p>
+
+
+
+
+<p>前段时间开发了<a href="http://github.com/openfibers/sshmole">SSHMole</a>，用作OS X上的ssh代理客户端。然而MAC给iPhone开ssh代理，或在iPhone上直接开ssh代理还是很麻烦的。所以在家里路由器上开了个ssh -D。</p>
+
+
+
+
+<h3>0. 首先要有一台VPS</h3>
+
+
+
+
+<p>没有的话到<a href="http://vpsadd.com">vpsadd</a>买一台。</p>
+
+
+
+
+<h3>1. OpenWRT上安装ssh-client, openssh-keygen</h3>
+
+
+
+
+<p>登录到OpenWRT，移除ssh到dropbear的软连接</p>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mv ssh dropbear-ssh
+</span><span class='line'>mv scp dropbear-scp</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-12T14:21:41+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/ssh/'>ssh</a>, <a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/09/12/ssh-proxy-on-openwrt/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/09/06/fuck-cocoapods/">安装指定版本的CocoaPods</a></h2>
+  
+  <p>
+    <p>在同事机器上，pod 工作的很正常，到了我的机器上，就 link error，原因是他的 pod 自动生成的.a 和我的 pod 自动生成的 .a 带的前缀不一样。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-06T10:50:14+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/cocoapods/'>cocoapods</a>, <a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/09/06/fuck-cocoapods/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/06/19/wwdc-2015-features/">WWDC 2015 带来的新玩法</a></h2>
+  
+  <p>
+    <p>WWDC 2015 更新了五大产品线：OS X EI，iOS 9，watchOS 2，Xcode 7，Swift 2.</p>
+
+
+
+
+<h2>1. OS X EI</h2>
+
+
+
+
+<h3>Metal APIs</h3>
+
+
+
+
+<p>Metal是一个开销极低的一种访问 GPU 的框架。<br/>
+Metal framework 提供了 GPU 加速的先进的3D渲染和数据并行计算能力。<br/>
+Metal 提供了流水线式的 API（streamlined API），预编译着色器（precompiled shaders），以及高性能的多线程支持。这些 features 可以帮助你把你的游戏或 app 的性能提升一个档次。<br/>
+Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。</p>
+
+
+
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/metal/">Metal Home Page</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40014221-CH1-SW1">Metal Programming Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalShadingLanguageGuide/Introduction/Introduction.html">Metal Shading Language Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalFrameworkReference/index.html">Metal Framework Reference</a></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-06-19T15:07:10+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/wwdc/'>wwdc</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/06/19/wwdc-2015-features/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/04/27/transparent-window-in-osx/">OSX各种实现毛玻璃效果窗口的方式与比较</a></h2>
+  
+  <p>
+    <p>毛玻璃窗体是10.10中新增的效果. 比如Finder的左边栏.<br/>
+本文只对10.8, 10.9, 10.10三个版本进行讨论. 我的App未对10.6和10.7做任何支持, 此处也不予讨论.</p>
+
+
+
+
+<h2>第一种方式: NSVisualEffectView</h2>
+
+
+
+
+<p>这是10.10中新开放的API, 只能在10.10的runtime上使用.<br/>
+如果需要上架App Store, 这也是在10.10上完成毛玻璃效果的唯一方式.<br/>
+首先为NSView增加扩展:</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//Returns NSVisualEffectView</span>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">Class</span> <span class="n">vibrantClass</span><span class="o">=</span><span class="n">NSClassFromString</span><span class="p">(</span><span class="s">@&quot;NSVisualEffectView&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">vibrantClass</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">NSVisualEffectView</span> <span class="o">*</span><span class="n">vibrant</span><span class="o">=</span><span class="p">[[</span><span class="n">vibrantClass</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFrame</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setAutoresizingMask</span><span class="p">:</span><span class="n">NSViewWidthSizable</span><span class="o">|</span><span class="n">NSViewHeightSizable</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setBlendingMode</span><span class="p">:</span><span class="n">mode</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="nb">self</span> <span class="nl">addSubview</span><span class="p">:</span><span class="n">vibrant</span> <span class="nl">positioned</span><span class="p">:</span><span class="n">NSWindowBelow</span> <span class="nl">relativeTo</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="n">vibrant</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-04-27T19:22:15+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/appkit/'>appkit</a>, <a class='category' href='/blog/categories/cocoa/'>cocoa</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/04/27/transparent-window-in-osx/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/23/using-karabiner-to-change-key/">如何优雅的使用60%键盘&#8212;-在所有App中使用Control+P、N、B、F代替上下左右</a></h2>
+  
+  <p>
+    <p>最近新宠是各种GH60，都没有独立方向键，按FN组合键是非常远的，刷固件修改按键也颇为不便，用软件修改就方便多了。<br/>
+经常有软件不支持Control+P、N、B、F做上下左右操作，于是想到直接把Control+P、N、B、F改为上下左右。</p>
+
+
+
+
+<p>OSX上可以用<a href="https://pqrs.org/osx/karabiner/">Karabiner</a>自定义按键，可定制程度非常高，其前身是Keymap4MacBook，<a href="https://github.com/tekezo/Karabiner">已开源在https://github.com/tekezo/Karabiner</a>。</p>
+
+
+
+
+<p>首先从官网下载一个最新版并安装好。我需要将将control+P、N、B、F修改为上下左右，在预置中找不到相应设置。直接在Misc &amp; Uninstall页面点击Open private.xml，修改这个配置文件可以完成各种高度可定制化改键。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-23T11:12:37+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/jian-pan/'>键盘</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/23/using-karabiner-to-change-key/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/17/make-a-hhkb-layout-gh60/">HHKB布局的GH60</a></h2>
+  
+  <p>
+    <p>很喜欢HHKB的键位，但是静电容的手感不是太喜欢，type-s一直在吃灰。于是萌生了做一把HHKB布局的GH60的想法。<br/>
+GH60富有富玩法，穷有穷玩法，这次是最穷的玩法。200块钱的洋垃圾键帽，60块钱的poker2外壳，改好弹簧的内胆400块钱，35块钱的屏蔽滑块，总共700搞定。</p>
+
+
+
+
+<p><img class="left" src="/images/blog/GH60_HHKB/keyboard2.JPG"></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-17T11:21:49+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/jian-pan/'>键盘</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/17/make-a-hhkb-layout-gh60/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/17/add-ports-to-keycaps/">热熔胶修改键帽菊花</a></h2>
+  
+  <p>
+    <p>最近很流行复古灰白色键帽，流行到几乎每把客制化键盘都要用，好像不用复古灰白色就不是客制化一样。<br/>
+通常来说选择有以下几种：<br/>
+1. 较高档的进口键帽比如GMK要上千而且不一定能买到，逼格是非常高的；<br/>
+2. 其次是原厂洋垃圾拆机热升华灰白套、二色灰白套键帽，一套要700左右，逼格也是非常高的；<br/>
+3. 更便宜的是G80拆机薄的pbt键帽，菊花大部分兼容现代键盘，一套要200左右，逼格还算说的过去；<br/>
+4. 再便宜的是太豪二色，复古色140搞定，带7键增补（7x空格、1.75x shift、阶梯capslock）一般键盘都能用，但是逼格太低；<br/>
+5. 最便宜的是G81拆机键帽，在100以内就能淘到，但是G81定位比较廉价，键帽大多只兼容平衡杆，并不像现代键盘是卫星轴平衡杆双兼容，这个逼格也是说的过去的。</p>
+
+
+
+
+<p>于是很多人买G81的拆机键帽改菊花给现代键盘用，有逼格又便宜，就是改菊花比较麻烦。<br/>
+网上搜到几篇AB胶改菊花的经验贴，本人手残党，对使用AB胶完全没有信心。而且AB胶粘歪了想抠下来是非常麻烦的。<br/>
+于是这次摸石头过河尝试了热熔胶改菊花，操作简单效果好，和我一样同样是手残党的朋友可以尝试一下。<br/>
+此法改pbt键帽出错的话，可以吹风机吹掉热熔胶，于是可以无限重试，并不像AB胶那样重试会非常麻烦。如果改abs二色要重试的话吹风机吹下键帽变形的危险性比较大，最好是有局部加热工具拿掉热熔胶。话说回来，AB胶改ABS二色键帽出错更难重试，因为AB胶失去粘性需要200摄氏度的温度，出错就只能用刀抠了。<br/>
+先上张效果图：  <br/>
+<img class="left" src="/images/blog/keycap_mod_cross/7.Final.JPG"></p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-17T10:20:23+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/jian-pan/'>键盘</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/17/add-ports-to-keycaps/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/11/apple-watch-ui-guidlines/">Apple Watch人机交互指南</a></h2>
+  
+  <p>
+    <p>翻译自<a href="https://developer.apple.com/library/prerelease/ios/documentation/UserExperience/Conceptual/WatchHumanInterfaceGuidelines/index.html">官方文档 - Apple Watch Human Interface Guidelines</a>。</p>
+
+
+
+
+<p>文档主要分为三部分：<br/>
+1. 为Apple Watch设计软件的注意事项。包括介绍了watch软件的特点、watch独有的新的交互方式、Glances、Notifications、Modal Sheets、布局、颜色与排版、动画、app品牌化，也穿插了一些设计原则；<br/>
+2. 各种控件的使用与设计原则。包括labels、images、groups、tables、buttons、switches、sliders、maps、dates、times和menus。虽然控件种类不多，但是和以往相比区别还是比较大的；<br/>
+3. Icon、image和menu image的设计原则。</p>
+
+
+
+
+<p>苹果的人机交互文档不只是给码农看的，也是给PD与设计师看的。建议PD和设计师们也读一读。</p>
+
+
+
+
+<h1>为Apple Watch设计软件的注意事项：</h1>
+
+
+
+
+<h2>Apple从未有过的穿戴式设备</h2>
+
+
+
+
+<ol>
+<li>Personal: 一方面更隐私，另一方面更个人化。带有心率等其它传感器，可以得到比以往设备更多的个人信息。由于是苹果的首个穿戴式设备，从未有过一款设备像apple watch一样如此与使用者紧密相连，这一点在设计应用时要多加注意。</li>
+<li>Holistic: Apple watch是软件与硬件的结合。新的交互方式包括Digtal Crown(表冠)、Taptic Engine(触觉反馈+细微声音反馈)和Force Touch(压力感应触摸屏)，<a href="https://www.apple.com/cn/watch/technology/">官方相关介绍传送门</a>。设计App时应当把以上交互体验一并考虑在内。</li>
+<li>Lightweight: Apple watch上的软件定义为轻量级的，要求能快速启动，交互简洁、UI简单。iPhone的人机交互文档也是这么要求的，可惜遵守的人不多。这次苹果重新指出了这一点。</li>
+</ol>
+
+
+
+
+<h2>UI架构与交互方式</h2>
+
+
+
+
+<h3>UI类型</h3>
+
+
+
+
+<p>App有两种基本样式，基于继承的,和基于平行页面的。</p>
+
+
+
+
+<ol>
+<li>Hierarchical：更像iOS上的导航模式。有推入推出。适合处理复杂的业务逻辑。</li>
+</ol>
+
+
+
+
+<p><img class="left" src="/images/blog/apple_watch_guidelines/1.hierarchical_interface_2x.png" width="513" height="267"></p>
+
+
+
+
+<ol>
+<li>Page-based：几个页面横滑切换的模式。苹果希望并列的页面能尽量少。适合处理简单的业务逻辑。</li>
+</ol>
+
+
+
+
+<p><img class="left" src="/images/blog/apple_watch_guidelines/2.paged_interface_2x.png" width="679" height="267"></p>
+
+
+
+
+<p>这两种基本架构不允许同时存在，只能二选其一。</p>
+
+
+
+
+<h3>用户交互</h3>
+
+
+
+
+<ol>
+<li>Action-based：单击操作。在各种各样的控件上点的事件都是。</li>
+<li>Gestures：竖滑、横滑、左边缘右滑后退、点击。</li>
+<li>Force Touch：大力按下时系统会弹出context menu，作用类似pc上的右键菜单。App内当使用此menu显示上下文可以操作的actions。</li>
+<li>The Digital Crown：第三方应用仅可以使用表冠卷动来支持滚动长页面。</li>
+</ol>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-11T13:49:29+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/apple-watch/'>apple watch</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/watchkit/'>watchkit</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/11/apple-watch-ui-guidlines/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/10/uiscreen-nativescale-method-handle-standard-zoomed/">处理iPhone6、6+标准视图和放大视图 & 新增的[UIScreen nativeScale]方法</a></h2>
+  
+  <p>
+    <h3>标准模式与放大模式</h3>
+
+
+
+
+<p>iPhone6和6+的设置(Settings)->显示与亮度(Display &amp; Brightness)->显示模式(View)都带有标准模式(Standard)和放大模式(Zoomed)。<br/>
+这个功能被引入后，依赖<code>[UIScreen bounds]</code>和<code>[UIScreen scale]</code>并不能完全确定屏幕分辨率是多大、用户选择了放大试图还是标准视图。比如放大模式下iPhone6读到的这两个属性和iPhone5是一模一样的，而放大模式下iPhone6+的<code>[UIScreen bounds]</code>属性和标准模式下iPhone6的一样。</p>
+
+
+
+
+<p>iOS8中苹果引入了<code>[UIScreen screenScale]</code>，可以用来区分不同的显示模式。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-10T14:08:47+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/10/uiscreen-nativescale-method-handle-standard-zoomed/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/04/install-ruby-on-windows/">在Windows上安装Ruby</a></h2>
+  
+  <p>
+    <p>Mac上使用RVM[<a href="https://rvm.io">https://rvm.io</a>]安装与管理各种版本的Ruby是非常简单易行的。今天心血来潮想在Windows上写Octopress，安装了Ruby，似乎已经没有13年的时候那么难装了。</p>
+
+
+
+
+<ol>
+<li><p>下载安装包
+访问<a href="http://rubyinstaller.org/downloads/">RubyInstaller下载页</a>，找到适合版本的Ruby Installer和Development Kit。</p></li>
+<li><p>安装RubyInstaller：基本上只要双击安装包一直点下一步就可以了。</p></li>
+<li><p>安装Development Kit：双击解压下载到的7z自解压文件，将其解压到自己喜欢的路径下。</p></li>
+<li><p>按照<a href="https://github.com/oneclick/rubyinstaller/wiki/Development-Kit">Development Kit Wiki</a>的指引步骤完成Development Kit安装。<br/>
+一般首次安装只要执行以下命令就可以了：</p></li>
+</ol>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='batch'><span class='line'>$ ruby dk.rb init
+</span><span class='line'>$ ruby dk.rb install
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<ol>
+<li>检查是否安装成功</li>
+</ol>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='batch'><span class='line'>$ gem install json --platform<span class="o">=</span>ruby
+</span><span class='line'># 成功则最后一行显示 <span class="m">1</span> gem installed
+</span><span class='line'>$ ruby -rubygems -e <span class="s2">&quot;require &#39;json&#39;; puts JSON.load(&#39;[42]&#39;).inspect&quot;</span>
+</span><span class='line'># 安装成功则显示 [<span class="m">42</span>]
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-04T22:18:27+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/04/use-bfg-to-clean-big-blog-in-git/">使用BFG Repo-Cleaner清除git的历史错误提交</a></h2>
+  
+  <p>
+    <p>Git中有时会不小心提交大文件或密码到repo中，然而使用git-filter-branch清理以往的全部提交是非常复杂的。<br/>
+今天介绍一个好用的工具<a href="https://rtyley.github.io/bfg-repo-cleaner/">BFG Repo-Cleaner</a>，可以方便清理错误的二进制文件或密码文件提交。</p>
+
+
+
+
+<p>以下命令中所有的 bfg 是 java -jar bfg.jar 的alias。</p>
+
+
+
+
+<h3>1. 克隆一份repo到本地</h3>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>git clone --mirror git@github.com:OpenFibers/openfibers.github.com.git
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h3>2. 执行bfg命令移除目标文件：</h3>
+
+
+
+
+<p>从历史纪录中删除所有文件名是 &lsquo;id_rsa&rsquo; 或 &lsquo;id_dsa&rsquo; 的文件：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>bfg --delete-files id_<span class="o">{</span>dsa,rsa<span class="o">}</span>  openfibers.github.com.git
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>从历史纪录中删除所有大于1M的二进制文件 :</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>bfg --strip-blobs-bigger-than 1M  openfibers.github.com.git
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-04T14:50:59+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/git/'>git</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/04/use-bfg-to-clean-big-blog-in-git/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/03/keyboards-from-2012-to-2015/">三年来用过的键盘</a></h2>
+  
+  <p>
+    <p>Type-s镇楼</p>
+
+
+
+
+<p><img class="left" src="/images/blog/keyboards_2012_2015/9.hhkb.JPG"></p>
+
+
+
+
+<h3>入坑</h3>
+
+
+
+
+<p>12年的时候，公司的薄膜键盘实在太烂，按的手机关节疼，IT不给换。于是萌生了撸一把机械键盘的想法。<br/>
+话说有那么一天节假日老婆回老家（当时还是女友）。<br/>
+前几天她的电脑硬盘被我摔坏了，于是在这天我自己把她的电脑背出来到售后修理。返程途中过一家颐高数码城。当天数码城门口正在露天打WCG我市星际2的决赛，印象中是三星赞助的。完全不会玩星际，天气又非常热，于是直接进数码城上了四楼外设层。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-03T19:18:50+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/jian-pan/'>键盘</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/03/keyboards-from-2012-to-2015/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/">自动选用速度快的CDN播放MV in iOS</a></h2>
+  
+  <p>
+    <h2>为什么要做这件事</h2>
+
+
+
+
+<p>最近云音乐用户数量要上亿了，用户量增加的过程中总有许许多多以前没暴露的问题。<br/>
+比如最近好多人反馈MV经常卡顿。从反馈情况看是某个区域的用户访问我们CDN的速度比较慢。  <br/>
+但是如果只是换CDN服务提供商的话，就算这个区域的用户连接速度康复了，也很容易造成另一个区域的用户访问CDN变慢的情况。挑选新的CDN提供商也是个麻烦事。<br/>
+不管怎样，先不考虑换CDN的事情，客户端层面的访问速度优化还是有必要做的。<br/>
+既然不把更换CDN的因素考虑在内，一个特定用户的终端连接到每个CDN节点的速度是硬生生摆在那的。<br/>
+所以要提升访问速度有两个事情可以做：</p>
+
+
+
+
+<ol>
+<li>降低视频文件尺寸</li>
+<li>选取最快的CDN节点</li>
+</ol>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-03T14:04:16+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/02/28/in-app-purchase-walk-through/">In-App Purchase Walk Through</a></h2>
+  
+  <p>
+    <h2>1. 适用情况</h2>
+
+
+
+
+<p>想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。<br/>
+除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。</p>
+
+
+
+
+<p>在苹果制定的游戏规则中，所有在App内提供的服务需要付费时，都应当使用IAP，比如软件功能、游戏道具；所有在App外提供的服务需要付费时，都应使用其他支付方式，比如Uber的信用卡，淘宝、快的打车的支付宝SDK等。</p>
+
+
+
+
+<p>在IAP里，可以出售：</p>
+
+
+
+
+<ol>
+<li>数字内容：比如杂志、图片、游戏关卡解锁、相机付费滤镜等；</li>
+<li>软件功能：如各种扩展features；</li>
+<li>一次性服务：比如一次语音通话等。注意是「一次性」服务，不是一次「性服务」。</li>
+</ol>
+
+
+
+
+<p>在IAP里，不能出售:</p>
+
+
+
+
+<ol>
+<li>现实世界的商品或服务：比如刚才提到的一次「性服务」。严格遵守此方案有个好处：IAP 如果被破解，用户无法得到大量实物，开发商也不会有很大经济损失。非要做的话想绕过也是可以的：用 IAP 购买代币，审核通过后用代币购买实物。</li>
+<li>其他<a href="https://developer.apple.com/appstore/guidelines.html">the App Review GuideLines</a>中规定的不允许的内容：比如刚才提到的一次「性服务」。</li>
+</ol>
+
+
+
+
+<p>顺便说下，有次大网易的同事分享时提到：使用兑换码兑换App内服务是一条高压线。像Uber和Amazon里允许有码，是因为他们的码是用在现实世界的产品或服务上的。</p>
+
+
+
+
+<p>如果你确定内购需求符合IAP的使用要求，可以继续往下读了。</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T16:19:15+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/iap/'>iap</a>, <a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2015/02/28/in-app-purchase-walk-through/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/02/28/jie-you-za-huo-dian/">解忧杂货店</a></h2>
+  
+  <p>
+    <p>这本书与11年开始连载，12年角川书店发行了单行本，不是新书。这几天亚马逊付费榜排行第一。前几天买了，刚刚看完。</p>
+
+
+
+
+<p>三个穷小偷为了跑路，钻进一家三十多年没开张的杂货店。</p>
+
+
+
+
+<p>世界观大体就是这样的：当杂货店完全关上门时，店内时间流逝是要比店外面慢的。而且杂货店可以收到三十年前人的来信并回复来信。来信都是一些烦恼咨询，三个贼居然有模有样的在店内回复了起来。</p>
+
+
+
+
+<p>整本书讲了几个咨询者身上发生的故事，以及店的来历。几个故事层层交织在一起，稍微带点推理小说的意思。毕竟作者是东野圭吾。<br/>
+Kindle版带X-Ray，翻交织的线索很方便。</p>
+
+
+
+
+<p>整书透过故事描述了日式的理想、亲情和爱，每段故事都挺感人的。<br/>
+总之是一本非常好的书，很值得一读。</p>
+
+
+
+
+<p>Over</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T11:39:34+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/shu-ji/'>书籍</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/02/13/hello-octopress/">Hello Octopress</a></h2>
+  
+  <p>
+    <h1>Octopress好像挺好玩啊</h1>
+
+
+
+
+<p>主题选了Medium Fox，页脚有点奇怪，怎么不是长在页脚上的。。。。</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-13T11:42:24+08:00" pubdate data-updated="true"></time>
+    
+
+
+	<a class='category' href='/blog/categories/octopress/'>octopress</a>, <a class='category' href='/blog/categories/de-ba-de/'>嘚吧嘚</a>
+
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

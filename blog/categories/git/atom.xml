@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: git | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/git/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[使用BFG Repo-Cleaner清除git的历史错误提交]]></title>
+    <link href="http://openfibers.github.io/blog/2015/03/04/use-bfg-to-clean-big-blog-in-git/"/>
+    <updated>2015-03-04T14:50:59+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/03/04/use-bfg-to-clean-big-blog-in-git</id>
+    <content type="html"><![CDATA[<p>Git中有时会不小心提交大文件或密码到repo中，然而使用git-filter-branch清理以往的全部提交是非常复杂的。<br/>
+今天介绍一个好用的工具<a href="https://rtyley.github.io/bfg-repo-cleaner/">BFG Repo-Cleaner</a>，可以方便清理错误的二进制文件或密码文件提交。</p>
+
+<p>以下命令中所有的 bfg 是 java -jar bfg.jar 的alias。</p>
+
+<h3>1. 克隆一份repo到本地</h3>
+
+<pre><code class="bash">git clone --mirror git@github.com:OpenFibers/openfibers.github.com.git
+</code></pre>
+
+<h3>2. 执行bfg命令移除目标文件：</h3>
+
+<p>从历史纪录中删除所有文件名是 &lsquo;id_rsa&rsquo; 或 &lsquo;id_dsa&rsquo; 的文件：</p>
+
+<pre><code class="bash">$ bfg --delete-files id_{dsa,rsa}  openfibers.github.com.git
+</code></pre>
+
+<p>从历史纪录中删除所有大于1M的二进制文件 :</p>
+
+<pre><code class="bash">$ bfg --strip-blobs-bigger-than 1M  openfibers.github.com.git
+</code></pre>
+
+<!--more-->
+
+
+<p>Replace all passwords listed in a file (prefix lines &lsquo;regex:&rsquo; or &lsquo;glob:&rsquo; if required) with <strong><em>REMOVED</em></strong> wherever they occur in your repository :</p>
+
+<pre><code class="bash">$ bfg --replace-text passwords.txt  openfibers.github.com.git
+</code></pre>
+
+<p>Remove all folders or files named &lsquo;.git&rsquo; - a reserved filename in Git. These often become a problem when migrating to Git from other source-control systems like Mercurial :</p>
+
+<pre><code class="bash">$ bfg --delete-folders .git --delete-files .git  --no-blob-protection  openfibers.github.com.git
+</code></pre>
+
+<h3>3. Reflog &amp; Push Back to Remote Repo</h3>
+
+<pre><code>$ cd openfibers.github.com.git
+$ git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive
+$ git push
+</code></pre>
+
+<p><a href="https://rtyley.github.io/bfg-repo-cleaner/">详细介绍及下载地址传送门</a>，需要安装JDK。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

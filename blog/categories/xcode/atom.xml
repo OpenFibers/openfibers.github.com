@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: xcode | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/xcode/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[在lldb中一键打开模拟器sandbox路径]]></title>
+    <link href="http://openfibers.github.io/blog/2016/03/04/open-sandbox-folder-in-lldb/"/>
+    <updated>2016-03-04T10:39:55+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/03/04/open-sandbox-folder-in-lldb</id>
+    <content type="html"><![CDATA[<p>打开~/.lldbinit，在里面加入一行：<br/>
+<code>bash
+command alias sb script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]]);
+</code></p>
+
+<p>然后中断时，在lldb里打sb回车，就能打开模拟器当前运行的app的沙箱路径了。</p>
+
+<!--more-->
+
+
+<h3>原理</h3>
+
+<p>lldb中允许我们执行python代码，中断时使用script命令即可进入python模式：</p>
+
+<pre><code class="bash">(lldb) script
+</code></pre>
+
+<p>在python中我们可以通过lldb.frame操纵lldb，比如执行表达式，会返回一个lldb.SBValue对象：</p>
+
+<pre><code class="python">//python code
+lldb.frame.EvaluateExpression("NSHomeDirectory()")
+
+//return
+&lt;lldb.SBValue; proxy of &lt;Swig Object of type 'lldb::SBValue *' at 0x13ded2bd0&gt; &gt;
+</code></pre>
+
+<p>然后我们格式化成python字符串，会返回SBValue的description，类型是pystring：</p>
+
+<pre><code class="python">//python code
+'{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()"))
+
+//return
+'(NSPathStore2 *) $1 = 0x00007fdbc4c1a6d0 @"/Users/openthread/Library/Developer/CoreSimulator/Devices/5D48B08A-44C2-4AC5-B52D-725150EA1091/data/Containers/Data/Application/8331B6D2-FC68-4523-8093-94FD9487FF74"'
+</code></pre>
+
+<p>我们用引号split这个pystring，取数组中第一个元素，就是path：</p>
+
+<pre><code class="python">//python code
+'{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]
+
+//return
+'/Users/openthread/Library/Developer/CoreSimulator/Devices/5D48B08A-44C2-4AC5-B52D-725150EA1091/data/Containers/Data/Application/8331B6D2-FC68-4523-8093-94FD9487FF74'
+</code></pre>
+
+<p>然后在python中使用call调用shell的open，就可以打开沙箱路径了：
+<code>python  
+//python code
+from subprocess import call; call(["open", pathOfSandbox)
+</code></p>
+
+<p>这些命令可以连起来在lldb中执行：<br/>
+<code>
+(lldb) script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]])
+</code></p>
+
+<p>然而实在太长了，于是我们在lldb中加了个alias：</p>
+
+<pre><code class="bash">(lldb) command alias sb script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]])
+</code></pre>
+
+<h3>扩展</h3>
+
+<p>lldb和python可以相互调用，给lldb增加了非常强的扩展性。<br/>
+facebook做了<a href="https://github.com/facebook/chisel">chisel</a>，内含各种各样的扩展功能。</p>
+
+<p>需要自己开发新扩展，可以参考lldb关于文档：<br/>
+<a href="http://lldb.llvm.org/python_reference/lldb.SBFrame-class.html">Package lldb :: Class SBFrame</a><br/>
+<a href="http://lldb.llvm.org/cpp_reference/html/classlldb_1_1SBValue.html">lldb::SBValue Class Reference</a></p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Xcode/lldb自动导入UIKit]]></title>
+    <link href="http://openfibers.github.io/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/"/>
+    <updated>2016-02-24T10:22:27+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb</id>
+    <content type="html"><![CDATA[<h2>lldb导入UIKit</h2>
+
+<p>使用lldb调试app时，lldb经常提示view.bounds无法打印：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import1.png" width="428" height="58"></p>
+
+<p>实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入</p>
+
+<pre><code class="bash">expr @import UIKit
+</code></pre>
+
+<p>即可解决：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import2.png" width="396" height="57"></p>
+
+<p>在开发Mac App时也是一样的，比如不导入AppKit则无法打印frame属性，手动导入AppKit即可：</p>
+
+<pre><code class="bash">expr @import AppKit
+</code></pre>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import3.png" width="297" height="113"></p>
+
+<h2>工程自动导入</h2>
+
+<p>但是大部分人都换有懒癌，对于每次调试都要手打一行命令是难以接受的。我们可以在main上加个断点：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import4.png" width="799" height="113"></p>
+
+<p>在main中断时执行<code>expr @import UIKit</code>，并自动continue:</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import5.png" width="647" height="370"></p>
+
+<p>然后在工程启动时就会自动导入UIKit到lldb了。</p>
+
+<h2>全局自动导入</h2>
+
+<p>对于懒癌晚期的患者，每个工程单独配置还是挺麻烦的，可以在lldbinit中设置全局自动导入UIKit。在命令行中执行：</p>
+
+<pre><code class="bash">echo display @import UIKit &gt;&gt; ~/.lldbinit
+echo display @import AppKit &gt;&gt; ~/.lldbinit
+</code></pre>
+
+<p>再重新启动调试即可（Xcode7测试时无需重启Xcode）。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[App/Framework/Static Library开启BitCode，既踩坑笔记]]></title>
+    <link href="http://openfibers.github.io/blog/2016/01/14/fucking-bitcode/"/>
+    <updated>2016-01-14T18:06:54+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/01/14/fucking-bitcode</id>
+    <content type="html"><![CDATA[<p>苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。</p>
+
+<p>下面介绍一下如何开启BitCode，以及我掉的坑有哪些。</p>
+
+<!--more-->
+
+
+<h3>1. App工程开启BitCode</h3>
+
+<p>在App的Target->Build Settings->Build Options中找到Enable BitCode，设置为YES，然后顶栏菜单Product->Archive。</p>
+
+<p>第一次使用BitCode编译很可能出现链接错误，ld时提示有文件编译时未开启bit code。比如下面这条错误：</p>
+
+<p>ld: &lsquo;FooFile(FooFile.o)&rsquo; does not contain bitcode. You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target.</p>
+
+<p>ld会提示什么framework或.a文件编译时未开启BitCode，这些framework或.a文件需要开启BitCode重新编译后再添加到工程，然后再次尝试编译。</p>
+
+<p>如果编译成功，上传到iTunes Connect后却提示如下错误：</p>
+
+<p><img class="left" src="/images/blog/fucking_bitcode/1.iTunesConnectError.png" width="509" height="379"></p>
+
+<p>则可能由于App不是用Archive编译的，或者在Custom Compiler Flags中未加入-fembed-bitcode。</p>
+
+<h3>2. 关于-fembed-bitcode</h3>
+
+<p>BitCode是编译期的feature，而非链接期的feature，也就是编译过程中每个.o文件都会有一个叫做__bitcode的段落生成。</p>
+
+<p>在Build Options中启用BitCode，且使用Build而非Archive编译时，Xcode会自动添加编译选项-fembed-bitcode-marker，这个选项的意思大概就是说：如果BitCode开启的话，这里本来应当是放bitcode的，实际上没放。</p>
+
+<p>在Build Options中启用BitCode，且使用Archive编译时，Xcode会自动添加编译选项-fembed-bitcode，此时才是真正开启了BitCode。<br/>
+如果编译选项设置-fembed-bitcode-marker，编译成功后上传iTunes Connect，就会出现1.中图片的错误。当然这里iTunes Connect的体验是非常差的，报个错还不告诉原因：“开发者你有本事猜猜看呀？”</p>
+
+<p>如果使用Build编译想强制开启-fembed-bitcode，只需在Target->Build Settings->Custom Compiler Flags中加入-fembed-bitcode即可。</p>
+
+<p>相关讨论可以参考<a href="http://stackoverflow.com/questions/31486232/how-do-i-xcodebuild-a-static-library-with-bitcode-enabled">How do I xcodebuild a static library with Bitcode enabled?</a></p>
+
+<h3>3. 创建支持 BitCode 的 Framework/Static Library</h3>
+
+<p>创建支持BitCode，并同时支持模拟器和真机的Framework/Static Library，和之前并无太大区别。</p>
+
+<p>Xcode6开始，在创建新工程时，增加了选项iOS->Framework and Library->Cocoa Touch Framework。假设想创建framework，可以首先选择这个选项，新建一个iOS framework project。如果想创建static library，则选择&#8221;Cocoa Touch Static Library&#8221;。<br/>
+创建完project，第一件事是在Target->Build Settings->Build Options中开启Enable BitCode，然后去Target->Build Settings->Custom Compiler Flags中加入-fembed-bitcode。因为一般来说，创建framework或static library，都是需要同时兼容模拟器和真机的，而Xcode并未提供便利的一键生成同时兼容模拟器和真机的executable binary的方式，而是要自己手动合并模拟器和真机的framework/static library。而在编译到模拟器时，是不支持Archive的，所以只有加上-fembed-bitcode选项才能支持BitCode。<br/>
+然后，在Build Settings->Architectures添加额外的真机指令集支持，在当前（2016.01.15）来说，就是再加上个armv7s。</p>
+
+<p>编译选项设置好之后，和以往一样，添加好各种代码文件和资源文件，将build configuration 设为 release，然后分别编译到模拟器和真机。之后手动合并fat executable file:</p>
+
+<p>合并framework的话：
+<code>bash
+    #combine framework
+    cd $product_folder
+    lipo -create -output "FooFramework" "Release-iphoneos/FooFramework.framework/FooFramework" "Release-iphonesimulator/FooFramework.framework/FooFramework"
+    lipo -info FooFramework
+    cp -R Release-iphoneos/FooFramework.framework ./FooFramework.framework
+    mv FooFramework ./FooFramework.framework/FooFramework
+</code></p>
+
+<p>lipo -info 后，对于常规的framework往往应该是如下显示：</p>
+
+<pre><code>Architectures in the fat file: FooFramework are: i386 x86_64 armv7 armv7s arm64 
+</code></pre>
+
+<p>合并static library的话：
+<code>
+    #combine library
+    cd $product_folder
+    lipo -create -output "libFooLibrary.a" "Release-iphoneos/libFooLibrary.a" "Release-iphonesimulator/libFooLibrary.a"
+    lipo -info libFooLibrary.a
+</code></p>
+
+<p>lipo -info 后，对于常规的static library往往应该是如下显示：</p>
+
+<pre><code>Architectures in the fat file: libFooLibrary.a are: i386 x86_64 armv7 armv7s arm64 
+</code></pre>
+
+<p>然后将 Framework 或（static library 和 public headers）加入到App工程中，开启App Target的BitCode，Archive编译，上传iTunes Connect测试是否能正常处理。如果是Framework的话，还需在App Target->General->Embedded Binaries中加入此Framework，否则会出现error。</p>
+
+<h3>4. 包的体积变化</h3>
+
+<p>花了这么大力气，总算成功上传Test Flight了，但在TestFlight中，原本31.7M的包体积变成了64.1M：</p>
+
+<p>关闭BitCode，TestFlight中显示如下：</p>
+
+<p><img class="left" src="/images/blog/fucking_bitcode/2.TestFlightDisableBitCode.PNG" width="375" height="164"></p>
+
+<p>开启BitCode，TestFlight中显示如下：</p>
+
+<p><img class="left" src="/images/blog/fucking_bitcode/3.TestFlightEnableBitCode.PNG" width="375" height="164"></p>
+
+<p>一口老血差点喷了出来。但是检查了可执行文件的大小，发现实际上用户下载的文件尺寸变小了。</p>
+
+<p>关闭BitCode，可执行文件尺寸为 20,741,664 Bytes：</p>
+
+<p><img class="left" src="/images/blog/fucking_bitcode/4.FileSizeDisableBitCode.PNG" width="446" height="259"></p>
+
+<p>开启BitCode，可执行文件尺寸为 9,374,768 Bytes：</p>
+
+<p><img class="left" src="/images/blog/fucking_bitcode/5.FileSizeEnableBitCode.PNG" width="446" height="259"></p>
+
+<p>占用硬盘空间小了不少。但是根据苹果的说法，随着尺寸的减小，可执行文件载入进内存的耗时也会减小，对于启动速度是会有提升的，但实际测试中，开启与不开启BitCode，从点击Icon到显示主界面，时间均在0.7秒左右，对于我的App提升不明显，或者说完全看不出来。<br/>
+理论上代码越多、工程越大，启用BitCode的优势越明显。<br/>
+结论是BitCode还是值得一用的，只是苹果在开启BitCode的路上留了不少坑，如果决定使用这个新feature，请做好充分的心理准备。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Xcode 中手动 Symbolicate Crash Log]]></title>
+    <link href="http://openfibers.github.io/blog/2015/12/16/xcode7-manually-symbolicate/"/>
+    <updated>2015-12-16T10:45:23+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/12/16/xcode7-manually-symbolicate</id>
+    <content type="html"><![CDATA[<p>从 Xcode7 开始 Organizer 集成了查看崩溃日志的功能，若 Xcode 可以定位到 crash 的 build，则可以直接在 Organizer 中查看崩溃是在具体哪一行。<br/>
+但是不能自动定位到 build 的情况也非常常见，此时地址不能自动转换成符号：</p>
+
+<p><img class="left" src="/images/blog/xcode7_manually_symbolicate1/xcode7_manually_symbolicate1.JPG"></p>
+
+<p>此时即需要手动转换。</p>
+
+<!--more-->
+
+
+<h4>1. 将.app文件夹、dSYM文件夹、crash文件放在同一个路径下</h4>
+
+<p><img class="left" src="/images/blog/xcode7_manually_symbolicate1/xcode7_manually_symbolicate2.JPG"></p>
+
+<p>其中.app文件夹也可以通过解压ipa文件提取到。</p>
+
+<h4>2. 配置Xcode环境变量</h4>
+
+<pre><code class="bash">export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
+</code></pre>
+
+<h4>3. 为了方便，把Xcode提供的symbolicatecrash工具加一个alias</h4>
+
+<p>Xcode8 :<br/>
+<code>
+alias symbolicatecrash='/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources/symbolicatecrash'
+</code></p>
+
+<p>Xcode7 / Xcode6 :<br/>
+<code>
+alias symbolicatecrash='/Applications/Xcode.app/Contents/SharedFrameworks/DTDeviceKitBase.framework/Versions/Current/Resources/symbolicatecrash'
+</code></p>
+
+<p>Xcode5 :<br/>
+<code>
+alias symbolicatecrash ='/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/PrivateFrameworks/DTDeviceKitBase.framework/Versions/Current/Resources/symbolicatecrash'
+</code></p>
+
+<h4>4. 切换到刚刚放置.app文件夹、dSYM、crash log的路径</h4>
+
+<pre><code>cd CRASH_FILES_PATH
+symbolicatecrash -v crash_to_convert.crash &gt; converted.crash
+</code></pre>
+
+<p>如果一切正常，converted.crash即为转换后的可读的crash log。</p>
+
+<h4>5. 如果没有成功，则检查.app、dSYM和crash log的build UUID是否相同</h4>
+
+<p>首先查看可执行文件和dSYM的build UUID：</p>
+
+<pre><code class="bash">➜ dwarfdump --uuid Crash.app/Crash
+UUID: 3ADB495D-8680-3403-A117-360D7658DA30 (armv7) Crash.app/Crash
+UUID: 5105C8AA-D5A1-31B7-A0B5-309EB899F43F (arm64) Crash.app/Crash
+➜ dwarfdump --uuid Crash.app.dSYM/Contents/Resources/DWARF/Crash 
+UUID: 3ADB495D-8680-3403-A117-360D7658DA30 (armv7) Crash.app.dSYM/Contents/Resources/DWARF/Crash
+UUID: 5105C8AA-D5A1-31B7-A0B5-309EB899F43F (arm64) Crash.app.dSYM/Contents/Resources/DWARF/Crash
+</code></pre>
+
+<p>将 UUID 去掉减号&#8217;-&lsquo;在 crash log 中搜索，如果 crash log 中 binary image 的 UUID 和可执行文件、dSYM的build UUID一致，则可以确定此 crash log 崩溃自此 build。否则 crash log 和此 build 不匹配。</p>
+
+<p><img class="left" src="/images/blog/xcode7_manually_symbolicate1/xcode7_manually_symbolicate3.JPG"></p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Xcode插件]]></title>
+    <link href="http://openfibers.github.io/blog/2015/10/04/xcode-plugins/"/>
+    <updated>2015-10-04T11:38:06+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/10/04/xcode-plugins</id>
+    <content type="html"><![CDATA[<h3>1. Alcatraz</h3>
+
+<p>其他插件的 package manager, 可以从此插件中搜索、安装、删除其他插件。<br/>
+<a href="https://github.com/supermarin/Alcatraz">Github地址</a></p>
+
+<h3>2. VVDocumenter-Xcode</h3>
+
+<p>///生成 Javadoc-Style 注释，可被 Xcode 识别，可生成文档。<br/>
+<a href="https://github.com/onevcat/VVDocumenter-Xcode">Github地址</a></p>
+
+<h3>3. MCLog</h3>
+
+<p>Log 的 filter，支持正则，响应式交互，尚有崩溃，不过值得一用。<br/>
+<a href="https://github.com/yuhua-chen/MCLog">Github地址</a></p>
+
+<h3>4. Clang-Format</h3>
+
+<p>一键格式化脏乱差代码。还支持自动按段落排序#import &ldquo;headers&#8221;。<br/>
+安装后在工程中建立 .clang-format 文件，在其中配置代码格式，再使用此插件格式化代码。<br/>
+前几天发pr修复了和 oh-my-zsh 同时使用的一处 crash，作者刚刚merge了，建议更新到最新。<br/>
+推荐格式：</p>
+
+<pre><code>BasedOnStyle: WebKit
+BreakBeforeBraces: Allman
+PointerAlignment: Right
+IndentCaseLabels: true
+AlignAfterOpenBracket: true
+</code></pre>
+
+<p><a href="https://github.com/travisjeffery/ClangFormat-Xcode">Github地址</a></p>
+
+<h3>5. FuzzyAutocomplete</h3>
+
+<p>代码自动补全的增强工具，输入反应稍微减慢，不装其他输入增强工具时卡顿尚可接受，值得一用。<br/>
+<a href="https://github.com/FuzzyAutocomplete/FuzzyAutocompletePlugin">Github地址</a></p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

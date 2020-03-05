@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: lldb | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/lldb/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[在lldb中一键打开模拟器sandbox路径]]></title>
+    <link href="http://openfibers.github.io/blog/2016/03/04/open-sandbox-folder-in-lldb/"/>
+    <updated>2016-03-04T10:39:55+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/03/04/open-sandbox-folder-in-lldb</id>
+    <content type="html"><![CDATA[<p>打开~/.lldbinit，在里面加入一行：<br/>
+<code>bash
+command alias sb script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]]);
+</code></p>
+
+<p>然后中断时，在lldb里打sb回车，就能打开模拟器当前运行的app的沙箱路径了。</p>
+
+<!--more-->
+
+
+<h3>原理</h3>
+
+<p>lldb中允许我们执行python代码，中断时使用script命令即可进入python模式：</p>
+
+<pre><code class="bash">(lldb) script
+</code></pre>
+
+<p>在python中我们可以通过lldb.frame操纵lldb，比如执行表达式，会返回一个lldb.SBValue对象：</p>
+
+<pre><code class="python">//python code
+lldb.frame.EvaluateExpression("NSHomeDirectory()")
+
+//return
+&lt;lldb.SBValue; proxy of &lt;Swig Object of type 'lldb::SBValue *' at 0x13ded2bd0&gt; &gt;
+</code></pre>
+
+<p>然后我们格式化成python字符串，会返回SBValue的description，类型是pystring：</p>
+
+<pre><code class="python">//python code
+'{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()"))
+
+//return
+'(NSPathStore2 *) $1 = 0x00007fdbc4c1a6d0 @"/Users/openthread/Library/Developer/CoreSimulator/Devices/5D48B08A-44C2-4AC5-B52D-725150EA1091/data/Containers/Data/Application/8331B6D2-FC68-4523-8093-94FD9487FF74"'
+</code></pre>
+
+<p>我们用引号split这个pystring，取数组中第一个元素，就是path：</p>
+
+<pre><code class="python">//python code
+'{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]
+
+//return
+'/Users/openthread/Library/Developer/CoreSimulator/Devices/5D48B08A-44C2-4AC5-B52D-725150EA1091/data/Containers/Data/Application/8331B6D2-FC68-4523-8093-94FD9487FF74'
+</code></pre>
+
+<p>然后在python中使用call调用shell的open，就可以打开沙箱路径了：
+<code>python  
+//python code
+from subprocess import call; call(["open", pathOfSandbox)
+</code></p>
+
+<p>这些命令可以连起来在lldb中执行：<br/>
+<code>
+(lldb) script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]])
+</code></p>
+
+<p>然而实在太长了，于是我们在lldb中加了个alias：</p>
+
+<pre><code class="bash">(lldb) command alias sb script from subprocess import call; call(["open", '{0:s}'.format(lldb.frame.EvaluateExpression("NSHomeDirectory()")).split("\"")[1]])
+</code></pre>
+
+<h3>扩展</h3>
+
+<p>lldb和python可以相互调用，给lldb增加了非常强的扩展性。<br/>
+facebook做了<a href="https://github.com/facebook/chisel">chisel</a>，内含各种各样的扩展功能。</p>
+
+<p>需要自己开发新扩展，可以参考lldb关于文档：<br/>
+<a href="http://lldb.llvm.org/python_reference/lldb.SBFrame-class.html">Package lldb :: Class SBFrame</a><br/>
+<a href="http://lldb.llvm.org/cpp_reference/html/classlldb_1_1SBValue.html">lldb::SBValue Class Reference</a></p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Xcode/lldb自动导入UIKit]]></title>
+    <link href="http://openfibers.github.io/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/"/>
+    <updated>2016-02-24T10:22:27+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb</id>
+    <content type="html"><![CDATA[<h2>lldb导入UIKit</h2>
+
+<p>使用lldb调试app时，lldb经常提示view.bounds无法打印：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import1.png" width="428" height="58"></p>
+
+<p>实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入</p>
+
+<pre><code class="bash">expr @import UIKit
+</code></pre>
+
+<p>即可解决：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import2.png" width="396" height="57"></p>
+
+<p>在开发Mac App时也是一样的，比如不导入AppKit则无法打印frame属性，手动导入AppKit即可：</p>
+
+<pre><code class="bash">expr @import AppKit
+</code></pre>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import3.png" width="297" height="113"></p>
+
+<h2>工程自动导入</h2>
+
+<p>但是大部分人都换有懒癌，对于每次调试都要手打一行命令是难以接受的。我们可以在main上加个断点：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import4.png" width="799" height="113"></p>
+
+<p>在main中断时执行<code>expr @import UIKit</code>，并自动continue:</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import5.png" width="647" height="370"></p>
+
+<p>然后在工程启动时就会自动导入UIKit到lldb了。</p>
+
+<h2>全局自动导入</h2>
+
+<p>对于懒癌晚期的患者，每个工程单独配置还是挺麻烦的，可以在lldbinit中设置全局自动导入UIKit。在命令行中执行：</p>
+
+<pre><code class="bash">echo display @import UIKit &gt;&gt; ~/.lldbinit
+echo display @import AppKit &gt;&gt; ~/.lldbinit
+</code></pre>
+
+<p>再重新启动调试即可（Xcode7测试时无需重启Xcode）。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

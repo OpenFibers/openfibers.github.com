@@ -1,0 +1,343 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Strong-weak dance 错误两则 - Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="第一则：RAC中strong-weak dance不完整造成内存泄露 今天在工程中发现了RAC导致的retain cycle: 1
+2
+3
+4
+@weakify(self)
+[RACObserve(self, fooProperty) subscribeNext:^(id fooProperty &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Strong-weak Dance 错误两则</h2>
+	<div class="entry-content"><h2>第一则：RAC中strong-weak dance不完整造成内存泄露</h2>
+
+<p>今天在工程中发现了RAC导致的retain cycle:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>相对于正常的RAC用法:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，strong-weak dance是必须做的，不做strong-weak dance就会循环引用。</p>
+
+<!--more-->
+
+
+<h3>1. 为何RAC以外的block可以不使用strong-weak dance</h3>
+
+<p>然而对于「传统」的strong-weak dance来说，如果不需避免block体执行过程中self中途变空，不strong回来也是非常正常的做法，换言之，strong-weak dance是保证block执行过程中weakSelf不变空的一种技巧。比如：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">//不需避免block体执行过程中weakSelf中途变空，可以这样用</span>
+</span><span class='line'><span class="k">__weak</span> <span class="kt">id</span> <span class="n">weakSelf</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">weakSelf</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如需避免block体执行过程中weakSelf中途变空，则可以这样：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">//这样可以避免block体执行过程中weakSelf中途变空</span>
+</span><span class='line'><span class="k">__weak</span> <span class="kt">id</span> <span class="n">weakSelf</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">id</span> <span class="n">strongSelf</span> <span class="o">=</span> <span class="n">weakSelf</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">strongSelf</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>2. 为何RAC中不用strong-weak dance就会内存泄露</h3>
+
+<p>参考该贴：<a href="http://stackoverflow.com/questions/21716982/explanation-of-how-weakify-and-strongify-work-in-reactivecocoa-libextobjc">Explanation of how weakify and strongify work in ReactiveCocoa / libextobjc</a></p>
+
+<p>在预处理前的RAC代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[[</span><span class="nb">self</span><span class="p">.</span><span class="n">searchText</span><span class="p">.</span><span class="n">rac_textSignal</span>
+</span><span class='line'>    <span class="nl">map</span><span class="p">:</span><span class="o">^</span><span class="kt">id</span><span class="p">(</span><span class="bp">NSString</span> <span class="o">*</span><span class="n">text</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">yellowColor</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}]</span>
+</span><span class='line'>    <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIColor</span> <span class="o">*</span><span class="n">color</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'>        <span class="nb">self</span><span class="p">.</span><span class="n">searchText</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="n">color</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>预处理后的RAC代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@autoreleasepool</span> <span class="p">{}</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">objc_ownership</span><span class="p">(</span><span class="k">weak</span><span class="p">)))</span> <span class="n">__typeof__</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span> <span class="n">self_weak_</span> <span class="o">=</span> <span class="p">(</span><span class="nb">self</span><span class="p">);</span>
+</span><span class='line'><span class="p">[[</span><span class="nb">self</span><span class="p">.</span><span class="n">searchText</span><span class="p">.</span><span class="n">rac_textSignal</span>
+</span><span class='line'>    <span class="nl">map</span><span class="p">:</span><span class="o">^</span><span class="kt">id</span><span class="p">(</span><span class="bp">NSString</span> <span class="o">*</span><span class="n">text</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">yellowColor</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}]</span>
+</span><span class='line'>    <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIColor</span> <span class="o">*</span><span class="n">color</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">@try</span> <span class="p">{}</span> <span class="k">@finally</span> <span class="p">{}</span>
+</span><span class='line'>        <span class="n">__attribute__</span><span class="p">((</span><span class="n">objc_ownership</span><span class="p">(</span><span class="k">strong</span><span class="p">)))</span> <span class="n">__typeof__</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span> <span class="nb">self</span> <span class="o">=</span> <span class="n">self_weak_</span><span class="p">;</span> <span class="c1">// 1</span>
+</span><span class='line'>        <span class="nb">self</span><span class="p">.</span><span class="n">searchText</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="n">color</span><span class="p">;</span>  <span class="c1">//2</span>
+</span><span class='line'>    <span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以看到<strong>@weakify</strong>在block外声明了一个weak的<strong>self_weak_</strong>，赋值为标准意义的<strong>self</strong>，<strong>@strongify</strong>在block内声明了一个strong的名为<strong>self</strong>的变量，retain了<strong>self_weak_</strong>，覆盖了标准意义的<strong>self</strong>，于是在block内直接使用<strong>self</strong>实际是使用的<strong>strong <strong>typeof</strong>(self) self</strong>，并不是使用的标准意义的<strong>self</strong>，完成了完整的strong-weak dance。<br/>
+ 而删除<strong>@strongify(self)</strong>，在block内则直接使用了标准意义的<strong>self</strong>，造成循环引用。</p>
+
+<h2>第二则 在dealloc中使用strong-weak dance造成崩溃</h2>
+
+<p>此类崩溃其实很容易定位，只要运行到，崩溃是必现的。只怕业务逻辑使得有此dealloc不是每次运行都会进，再加上有稍懒同事提交了以下代码且没测试，就会造成崩溃：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">dealloc</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">__weak</span> <span class="k">typeof</span> <span class="p">(</span><span class="nb">self</span><span class="p">)</span> <span class="n">weakSelf</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span><span class="c1">//此时就会崩溃，已进入dealloc的对象不能再赋给weak指针了</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="nl">action</span><span class="p">:</span><span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">weakSelf</span> <span class="n">doSomeThing</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>模拟器中运行，第三行报错EXC_BAD_INSTRUCTIONS(code=EXC_I386_INVOP)：</p>
+
+<blockquote><p>FooClass dealloced
+objc[16870]: Cannot form weak reference to instance (0x7fc02081ae50) of class FooClass. It is possible that this object was over-released, or is in the process of deallocation.</p></blockquote>
+
+<p>额外的两点提示：<br/>
+1. dealloc中，如果不百分之百确定代码的行为，不要对内存做玩火的操作。<br/>
+2. 想开发一款卓越产品，在开发过程中须建立机制，保证每位开发人员运行测试了他所写的每一行代码。</p>
+
+<p>Over</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-03T10:12:32+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/rac/'>rac</a>
+
+
+</div>
+	
+	<div class="comments"><a href="#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://openfibers.github.io/blog/2015/11/03/strong-weak-dance-mistakes/';
+        var disqus_url = 'http://openfibers.github.io/blog/2015/11/03/strong-weak-dance-mistakes/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,1018 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>In-App Purchase Walk Through - Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="1. 适用情况 想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。
+除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。 在苹果制定的游戏规则中，所有在App内提供的服务需要付费时，都应当使用IAP，比如软件功能、游戏道具； &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">In-App Purchase Walk Through</h2>
+	<div class="entry-content"><h2>1. 适用情况</h2>
+
+<p>想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。<br/>
+除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。</p>
+
+<p>在苹果制定的游戏规则中，所有在App内提供的服务需要付费时，都应当使用IAP，比如软件功能、游戏道具；所有在App外提供的服务需要付费时，都应使用其他支付方式，比如Uber的信用卡，淘宝、快的打车的支付宝SDK等。</p>
+
+<p>在IAP里，可以出售：</p>
+
+<ol>
+<li>数字内容：比如杂志、图片、游戏关卡解锁、相机付费滤镜等；</li>
+<li>软件功能：如各种扩展features；</li>
+<li>一次性服务：比如一次语音通话等。注意是「一次性」服务，不是一次「性服务」。</li>
+</ol>
+
+
+<p>在IAP里，不能出售:</p>
+
+<ol>
+<li>现实世界的商品或服务：比如刚才提到的一次「性服务」。严格遵守此方案有个好处：IAP 如果被破解，用户无法得到大量实物，开发商也不会有很大经济损失。非要做的话想绕过也是可以的：用 IAP 购买代币，审核通过后用代币购买实物。</li>
+<li>其他<a href="https://developer.apple.com/appstore/guidelines.html">the App Review GuideLines</a>中规定的不允许的内容：比如刚才提到的一次「性服务」。</li>
+</ol>
+
+
+<p>顺便说下，有次大网易的同事分享时提到：使用兑换码兑换App内服务是一条高压线。像Uber和Amazon里允许有码，是因为他们的码是用在现实世界的产品或服务上的。</p>
+
+<p>如果你确定内购需求符合IAP的使用要求，可以继续往下读了。</p>
+
+<!--more-->
+
+
+<h2>2. 购买及发放虚拟产品流程</h2>
+
+<p>官方给出的流程图是这样的：</p>
+
+<p><img class="left" src="/images/blog/iap/1.iap_intro_2x.png"></p>
+
+<ol>
+<li>获取内购列表（从App内读取或从自己服务器读取）</li>
+<li>App Store请求可用的内购列表</li>
+<li>向用户展示内购列表</li>
+<li>用户选择了内购列表，再发个购买请求</li>
+<li>收到购买完成的回掉</li>
+<li>发放虚拟产品</li>
+</ol>
+
+
+<h2>3.虚拟产品</h2>
+
+<h3>虚拟产品的分类</h3>
+
+<p>虚拟产品分为以下几种类型：</p>
+
+<ol>
+<li>消耗品（Consumable products）：比如游戏内金币等。</li>
+<li>不可消耗品（Non-consumable products）：简单来说就是一次购买，终身可用（用户可随时从App Store restore）。</li>
+<li>自动更新订阅品（Auto-renewable subscriptions）：和不可消耗品的不同点是有失效时间。比如一整年的付费周刊。在这种模式下，开发者定期投递内容，用户在订阅期内随时可以访问这些内容。订阅快要过期时，系统将自动更新订阅（如果用户同意）。</li>
+<li>非自动更新订阅品（Non-renewable subscriptions）：一般使用场景是从用户从IAP购买后，购买信息存放在自己的开发者服务器上。失效日期/可用是由开发者服务器自行控制的，而非由App Store控制，这一点与自动更新订阅品有差异。</li>
+<li>免费订阅品（Free subscriptions）：在Newsstand中放置免费订阅的一种方式。免费订阅永不过期。只能用于Newsstand-enabled apps。</li>
+</ol>
+
+
+<p>类型2、3、5都是以Apple ID为粒度的。比如小张有三个iPad，有一个Apple ID购买了不可消耗品，则三个iPad上都可以使用。<br/>
+类型1、4一般来说则是现买现用。如果开发者自己想做更多控制，一般选4。</p>
+
+<p>几种产品的区别如下（表格懒得翻译了）：</p>
+
+<p><strong><em>Table 1-1  Comparison of product types</em></strong></p>
+
+<table>
+<thead>
+<tr>
+<th>Product type</th>
+<th> Non-consumable </th>
+<th> Consumable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users can buy </td>
+<td> Once </td>
+<td> Multiple times</td>
+</tr>
+<tr>
+<td>Appears in the receipt</td>
+<td>Always</td>
+<td>Once</td>
+</tr>
+<tr>
+<td>Synced across devices</td>
+<td>By the system</td>
+<td>Not synced</td>
+</tr>
+<tr>
+<td>Restored</td>
+<td>By the system</td>
+<td>Not restored</td>
+</tr>
+</tbody>
+</table>
+
+
+<p><strong><em>Table 1-2  Comparison of subscription types</em></strong></p>
+
+<table>
+<thead>
+<tr>
+<th>Subscription type</th>
+<th>Auto-renewable</th>
+<th>Non-renewing</th>
+<th>Free</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users can buy</td>
+<td>Multiple times</td>
+<td>Multiple times</td>
+<td>Once</td>
+</tr>
+<tr>
+<td>Appears in the receipt</td>
+<td>Always</td>
+<td>Once</td>
+<td>Always</td>
+</tr>
+<tr>
+<td>Synced across devices</td>
+<td>By the system</td>
+<td>By your app</td>
+<td>By the system</td>
+</tr>
+<tr>
+<td>Restored</td>
+<td>By the system</td>
+<td>By your app</td>
+<td>By the system</td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>关于自动更新订阅品更新周期组（Auto-Renewable Subscription Duration Families）：</h3>
+
+<p>每种订阅品的每种更新周期可以在iTunes Connect中设置一个单独的价格。图中给出了一种订阅品的不同长度的更新周期的价格截图：<br/>
+<img class="left" src="/images/blog/iap/2.iap_news_alerts_2x.jpg"><br/>
+你可以把每种订阅品的每个长度的更新周期看成一个单独的产品，每个产品有自己独有的时长、价格、市场促销属性。<br/>
+为了让用户可以从中挑选一个偏好的更新周期，上图中我们为此种订阅的每个长度的更新周期分别设值了一个单独的价格，有一周的、一个月的、两个月的、季度的、半年的和一年的。<br/>
+上图中这种订阅品的全部六种更新周期合起来称为一个自动更新订阅品更新周期组（Auto-Renewable Subscription Duration Families）。</p>
+
+<h2>4. 人肉和iTunes Connect交互</h2>
+
+<h3>填写银行卡与纳税信息</h3>
+
+<ol>
+<li>登录<a href="https://itunesconnect.apple.com/">iTunes Connect</a></li>
+<li>点击Agreements, Tax, and Banking，填写Contact Info, Bank Info, Tax Info。如果填过就不用再填了。刚刚填写完成后，各种信息正在审核，如下图：<br/>
+<img class="left" src="/images/blog/iap/17.iap_tax_banking.png"><br/>
+即使信息正在审核，沙箱环境下也是可以访问IAP服务的，并不需要等审核完成才能测试。</li>
+</ol>
+
+
+<h3>新建虚拟产品</h3>
+
+<ol>
+<li>登录<a href="https://itunesconnect.apple.com/">iTunes Connect</a></li>
+<li>点击My Apps</li>
+<li>进入想使用IAP的App详情</li>
+<li>选择In-App Purchases<br/>
+<img class="left" src="/images/blog/iap/3.iap_AppDetails-menu-4_2x.png"></li>
+<li>点击Create New</li>
+<li>选择IAP虚拟产品类型。注意虚拟产品一旦新建，类型无法修改。<br/>
+<img class="left" src="/images/blog/iap/5.iap_iTunes_SelectType.png"></li>
+<li>填入Internal Name。只能在iTunes Connect中看到这个名字。不会出现在App Store中。最长255字节。<br/>
+<img class="left" src="/images/blog/iap/6.iap_internal_name.png"></li>
+<li>填入<strong><em>Product ID</em></strong>。每件产品有一个单独的<strong><em>Product ID</em></strong>，<strong><em>Product ID</em></strong>用于从App Store获取价格信息，以及付费时标识是哪种产品被购买了。例如com.163.neteasemusic.skin.dog。这个新建之后也是不能修改的。<br/>
+<img class="left" src="/images/blog/iap/7.iap_product_id.png"></li>
+<li>然后是设置价格。Cleared For Sale选为YES是虚拟产品被审核通过自动上架。NO是手动上架。Price Tier则是价格。<br/>
+<img class="left" src="/images/blog/iap/8.iap_price.png"></li>
+<li>多语言描述，这个是给用户看的。<br/>
+<img class="left" src="/images/blog/iap/9.iap_add_language_1.png">
+<img class="left" src="/images/blog/iap/10.iap_add_language_2.png"></li>
+<li>是否要在iTunes托管可购买内容，这个后面再说<br/>
+<img class="left" src="/images/blog/iap/11.iap_host_contents.png"></li>
+<li>填入review notes和review用的截图。<br/>
+<img class="left" src="/images/blog/iap/12.iap_review_notes_and_screen_shot.png"></li>
+<li>保存。</li>
+<li>保存后除了类型和Product ID都可以修改<br/>
+<img class="left" src="/images/blog/iap/13.iap_edit_product1.png">
+<img class="left" src="/images/blog/iap/14.iap_edit_product2.png">
+<img class="left" src="/images/blog/iap/15.iap_edit_product3.png">
+<img class="left" src="/images/blog/iap/16.iap_edit_product4.png"></li>
+</ol>
+
+
+<p>新建完，不用等待苹果审核就可以在沙箱环境使用了。</p>
+
+<h3>新建测试帐号</h3>
+
+<ol>
+<li>登录<a href="https://itunesconnect.apple.com/">iTunes Connect</a></li>
+<li>点击Users and Roles</li>
+<li>点击Sandbox Testers</li>
+<li>添加Tester。添加后在测试机上用tester帐号登录app store</li>
+</ol>
+
+
+<h3>附：在苹果托管不可消耗品（Non-consumable products）的内容需知</h3>
+
+<p>托管内容仅限于针对不可消耗品。<br/>
+首次创建不可消耗品时可以选择把内容托管到苹果服务器，当然也可以随时将自己服务器上的内容迁移到苹果服务器由苹果托管。<br/>
+需要使用托管功能的话，首先在iTunes Connect中提交不可消耗品让苹果审核。然后在Xcode中选取In-App Purchase Content template创建虚拟产品, 放入需要托管的内容, 然后使用Archive功能上传。或者使用Xcode为每一种虚拟产品创建一个.pkg文件，然后使用Application Loader一次性上传。<br/>
+具体细节请参考<a href="https://itunesconnect.apple.com/docs/UsingApplicationLoader.pdf">Using Application Loader</a>中和In-App Purchase有关的章节。</p>
+
+<p>关于和iTunes Connect的交互，更多细节请参考<a href="https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnectInAppPurchase_Guide/Chapters/Introduction.html#//apple_ref/doc/uid/TP40013727-CH1-SW1">In-App Purchase Configuration Guide for iTunes Connect</a>。</p>
+
+<h2>5. 代码里该做的事情</h2>
+
+<h3>获取产品列表</h3>
+
+<ol>
+<li>首先读取出App中内嵌的或是服务端中的Product IDs。</li>
+<li>使用SKProductRequest向苹果服务器验证哪些Product IDs是可用的。注意不要在[Class load]里发送请求，一定要等到App didFinishLauching之后再发，不然无法接到请求返回。核心代码如下：</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &lt;StoreKit/StoreKit.h&gt;</span>
+</span><span class='line'><span class="cp">#define kInAppPurchaseProUpgradeProductId   @&quot;com.163.neteasemusic.skin.dog&quot;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="bp">NSSet</span> <span class="o">*</span><span class="n">productIDs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSSet</span> <span class="nl">setWithObject</span><span class="p">:</span><span class="n">kInAppPurchaseProUpgradeProductId</span><span class="p">];</span>
+</span><span class='line'><span class="bp">SKProductsRequest</span> <span class="o">*</span><span class="n">request</span><span class="o">=</span> <span class="p">[[</span><span class="bp">SKProductsRequest</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithProductIdentifiers</span><span class="p">:</span><span class="n">productIDs</span><span class="p">];</span>
+</span><span class='line'><span class="n">request</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">request</span> <span class="n">start</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接收结果</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">productsRequest:</span><span class="p">(</span><span class="bp">SKProductsRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span>
+</span><span class='line'>     <span class="nf">didReceiveResponse:</span><span class="p">(</span><span class="bp">SKProductsResponse</span> <span class="o">*</span><span class="p">)</span><span class="nv">response</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="bp">NSArray</span> <span class="o">*</span><span class="n">myProducts</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">products</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="bp">SKProduct</span> <span class="o">*</span><span class="n">product</span> <span class="k">in</span> <span class="n">myProducts</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">//product</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">request:</span><span class="p">(</span><span class="bp">SKRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span> <span class="nf">didFailWithError:</span><span class="p">(</span><span class="bp">NSError</span> <span class="o">*</span><span class="p">)</span><span class="nv">error</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="c1">//处理错误</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>向自己的服务器生成订单</h3>
+
+<p>如果需要经过自己的服务器做二次验证，建议在调用苹果支付接口前做这一步。<br/>
+订单中必须要保存的是订单ID和用户想要购买的商品ID。这个记录是为了在二次验证时服务端做检查，防止 A 商品的 receipt 被用户拿来做 B 商品的购买结果校验。</p>
+
+<h3>发送购买请求</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &lt;StoreKit/StoreKit.h&gt;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="bp">SKProduct</span> <span class="o">*</span><span class="n">product</span> <span class="o">=</span> <span class="o">&lt;</span><span class="err">#</span> <span class="n">products</span> <span class="n">request</span><span class="err">中返回的</span><span class="bp">SKProduct</span> <span class="err">#</span><span class="o">&gt;</span><span class="p">;</span>
+</span><span class='line'><span class="bp">SKMutablePayment</span> <span class="o">*</span><span class="n">payment</span> <span class="o">=</span> <span class="p">[</span><span class="bp">SKMutablePayment</span> <span class="nl">paymentWithProduct</span><span class="p">:</span><span class="n">product</span><span class="p">];</span>
+</span><span class='line'><span class="n">payment</span><span class="p">.</span><span class="n">quantity</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'><span class="p">[[</span><span class="bp">SKPaymentQueue</span> <span class="n">defaultQueue</span><span class="p">]</span> <span class="nl">addPayment</span><span class="p">:</span><span class="n">payment</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>或者</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &lt;StoreKit/StoreKit.h&gt;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="bp">SKProduct</span> <span class="o">*</span><span class="n">product</span> <span class="o">=</span> <span class="o">&lt;</span><span class="err">#</span> <span class="n">products</span> <span class="n">request</span><span class="err">中返回的</span><span class="bp">SKProduct</span> <span class="err">#</span><span class="o">&gt;</span><span class="p">;</span>
+</span><span class='line'><span class="bp">SKPayment</span> <span class="o">*</span><span class="n">payment</span> <span class="o">=</span> <span class="p">[</span><span class="bp">SKPayment</span> <span class="nl">paymentWithProduct</span><span class="p">:</span><span class="n">product</span><span class="p">];</span>
+</span><span class='line'><span class="p">[[</span><span class="bp">SKPaymentQueue</span> <span class="n">defaultQueue</span><span class="p">]</span> <span class="nl">addPayment</span><span class="p">:</span><span class="n">payment</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>观察购买状态</h3>
+
+<p>首先在程序启动时注册观察者</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &lt;StoreKit/StoreKit.h&gt;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="p">[[</span><span class="bp">SKPaymentQueue</span> <span class="n">defaultQueue</span><span class="p">]</span> <span class="nl">addTransactionObserver</span><span class="p">:</span><span class="n">observer</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>并且实现回调，处理相应的购买返回。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">paymentQueue:</span><span class="p">(</span><span class="bp">SKPaymentQueue</span> <span class="o">*</span><span class="p">)</span><span class="nv">queue</span>
+</span><span class='line'> <span class="nf">updatedTransactions:</span><span class="p">(</span><span class="bp">NSArray</span> <span class="o">*</span><span class="p">)</span><span class="nv">transactions</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="bp">SKPaymentTransaction</span> <span class="o">*</span><span class="n">transaction</span> <span class="k">in</span> <span class="n">transactions</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">switch</span> <span class="p">(</span><span class="n">transaction</span><span class="p">.</span><span class="n">transactionState</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">// Call the appropriate custom method for the transaction state.</span>
+</span><span class='line'>            <span class="k">case</span> <span class="nl">SKPaymentTransactionStatePurchasing</span><span class="p">:</span>
+</span><span class='line'>                <span class="p">[</span><span class="nb">self</span> <span class="nl">showTransactionAsInProgress</span><span class="p">:</span><span class="n">transaction</span> <span class="nl">deferred</span><span class="p">:</span><span class="nb">NO</span><span class="p">];</span>
+</span><span class='line'>                <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">case</span> <span class="nl">SKPaymentTransactionStateDeferred</span><span class="p">:</span>
+</span><span class='line'>                <span class="p">[</span><span class="nb">self</span> <span class="nl">showTransactionAsInProgress</span><span class="p">:</span><span class="n">transaction</span> <span class="nl">deferred</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>                <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">case</span> <span class="nl">SKPaymentTransactionStateFailed</span><span class="p">:</span>
+</span><span class='line'>                <span class="p">[</span><span class="nb">self</span> <span class="nl">failedTransaction</span><span class="p">:</span><span class="n">transaction</span><span class="p">];</span>
+</span><span class='line'>                <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">case</span> <span class="nl">SKPaymentTransactionStatePurchased</span><span class="p">:</span>
+</span><span class='line'>                <span class="p">[</span><span class="nb">self</span> <span class="nl">completeTransaction</span><span class="p">:</span><span class="n">transaction</span><span class="p">];</span>
+</span><span class='line'>                <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">case</span> <span class="nl">SKPaymentTransactionStateRestored</span><span class="p">:</span>
+</span><span class='line'>                <span class="p">[</span><span class="nb">self</span> <span class="nl">restoreTransaction</span><span class="p">:</span><span class="n">transaction</span><span class="p">];</span>
+</span><span class='line'>                <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>                <span class="c1">// For debugging</span>
+</span><span class='line'>                <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;Unexpected transaction state %@&quot;</span><span class="p">,</span> <span class="l">@(</span><span class="n">transaction</span><span class="p">.</span><span class="n">transactionState</span><span class="l">)</span><span class="p">);</span>
+</span><span class='line'>                <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>需要监听SKPaymentQueue的更多状态变更，请实现<a href="https://developer.apple.com/library/ios/documentation/StoreKit/Reference/SKPaymentTransactionObserver_Protocol/index.html#//apple_ref/occ/intf/SKPaymentTransactionObserver">SKPaymentTransactionObserver</a>协议中提供的更多方法。</p>
+
+<h3>完成购买</h3>
+
+<p>在收到Purchased或Restored回调后，持久化购买记录以及receipt data。iOS6.X 或之前的版本中，持久化 receipt data 必须万无一失，因为一旦丢失，将没有任何途径再次拿到此 receipt，造成用户购买记录丢失。获取 receipt data 需要注意的点将在后面的二次验证中详细说。<br/>
+然后通知PaymentQueue，购买已经完成了。对finishTransaction则会触发系统IAP的UI刷新：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="bp">SKPaymentTransaction</span> <span class="o">*</span><span class="n">transaction</span> <span class="o">=</span> <span class="o">&lt;</span><span class="err">#</span> <span class="n">The</span> <span class="n">current</span> <span class="n">payment</span> <span class="err">#</span><span class="o">&gt;</span><span class="p">;</span>
+</span><span class='line'><span class="p">[[</span><span class="bp">SKPaymentQueue</span> <span class="n">defaultQueue</span><span class="p">]</span> <span class="nl">finishTransaction</span><span class="p">:</span><span class="n">transaction</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>另外在发放功能或道具之前，最好在自己服务端做一次二次校验，防止越狱插件或者Wifi的HTTP代理伪造购买记录。</p>
+
+<h3>二次验证防止破解</h3>
+
+<p>越狱插件或者HTTP代理均可让用户做到伪造购买记录。当我们收到购买完成的回调后，最好经过自己服务器验证购买是否合法。</p>
+
+<h4>经过 App Store 验证</h4>
+
+<p>以下代码用Cocoa实现了二次验证的过程。但是这个过程最好通过自己的后台服务器来做，不然非常容易在客户端被伪造返回结果。<br/>
+这里使用Cocoa实现只是为了阐述请求与返回值的格式。
+发送二次验证请求：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#define SANDBOX_VERIFY_RECEIPT_URL          [NSURL URLWithString:@&quot;https:</span><span class="c1">//sandbox.itunes.apple.com/verifyReceipt&quot;]</span>
+</span><span class='line'><span class="cp">#define APP_STORE_VERIFY_RECEIPT_URL        [NSURL URLWithString:@&quot;https:</span><span class="c1">//buy.itunes.apple.com/verifyReceipt&quot;]</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#ifdef DEBUG</span>
+</span><span class='line'><span class="cp">#define VERIFY_RECEIPT_URL SANDBOX_VERIFY_RECEIPT_URL</span>
+</span><span class='line'><span class="cp">#else</span>
+</span><span class='line'><span class="cp">#define VERIFY_RECEIPT_URL APP_STORE_VERIFY_RECEIPT_URL</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nl">verifyTransaction</span><span class="p">:(</span><span class="bp">SKPaymentTransaction</span> <span class="o">*</span><span class="p">)</span><span class="n">transaction</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="bp">NSData</span> <span class="o">*</span><span class="n">transactionReceipt</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">self</span> <span class="k">class</span><span class="p">]]</span> <span class="nl">receiptDataFromTransaction</span><span class="p">:</span><span class="n">transaction</span><span class="p">];</span>
+</span><span class='line'>    <span class="bp">NSString</span> <span class="o">*</span><span class="n">base64String</span> <span class="o">=</span> <span class="p">[</span><span class="n">OTBase64Helper</span> <span class="nl">base64forData</span><span class="p">:</span><span class="n">transactionReceipt</span><span class="p">];</span>
+</span><span class='line'>    <span class="bp">NSDictionary</span> <span class="o">*</span><span class="n">receiptDictionary</span> <span class="o">=</span> <span class="l">@{</span><span class="s">@&quot;receipt-data&quot;</span><span class="o">:</span><span class="n">base64String</span><span class="l">}</span><span class="p">;</span>
+</span><span class='line'>    <span class="bp">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">receiptDictionary</span> <span class="n">JSONData</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">_receiptRequest</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">_receiptRequest</span> <span class="n">cancel</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">_receiptRequest</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">_receiptRequest</span> <span class="o">=</span> <span class="p">[[</span><span class="n">ASIFormDataRequest</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithURL</span><span class="p">:</span><span class="n">VERIFY_RECEIPT_URL</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">_receiptRequest</span><span class="p">.</span><span class="n">userInfo</span> <span class="o">=</span> <span class="l">@{</span><span class="s">@&quot;ProductIdentifier&quot;</span> <span class="o">:</span> <span class="n">transaction</span><span class="p">.</span><span class="n">payment</span><span class="p">.</span><span class="n">productIdentifier</span><span class="l">}</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">_receiptRequest</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">_receiptRequest</span> <span class="nl">appendPostData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">_receiptRequest</span> <span class="n">startAsynchronous</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">+</span> <span class="p">(</span><span class="bp">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nl">receiptDataFromTransaction</span><span class="p">:(</span><span class="bp">SKPaymentTransaction</span> <span class="o">*</span><span class="p">)</span><span class="n">transaction</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="bp">NSData</span> <span class="o">*</span><span class="n">receiptData</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">receiptDataInReceiptURL</span><span class="p">];</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">receiptData</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'><span class="cp">#pragma clang diagnostic push</span>
+</span><span class='line'><span class="cp">#pragma clang diagnostic ignored &quot;-Wdeprecated&quot;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">([</span><span class="n">transaction</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">transactionReceipt</span><span class="p">)])</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">//Works in iOS3 - iOS8, deprected since iOS7, actual deprecated (returns nil) since iOS9</span>
+</span><span class='line'>            <span class="n">receiptData</span> <span class="o">=</span> <span class="n">transaction</span><span class="p">.</span><span class="n">transactionReceipt</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'><span class="cp">#pragma clang diagnostic pop</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">receiptData</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">+</span> <span class="p">(</span><span class="bp">NSData</span> <span class="o">*</span><span class="p">)</span><span class="n">receiptDataInReceiptURL</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO</span><span class="p">(</span><span class="s">@&quot;7.0&quot;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">[[</span><span class="bp">NSBundle</span> <span class="n">mainBundle</span><span class="p">]</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">appStoreReceiptURL</span><span class="p">)])</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">//Works since iOS7, implemented but calls selector not found directly in iOS6</span>
+</span><span class='line'>        <span class="c1">//so must decide by if system version &gt;= 7.0, DO NOT use respondsToSelector:@selector(appStoreReceiptURL)</span>
+</span><span class='line'>        <span class="bp">NSURL</span> <span class="o">*</span><span class="n">receiptUrl</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSBundle</span> <span class="n">mainBundle</span><span class="p">]</span> <span class="n">appStoreReceiptURL</span><span class="p">];</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">([[</span><span class="bp">NSFileManager</span> <span class="n">defaultManager</span><span class="p">]</span> <span class="nl">fileExistsAtPath</span><span class="p">:[</span><span class="n">receiptUrl</span> <span class="n">path</span><span class="p">]])</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="bp">NSData</span> <span class="o">*</span><span class="n">receiptData</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSData</span> <span class="nl">dataWithContentsOfURL</span><span class="p">:</span><span class="n">receiptUrl</span><span class="p">];</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">receiptData</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>需要注意的是，如果 App 不需要支持 iOS6.x 及之前的版本，建议仅使用 appStoreReceiptURL 获取 receipt 数据。appStoreReceiptURL 从 iOS7 开始启用，会返回用户在此 app 上购买过的全部 receipt 的 data（粒度猜测应该是本机，本 App Store 帐号，本 App 内的购买，具体没测试）。</p>
+
+<p>接收二次验证结果：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">requestFinished:</span><span class="p">(</span><span class="n">ASIHTTPRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="bp">NSString</span> <span class="o">*</span><span class="n">responseString</span> <span class="o">=</span> <span class="p">[</span><span class="n">request</span> <span class="n">responseString</span><span class="p">];</span>
+</span><span class='line'>    <span class="bp">NSDictionary</span> <span class="o">*</span><span class="n">dictionary</span> <span class="o">=</span> <span class="p">[</span><span class="n">responseString</span> <span class="n">objectFromJSONString</span><span class="p">];</span>
+</span><span class='line'>    <span class="bp">NSString</span> <span class="o">*</span><span class="n">productId</span> <span class="o">=</span> <span class="n">dictionary</span><span class="p">[</span><span class="s">@&quot;receipt&quot;</span><span class="p">][</span><span class="s">@&quot;product_id&quot;</span><span class="p">];</span>
+</span><span class='line'>    <span class="bp">NSNumber</span> <span class="o">*</span><span class="n">status</span> <span class="o">=</span> <span class="n">dictionary</span><span class="p">[</span><span class="s">@&quot;status&quot;</span><span class="p">];</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">status</span><span class="p">.</span><span class="n">intValue</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">//校验成功，发放内容</span>
+</span><span class='line'>         <span class="c1">//status code 0为成功</span>
+</span><span class='line'>   <span class="p">}</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="c1">//校验失败，不做处理或相应惩罚</span>
+</span><span class='line'>        <span class="c1">//21000 App Store不能读取你提供的JSON对象</span>
+</span><span class='line'>        <span class="c1">//21002 receipt-data域的数据有问题</span>
+</span><span class='line'>        <span class="c1">//21003 receipt无法通过验证</span>
+</span><span class='line'>        <span class="c1">//21004 提供的shared secret不匹配你账号中的shared secret</span>
+</span><span class='line'>        <span class="c1">//21005 receipt服务器当前不可用</span>
+</span><span class='line'>        <span class="c1">//21006 receipt合法，但是订阅已过期。服务器接收到这个状态码时，receipt数据仍然会解码并一起发送</span>
+</span><span class='line'>        <span class="c1">//21007 receipt是Sandbox receipt，但却发送至生产系统的验证服务</span>
+</span><span class='line'>        <span class="c1">//21008 receipt是生产receipt，但却发送至Sandbox环境的验证服务</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">requestFailed:</span><span class="p">(</span><span class="n">ASIHTTPRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">//出错处理</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>苹果的返回值如下：</p>
+
+<p>使用transaction.transactionReceipt取得的小票经二次验证后返回值：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;receipt&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nt">&quot;original_purchase_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2015-06-03 04:00:37 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;purchase_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1433329237329&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;unique_identifier&quot;</span><span class="p">:</span><span class="s2">&quot;secret9f135e2cd8f7dda951a15c01cd2220c60b&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;original_transaction_id&quot;</span><span class="p">:</span><span class="s2">&quot;1000000157783770&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;bvrs&quot;</span><span class="p">:</span><span class="s2">&quot;2.6.0&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;transaction_id&quot;</span><span class="p">:</span><span class="s2">&quot;1000000157783770&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;quantity&quot;</span><span class="p">:</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;unique_vendor_identifier&quot;</span><span class="p">:</span><span class="s2">&quot;SECRETCD-89AD-45C4-8937-359CCA9E8F36&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;item_id&quot;</span><span class="p">:</span><span class="s2">&quot;SECRET509&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;product_id&quot;</span><span class="p">:</span><span class="s2">&quot;com.your.iap.product.id&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;purchase_date&quot;</span><span class="p">:</span><span class="s2">&quot;2015-06-03 11:00:37 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;original_purchase_date&quot;</span><span class="p">:</span><span class="s2">&quot;2015-06-03 11:00:37 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;purchase_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2015-06-03 04:00:37 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;bid&quot;</span><span class="p">:</span><span class="s2">&quot;com.your.app.bundle.id&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;original_purchase_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1433329237329&quot;</span>
+</span><span class='line'>            <span class="p">},</span>
+</span><span class='line'><span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="mi">0</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使用[[NSBundle mainBundle] appStoreReceiptURL]取得的小票经二次验证后返回值：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='JSON'><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;environment&quot;</span><span class="p">:</span><span class="s2">&quot;Sandbox&quot;</span><span class="p">,</span>
+</span><span class='line'><span class="nt">&quot;receipt&quot;</span><span class="p">:</span>  <span class="p">{</span>
+</span><span class='line'>            <span class="err">//in_app</span> <span class="err">中全部支付共有的信息（本App的IAP信息）</span>
+</span><span class='line'>            <span class="nt">&quot;receipt_type&quot;</span><span class="p">:</span><span class="s2">&quot;ProductionSandbox&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;adam_id&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;app_item_id&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;bundle_id&quot;</span><span class="p">:</span><span class="s2">&quot;com.netease.neteasemusic&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;application_version&quot;</span><span class="p">:</span><span class="s2">&quot;2.9.0&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;download_id&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;version_external_identifier&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;request_date&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-29 03:37:17 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;request_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1438141037628&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;request_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-28 20:37:17 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;original_purchase_date&quot;</span><span class="p">:</span><span class="s2">&quot;2013-08-01 07:00:00 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;original_purchase_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1375340400000&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;original_purchase_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2013-08-01 00:00:00 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;original_application_version&quot;</span><span class="p">:</span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nt">&quot;in_app&quot;</span><span class="p">:</span>   <span class="p">[</span>
+</span><span class='line'>                            <span class="err">//每笔交易分别的信息</span>
+</span><span class='line'>                            <span class="p">{</span>
+</span><span class='line'>                                <span class="nt">&quot;quantity&quot;</span><span class="p">:</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;product_id&quot;</span><span class="p">:</span><span class="s2">&quot;com.netease.neteasemusictest.pack.clouddrive.2t12&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;transaction_id&quot;</span><span class="p">:</span><span class="s2">&quot;1000000164784521&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_transaction_id&quot;</span><span class="p">:</span><span class="s2">&quot;1000000164784521&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;purchase_date&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-23 15:03:04 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;purchase_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1437663784000&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;purchase_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-23 08:03:04 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_purchase_date&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-23 15:03:04 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_purchase_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1437663784000&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_purchase_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-23 08:03:04 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;is_trial_period&quot;</span><span class="p">:</span><span class="s2">&quot;false&quot;</span>
+</span><span class='line'>                            <span class="p">},</span>
+</span><span class='line'>                            <span class="p">{</span>
+</span><span class='line'>                                <span class="nt">&quot;quantity&quot;</span><span class="p">:</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;product_id&quot;</span><span class="p">:</span><span class="s2">&quot;com.netease.neteasemusictest.pack.clouddrive.1t12&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;transaction_id&quot;</span><span class="p">:</span><span class="s2">&quot;1000000165136224&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_transaction_id&quot;</span><span class="p">:</span><span class="s2">&quot;1000000165136224&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;purchase_date&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-27 06:40:40 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;purchase_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1437979240000&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;purchase_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-26 23:40:40 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_purchase_date&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-27 06:40:40 Etc/GMT&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_purchase_date_ms&quot;</span><span class="p">:</span><span class="s2">&quot;1437979240000&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;original_purchase_date_pst&quot;</span><span class="p">:</span><span class="s2">&quot;2015-07-26 23:40:40 America/Los_Angeles&quot;</span><span class="p">,</span>
+</span><span class='line'>                                <span class="nt">&quot;is_trial_period&quot;</span><span class="p">:</span><span class="s2">&quot;false&quot;</span>
+</span><span class='line'>                            <span class="p">}</span>
+</span><span class='line'>                        <span class="p">]</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>纯本地验证</h4>
+
+<p>除了网络验证以外，苹果提供了纯粹的本地验证方式：<a href="https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html#//apple_ref/doc/uid/TP40010573-CH1-SW2">Validating Receipts Locally</a>.<br/>
+Receipt data 经过 App Store 证书签名，所以第三方无法凭空生成能够通过此法验证的 receipt data。只要做好证书校验，无需担心用户会伪造 receipt data。<br/>
+在客户端使用这种方式可以做到防止被通用破解方式破解，但并不能防止针对特定 App 的破解。<br/>
+实际上，这种验证方式是苹果为服务端设计的。Receipt data 的格式遵守ASN.1格式，服务端安装asn1c就可以解析 receipt data，并不需要纯手写一份解析代码。只要服务端代码和 asn1c 不出 bug，在服务端使用这种方式验证就是安全的。</p>
+
+<h4>第三方网站验证</h4>
+
+<p>有些第三方网站提供了经服务端的验证服务。比如<a href="http://urbanairship.com/products">urbanairship</a>. 但是我并没有用过，所以不知道具体效果如何。毕竟第三方服务无法做到在用户发起购买之前生成订单记录，与购买后验证结果比对，所以我还是比较担心第三方验证服务的安全性的。而且鸡国网络连国外验证服务器，你懂的。。</p>
+
+<p>总之想要万无一失，建议开发自己的验证接口。</p>
+
+<p>更多验证相关问题，请参考<a href="https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Introduction.html#//apple_ref/doc/uid/TP40010573">Receipt Validation Programming Guide</a></p>
+
+<p>大多数产品在验证成功后，才是真正的发放内容、道具等。特别是充值后立即消费的虚拟货币基本都是这么处理的。<br/>
+但是从接口来看， IAP 的设计者是想让开发者在购买完成时发放内容、道具，在二次验证失败时以删除内容、道具等方式来进行处罚。</p>
+
+<h2>6.服务端二次验证后再发放数据中的安全问题</h2>
+
+<p>由于是和钱关系最紧密的功能，IAP安全性显得无比重要。</p>
+
+<h3>客户端数据安全</h3>
+
+<p>客户端根据使用不同的获取 receipt 的接口，需要做的事情也不同：</p>
+
+<h4>1. 客户端使用transaction.transactionReceipt（或使用transaction.transactionReceipt + appStoreReceiptURL两者）:</h4>
+
+<p>如果要支持 iOS6，那么不得不使用transaction.transactionReceipt在 iOS6上读取receipt，客户端需要保证持久化逻辑：<br/>
+在transaction完成后，和服务端的二次验证完成前，要对receipt data做持久化；
+若存在未上传成功的 receipt ，需要开定时器重试上传；
+如果要做删除持久化数据，删除的时机应当是收到从服务端发回的二次验证请求的响应时，确认服务端已和苹果完成通信之后（服务端返回和苹果连接失败则不应删除已保存的receiptData），若 IAP 交易不频繁，可考虑不删除持久化的 receipt data。</p>
+
+<h4>2. 客户端仅使用appStoreReceiptURL获取receipt</h4>
+
+<p>客户端每次交易完成从 appStoreReceiptURL 读取出 data 上传给服务器。同时有上传请求正在进行的话，持久化一个标记，表示有未完成的上传，在全部上传完成后将此标记置为上传结束。如果标记存在，需要开定时器重试上传。</p>
+
+<h3>服务端数据安全</h3>
+
+<p>服务端安全包含两部分：防止已扣款却购买无效；防止作弊。目前想到最圆的实践是：<br/>
+1. 在从客户端上传的 receipt data 中解析出的数据（包括本地解析或经苹果服务器解析）中，从全部交易记录中找到所有未被标记为已使用的交易记录，作为集合A。<br/>
+2. 枚举当前用户的全部待支付订单，匹配集合A中的交易记录中product id相同的项，并将此交易记录的 transaction id 记录下，标记为已使用；并将此订单标记为已支付，并发放道具。<br/>
+3. 线上环境仅在审核期间允许使用sandbox环境做二次验证，防止上线后内部同事使用sandbox test user免费充值道具到线上环境。需注意审核期间必须开启 sandbox 环境验证，不然会被 rejected。</p>
+
+<h3>其他安全问题</h3>
+
+<ol>
+<li>尽量使用纯 HTTPS 接口上传 receipt，并严格校验 SSL 证书，防止中间人攻击。</li>
+<li>越狱后有木马会盗取用户的支付，如果必要，需要提醒用户越狱风险。</li>
+</ol>
+
+
+<h2>7.切换线上/测试环境</h2>
+
+<p>需要在代码里显示声明的环境，就只有二次验证地址：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#define SANDBOX_VERIFY_RECEIPT_URL          [NSURL URLWithString:@&quot;https:</span><span class="c1">//sandbox.itunes.apple.com/verifyReceipt&quot;]</span>
+</span><span class='line'><span class="cp">#define APP_STORE_VERIFY_RECEIPT_URL        [NSURL URLWithString:@&quot;https:</span><span class="c1">//buy.itunes.apple.com/verifyReceipt&quot;]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而在Cocoa中调用苹果接口时，开发证书、Beta测试证书、提交证书编译出的App连接的都是Sandbox环境；只有上线后的App连接的是线上环境。</p>
+
+<p>另外再次强调，除非少量必要的自己线上环境的测试需要连接苹果的 Sandbox 验证服务之外，自己服务端的二次验证 API 应该严格做到自己的环境是线上环境，则连接苹果的线上环境二次验证接口。防止监守自盗的情况出现。</p>
+
+<h2>8.提交审核</h2>
+
+<p>如果是初次提交审核，IAP 商品要和第一个支持 IAP 的版本一起提交。审核期间要允许 sandbox 环境二次验证。<br/>
+后续新增的 IAP 商品则没有此限制，可以随时提交审核。</p>
+
+<p>Over</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T16:19:15+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/iap/'>iap</a>, <a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+	
+	<div class="comments"><a href="#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://openfibers.github.io/blog/2015/02/28/in-app-purchase-walk-through/';
+        var disqus_url = 'http://openfibers.github.io/blog/2015/02/28/in-app-purchase-walk-through/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

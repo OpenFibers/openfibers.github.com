@@ -1,0 +1,339 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>iOS抓包（使用BurpSuite和tcpdump） - Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="Introduce 开发过程中我们经常会需要对网络请求抓包，本次介绍的是使用BurpSuite抓取HTTP/HTTPS包，以及不越狱使用tcpdump抓取iPhone的网络包。 使用BurpSuite对HTTP/HTTPS抓包 开发中我们经常会需要对HTTP/HTTPS请求进行抓包。 &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">iOS抓包（使用BurpSuite和tcpdump）</h2>
+	<div class="entry-content"><h2>Introduce</h2>
+
+<p>开发过程中我们经常会需要对网络请求抓包，本次介绍的是使用BurpSuite抓取HTTP/HTTPS包，以及不越狱使用tcpdump抓取iPhone的网络包。</p>
+
+<h2>使用BurpSuite对HTTP/HTTPS抓包</h2>
+
+<p>开发中我们经常会需要对HTTP/HTTPS请求进行抓包。<br/>
+抓包实际上是在中间机器开了一个代理服务，让需要抓包的请求经过代理，我们就可以看到这些请求了。本质上是中间人攻击。<br/>
+BurpSuite是一个常用的调试工具。</p>
+
+<h4>1. 下载BurpSuite</h4>
+
+<p>从<a href="http://portswigger.net/burp/download.html">BurpSuite</a>官网下载jar包，右键点击，运行：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_1.jpg" width="947"></p>
+
+<!--more-->
+
+
+<h4>2. Burp设置</h4>
+
+<p>先从菜单Burp->Remember settings中检查是否All options都记录设置了，以便下次打开不用重新配置：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_2.jpg" width="418"></p>
+
+<p>在选项卡的Proxy->Options中，选择代理规则，点击Edit：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_3.jpg" width="693"></p>
+
+<p>在弹出的对话框中选择All interfaces，再点击OK，来监听所有的网卡：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_4.jpg" width="707"></p>
+
+<p>至此已经可以通过代理来监听手机的HTTP请求了。现在我们再制作CA让手机信任，来解密被加密的HTTPS请求。</p>
+
+<p>回到选项卡的Proxy->Options中，重新生成证书，以防被拥有相同的证书的人中间人攻击。生成后需要重启Burp：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_5.jpg" width="633"></p>
+
+<p>重启Burp后，回到选项卡的Proxy->Options中，导出证书为Der格式：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_6.jpg" width="946"></p>
+
+<p>然后将Der证书通过HTTP服务器或邮件发给手机，在手机上安装证书：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/InstallCert_1.jpg" width="250">
+<img class="left" src="/images/blog/ios_burp/InstallCert_2.jpg" width="250">
+<img class="left" src="/images/blog/ios_burp/InstallCert_3.jpg" width="250"></p>
+
+<p>第一次用，先关闭排除规则，抓取全部的包。在Proxy->Intercept选项卡中，点击按钮，使其显示‘Intercept is off’:</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_7.jpg" width="571"></p>
+
+<h4>3. 设置手机/模拟器代理</h4>
+
+<p>先看下Mac的网卡地址：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/ProxySettings_1.jpg" width="664"></p>
+
+<p>然后在手机的wifi详情中设置手动代理：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/ProxySettings_2.jpg" width="375"></p>
+
+<p>如果是模拟器，在网卡的高级设置中，设置HTTP和HTTPS代理为127.0.0.1:8080：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/ProxySettings_3.jpg" width="662"></p>
+
+<p>在手机或模拟器中发送请求，然后在Burp选项卡的Proxy->HTTP history中可以查看到结果：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_8.jpg" width="857"></p>
+
+<h4>4. 测试完成后删除手机的Der</h4>
+
+<p>不删除一旦私钥泄露会被中间人攻击，保险起见，调试完就赶紧从手机删掉证书。</p>
+
+<p>在系统设置->通用->描述文件中找到刚才安装的证书，然后删除：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/RemoveCert_1.jpg" width="375">
+<img class="left" src="/images/blog/ios_burp/RemoveCert_2.jpg" width="375"></p>
+
+<h2>使用tcpdump抓包</h2>
+
+<p>我们经常会用tcpdump抓取各种协议的网络包。<br/>
+iOS5之后，可以使用Remote Virtual Interface(RVI)建立虚拟网卡进行抓包，好处是：</p>
+
+<ul>
+<li>新版的Macbook/Air/Pro只有一块Wifi，没有RJ45接口，我们用USB线连接手机就可以完成抓包。</li>
+<li>使用RVI不管是蜂窝数据还是Wifi，网络报文都能抓的到，而以往用Wifi把流量导入电脑抓包无法抓取蜂窝数据下的报文。</li>
+</ul>
+
+
+<h4>1. 建立RVI</h4>
+
+<p>首先将手机用数据线连接到电脑。</p>
+
+<p>使用ifconfig -l命令查看当前网卡：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ifconfig -l
+</span><span class='line'>lo0 gif0 stf0 en0 en1 en2 p2p0 awdl0 bridge0 en4
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>查看手机的udid，然后使用rvictl命令建立rvi：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rvictl -s a1fad5xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxc60b
+</span><span class='line'>Starting device a1fad59f135e2cd8f7dda951a15c01cd2220c60b <span class="o">[</span>SUCCEEDED<span class="o">]</span> with interface rvi0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再次使用ifconfig -l查看网卡：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>ifconfig -l
+</span><span class='line'>lo0 gif0 stf0 en0 en1 en2 p2p0 awdl0 bridge0 en4 rvi0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们发现多出了一个rvi0，这个就是新建立的rvi。</p>
+
+<h4>2. 抓包</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo tcpdump -i rvi0 -w trace.pcap
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后在手机上进行操作，操作结束后在terminal里按control+c，结束抓包。然后trace.pcap就是生成的抓包记录。</p>
+
+<p>之后断开rvi连接：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>rvictl -s a1fad5xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxc60b
+</span><span class='line'>Stopping device a1fad59f135e2cd8f7dda951a15c01cd2220c60b <span class="o">[</span>SUCCEEDED<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们可以将pcap文件转换成纯文本格式查看：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>tcpdump -n -e -x -vvv -r trace.pcap &gt; trace.txt
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>不过一般还是用wireshark直接打开pcap文件查看比较方便。</p>
+
+<p>相关资源：</p>
+
+<p><a href="https://developer.apple.com/library/mac/qa/qa1176/_index.html">Apple Technical Q&amp;A 1176 : Getting a Packet Trace</a></p>
+
+<p>Over</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-18T14:39:33+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/burpsuite/'>burpsuite</a>, <a class='category' href='/blog/categories/debug/'>debug</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/tcpdump/'>tcpdump</a>
+
+
+</div>
+	
+	<div class="comments"><a href="#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://openfibers.github.io/blog/2016/03/18/debug-ios-traffic/';
+        var disqus_url = 'http://openfibers.github.io/blog/2016/03/18/debug-ios-traffic/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

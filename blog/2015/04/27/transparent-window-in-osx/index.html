@@ -1,0 +1,949 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>OSX各种实现毛玻璃效果窗口的方式与比较 - Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="毛玻璃窗体是10.10中新增的效果. 比如Finder的左边栏.
+本文只对10.8, 10.9, 10.10三个版本进行讨论. 我的App未对10.6和10.7做任何支持, 此处也不予讨论. 第一种方式: NSVisualEffectView 这是10.10中新开放的API, 只能在10. &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">OSX各种实现毛玻璃效果窗口的方式与比较</h2>
+	<div class="entry-content"><p>毛玻璃窗体是10.10中新增的效果. 比如Finder的左边栏.<br/>
+本文只对10.8, 10.9, 10.10三个版本进行讨论. 我的App未对10.6和10.7做任何支持, 此处也不予讨论.</p>
+
+<h2>第一种方式: NSVisualEffectView</h2>
+
+<p>这是10.10中新开放的API, 只能在10.10的runtime上使用.<br/>
+如果需要上架App Store, 这也是在10.10上完成毛玻璃效果的唯一方式.<br/>
+首先为NSView增加扩展:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//Returns NSVisualEffectView</span>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@implementation</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">Class</span> <span class="n">vibrantClass</span><span class="o">=</span><span class="n">NSClassFromString</span><span class="p">(</span><span class="s">@&quot;NSVisualEffectView&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">vibrantClass</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">NSVisualEffectView</span> <span class="o">*</span><span class="n">vibrant</span><span class="o">=</span><span class="p">[[</span><span class="n">vibrantClass</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFrame</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setAutoresizingMask</span><span class="p">:</span><span class="n">NSViewWidthSizable</span><span class="o">|</span><span class="n">NSViewHeightSizable</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setBlendingMode</span><span class="p">:</span><span class="n">mode</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">[</span><span class="nb">self</span> <span class="nl">addSubview</span><span class="p">:</span><span class="n">vibrant</span> <span class="nl">positioned</span><span class="p">:</span><span class="n">NSWindowBelow</span> <span class="nl">relativeTo</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="n">vibrant</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!--more-->
+
+
+<p>然后调用(代码只举例了整个window的contentView开启半透明):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@implementation</span> <span class="nc">NSWindow</span> <span class="nl">(BackgroundBlur)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">enableBlur</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">contentView</span> <span class="nl">insertVibrancyViewBlendingMode</span><span class="p">:</span><span class="n">NSVisualEffectBlendingModeBehindWindow</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>值得一提的是, 虽然SDK10.9中不包含NSVisualEffectView, 但是把NSVisualEffectView.h拷贝到工程中, 稍加改动修掉编译错误, 在SDK10.9下编译后, product放在10.10下运行, 是能正常显示毛玻璃效果的.<br/>
+至于我为什么要这么蛋疼的用SDK10.9编译一个只在10.10上用的功能, 因为SDK10.10编译后窗体标题不能隐藏, 而我的App必须隐藏窗口标题&hellip;<br/>
+然后我的App上架App Store的版本中只用此方式为10.10增加了毛玻璃窗体, 其他版本下均未实现透明窗体.</p>
+
+<h2>第二种方式: CGSConnection</h2>
+
+<p>此方式只能在10.8中使用. 其他版本中调用后不会生效.<br/>
+以下是给NSWindow增加的扩展中的方法. self表示一个NSWindow.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">applyGaussianBlurWithRadius:</span><span class="p">(</span><span class="n">CGFloat</span><span class="p">)</span><span class="nv">radius</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="p">[</span><span class="nb">self</span> <span class="nl">addCGSFilterWithName</span><span class="p">:</span><span class="s">@&quot;CIZoomBlur&quot;</span>
+</span><span class='line'>                 <span class="nl">withOptions</span><span class="p">:</span><span class="l">@{</span><span class="s">@&quot;inputRadius&quot;</span><span class="o">:</span> <span class="l">@(</span><span class="n">radius</span><span class="l">)}</span>
+</span><span class='line'>              <span class="nl">backgroundOnly</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">addCGSFilterWithName:</span><span class="p">(</span><span class="bp">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">filterName</span>
+</span><span class='line'>                <span class="nf">withOptions:</span><span class="p">(</span><span class="bp">NSDictionary</span> <span class="o">*</span><span class="p">)</span><span class="nv">filterOptions</span>
+</span><span class='line'>             <span class="nf">backgroundOnly:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">backgroundOnly</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">CGSConnection</span> <span class="n">conn</span> <span class="o">=</span> <span class="n">_CGSDefaultConnection</span><span class="p">();</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">{</span>
+</span><span class='line'>      <span class="n">CGSWindowFilterRef</span> <span class="n">filter</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">//Create a CoreImage gaussian blur filter.</span>
+</span><span class='line'>      <span class="n">CGSNewCIFilterByName</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="p">(</span><span class="k">__bridge</span> <span class="n">CFStringRef</span><span class="p">)</span><span class="n">filterName</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">filter</span><span class="p">);</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="n">filter</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">{</span>
+</span><span class='line'>          <span class="n">CGSWindowID</span> <span class="n">windowNumber</span> <span class="o">=</span> <span class="p">(</span><span class="n">CGSWindowID</span><span class="p">)</span><span class="nb">self</span><span class="p">.</span><span class="n">windowNumber</span><span class="p">;</span>
+</span><span class='line'>          <span class="kt">int</span> <span class="n">compositingType</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">backgroundOnly</span><span class="p">;</span>
+</span><span class='line'>          
+</span><span class='line'>          <span class="n">CGSSetCIFilterValuesFromDictionary</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">filter</span><span class="p">,</span> <span class="p">(</span><span class="k">__bridge</span> <span class="n">CFDictionaryRef</span><span class="p">)</span><span class="n">filterOptions</span><span class="p">);</span>
+</span><span class='line'>          
+</span><span class='line'>          <span class="n">CGSAddWindowFilter</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">windowNumber</span><span class="p">,</span> <span class="n">filter</span><span class="p">,</span> <span class="n">compositingType</span><span class="p">);</span>
+</span><span class='line'>          
+</span><span class='line'>          <span class="c1">//Clean up after ourselves.</span>
+</span><span class='line'>          <span class="n">CGSReleaseCIFilter</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">filter</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>第三种方式: 私有APICGSSetWindowBackgroundBlurRadius</h2>
+
+<p>此方法只能在10.9以上版本使用, 且为私有API, 使用后App不能上架, 而且模糊半径最大为15px, 设置更大的值系统会按照15px处理.<br/>
+这也是10.9中实现窗体半透明的唯一方式, 10.9中内置的Terminate.app也是用此法实现的.<br/>
+以下是给NSWindow增加的扩展中的方法. self表示一个NSWindow.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">extern</span> <span class="n">OSStatus</span> <span class="nf">CGSSetWindowBackgroundBlurRadius</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">connection</span><span class="p">,</span> <span class="bp">NSInteger</span>   <span class="n">windowNumber</span><span class="p">,</span> <span class="kt">int</span> <span class="n">radius</span><span class="p">);</span>
+</span><span class='line'><span class="k">extern</span> <span class="n">CGSConnection</span> <span class="nf">CGSDefaultConnectionForThread</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setWindowBackgroundBlurRadius:</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="nv">radius</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">CGSConnection</span> <span class="n">connection</span> <span class="o">=</span> <span class="n">CGSDefaultConnectionForThread</span><span class="p">();</span>
+</span><span class='line'>    <span class="n">CGSSetWindowBackgroundBlurRadius</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="p">[</span><span class="nb">self</span> <span class="n">windowNumber</span><span class="p">],</span> <span class="n">radius</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后在工程中放入声明私有API的头文件CGSPrivate.h:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+<span class='line-number'>151</span>
+<span class='line-number'>152</span>
+<span class='line-number'>153</span>
+<span class='line-number'>154</span>
+<span class='line-number'>155</span>
+<span class='line-number'>156</span>
+<span class='line-number'>157</span>
+<span class='line-number'>158</span>
+<span class='line-number'>159</span>
+<span class='line-number'>160</span>
+<span class='line-number'>161</span>
+<span class='line-number'>162</span>
+<span class='line-number'>163</span>
+<span class='line-number'>164</span>
+<span class='line-number'>165</span>
+<span class='line-number'>166</span>
+<span class='line-number'>167</span>
+<span class='line-number'>168</span>
+<span class='line-number'>169</span>
+<span class='line-number'>170</span>
+<span class='line-number'>171</span>
+<span class='line-number'>172</span>
+<span class='line-number'>173</span>
+<span class='line-number'>174</span>
+<span class='line-number'>175</span>
+<span class='line-number'>176</span>
+<span class='line-number'>177</span>
+<span class='line-number'>178</span>
+<span class='line-number'>179</span>
+<span class='line-number'>180</span>
+<span class='line-number'>181</span>
+<span class='line-number'>182</span>
+<span class='line-number'>183</span>
+<span class='line-number'>184</span>
+<span class='line-number'>185</span>
+<span class='line-number'>186</span>
+<span class='line-number'>187</span>
+<span class='line-number'>188</span>
+<span class='line-number'>189</span>
+<span class='line-number'>190</span>
+<span class='line-number'>191</span>
+<span class='line-number'>192</span>
+<span class='line-number'>193</span>
+<span class='line-number'>194</span>
+<span class='line-number'>195</span>
+<span class='line-number'>196</span>
+<span class='line-number'>197</span>
+<span class='line-number'>198</span>
+<span class='line-number'>199</span>
+<span class='line-number'>200</span>
+<span class='line-number'>201</span>
+<span class='line-number'>202</span>
+<span class='line-number'>203</span>
+<span class='line-number'>204</span>
+<span class='line-number'>205</span>
+<span class='line-number'>206</span>
+<span class='line-number'>207</span>
+<span class='line-number'>208</span>
+<span class='line-number'>209</span>
+<span class='line-number'>210</span>
+<span class='line-number'>211</span>
+<span class='line-number'>212</span>
+<span class='line-number'>213</span>
+<span class='line-number'>214</span>
+<span class='line-number'>215</span>
+<span class='line-number'>216</span>
+<span class='line-number'>217</span>
+<span class='line-number'>218</span>
+<span class='line-number'>219</span>
+<span class='line-number'>220</span>
+<span class='line-number'>221</span>
+<span class='line-number'>222</span>
+<span class='line-number'>223</span>
+<span class='line-number'>224</span>
+<span class='line-number'>225</span>
+<span class='line-number'>226</span>
+<span class='line-number'>227</span>
+<span class='line-number'>228</span>
+<span class='line-number'>229</span>
+<span class='line-number'>230</span>
+<span class='line-number'>231</span>
+<span class='line-number'>232</span>
+<span class='line-number'>233</span>
+<span class='line-number'>234</span>
+<span class='line-number'>235</span>
+<span class='line-number'>236</span>
+<span class='line-number'>237</span>
+<span class='line-number'>238</span>
+<span class='line-number'>239</span>
+<span class='line-number'>240</span>
+<span class='line-number'>241</span>
+<span class='line-number'>242</span>
+<span class='line-number'>243</span>
+<span class='line-number'>244</span>
+<span class='line-number'>245</span>
+<span class='line-number'>246</span>
+<span class='line-number'>247</span>
+<span class='line-number'>248</span>
+<span class='line-number'>249</span>
+<span class='line-number'>250</span>
+<span class='line-number'>251</span>
+<span class='line-number'>252</span>
+<span class='line-number'>253</span>
+<span class='line-number'>254</span>
+<span class='line-number'>255</span>
+<span class='line-number'>256</span>
+<span class='line-number'>257</span>
+<span class='line-number'>258</span>
+<span class='line-number'>259</span>
+<span class='line-number'>260</span>
+<span class='line-number'>261</span>
+<span class='line-number'>262</span>
+<span class='line-number'>263</span>
+<span class='line-number'>264</span>
+<span class='line-number'>265</span>
+<span class='line-number'>266</span>
+<span class='line-number'>267</span>
+<span class='line-number'>268</span>
+<span class='line-number'>269</span>
+<span class='line-number'>270</span>
+<span class='line-number'>271</span>
+<span class='line-number'>272</span>
+<span class='line-number'>273</span>
+<span class='line-number'>274</span>
+<span class='line-number'>275</span>
+<span class='line-number'>276</span>
+<span class='line-number'>277</span>
+<span class='line-number'>278</span>
+<span class='line-number'>279</span>
+<span class='line-number'>280</span>
+<span class='line-number'>281</span>
+<span class='line-number'>282</span>
+<span class='line-number'>283</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="c1">//</span>
+</span><span class='line'><span class="c1">//  CGSPrivate.h</span>
+</span><span class='line'><span class="c1">//  Header file for undocumented CoreGraphics SPI</span>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'><span class="c1">//  Arranged by Nicholas Jitkoff</span>
+</span><span class='line'><span class="c1">//  Based on CGSPrivate.h by Richard Wareham</span>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'><span class="c1">//  Contributors:</span>
+</span><span class='line'><span class="c1">//    Austin Sarner: Shadows</span>
+</span><span class='line'><span class="c1">//    Jason Harris: Filters, Shadows, Regions</span>
+</span><span class='line'><span class="c1">//    Kevin Ballard: Warping</span>
+</span><span class='line'><span class="c1">//    Steve Voida: Workspace notifications</span>
+</span><span class='line'><span class="c1">//    Tony Arnold: Workspaces notifications enum filters</span>
+</span><span class='line'><span class="c1">//    Ben Gertzfield: CGSRemoveConnectionNotifyProc</span>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'><span class="c1">//  Changes:</span>
+</span><span class='line'><span class="c1">//    2.3 - Added the CGSRemoveConnectionNotifyProc method with the help of Ben Gertzfield</span>
+</span><span class='line'><span class="c1">//    2.2 - Moved back to CGSPrivate, added more enums to the CGSConnectionNotifyEvent</span>
+</span><span class='line'><span class="c1">//    2.1 - Added spaces notifications</span>
+</span><span class='line'><span class="c1">//    2.0 - Original Release</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;Carbon/Carbon.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#define CGSConnectionID CGSConnection</span>
+</span><span class='line'><span class="cp">#define CGSWindowID CGSWindow</span>
+</span><span class='line'><span class="cp">#define CGSDefaultConnection _CGSDefaultConnection()</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#ifdef __cplusplus</span>
+</span><span class='line'><span class="k">extern</span> <span class="s">&quot;C&quot;</span> <span class="p">{</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="kt">int</span> <span class="n">CGSConnection</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">typedef</span> <span class="kt">int</span> <span class="n">CGSWindow</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">typedef</span> <span class="kt">int</span> <span class="n">CGSWorkspace</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">typedef</span> <span class="kt">int</span> <span class="n">CGSValue</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#pragma mark Listing Windows</span>
+</span><span class='line'>  <span class="cm">/* Get the default connection for the current process. */</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGSConnection</span> <span class="nf">_CGSDefaultConnection</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">OSStatus</span> <span class="nf">CGSNewConnection</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">**</span><span class="n">attr</span><span class="p">,</span> <span class="n">CGSConnectionID</span> <span class="o">*</span><span class="kt">id</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Disable/Enable Screen Updates</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSDisableUpdate</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSReenableUpdate</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#pragma mark Listing Windows</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Get window counts and lists.</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowCount</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSConnection</span> <span class="n">targetCID</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">outCount</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowList</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSConnection</span> <span class="n">targetCID</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">list</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">outCount</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Get on-screen window counts and lists.</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetOnScreenWindowCount</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSConnection</span> <span class="n">targetCID</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">outCount</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetOnScreenWindowList</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSConnection</span> <span class="n">targetCID</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">list</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">outCount</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Per-workspace window counts and lists.</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWorkspaceWindowCount</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="n">workspaceNumber</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">outCount</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWorkspaceWindowList</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="n">workspaceNumber</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">list</span><span class="p">,</span> <span class="kt">int</span><span class="o">*</span> <span class="n">outCount</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#pragma mark Window Manipulation</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Window Level</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowLevel</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGWindowLevel</span> <span class="o">*</span><span class="n">level</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowLevel</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGWindowLevel</span> <span class="n">level</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Window ordering</span>
+</span><span class='line'>  <span class="k">typedef</span> <span class="k">enum</span> <span class="n">_CGSWindowOrderingMode</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">kCGSOrderAbove</span>                <span class="o">=</span>  <span class="mi">1</span><span class="p">,</span> <span class="c1">// Window is ordered above target.</span>
+</span><span class='line'>    <span class="n">kCGSOrderBelow</span>                <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="c1">// Window is ordered below target.</span>
+</span><span class='line'>    <span class="n">kCGSOrderOut</span>                  <span class="o">=</span>  <span class="mi">0</span>  <span class="c1">// Window is removed from the on-screen window list.</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">CGSWindowOrderingMode</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSOrderWindow</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSWindowOrderingMode</span> <span class="n">place</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">relativeToWindowID</span> <span class="cm">/* can be NULL */</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSWindowIsOrderedIn</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">Boolean</span> <span class="o">*</span><span class="n">result</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSUncoverWindow</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSFlushWindow</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">int</span> <span class="n">unknown</span> <span class="cm">/* 0 works */</span> <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Position</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowBounds</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindowID</span> <span class="n">wid</span><span class="p">,</span> <span class="bp">CGRect</span> <span class="o">*</span><span class="n">outBounds</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetScreenRectForWindow</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="bp">CGRect</span> <span class="o">*</span><span class="n">outRect</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSMoveWindow</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="bp">CGPoint</span> <span class="o">*</span><span class="n">point</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowTransform</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="bp">CGAffineTransform</span> <span class="n">transform</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowTransform</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="bp">CGAffineTransform</span> <span class="o">*</span> <span class="n">outTransform</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowTransforms</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="o">*</span><span class="n">wids</span><span class="p">,</span> <span class="bp">CGAffineTransform</span> <span class="o">*</span><span class="n">transform</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Alpha</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowAlpha</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">float</span> <span class="n">alpha</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowListAlpha</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="o">*</span><span class="n">wids</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="kt">float</span> <span class="n">alpha</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowAlpha</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">alpha</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Brightness</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowListBrightness</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="o">*</span><span class="n">wids</span><span class="p">,</span> <span class="kt">float</span> <span class="o">*</span><span class="n">brightness</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Workspace</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSMoveWorkspaceWindows</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">connection</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="n">toWorkspace</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="n">fromWorkspace</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSMoveWorkspaceWindowList</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">connection</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="o">*</span><span class="n">wids</span><span class="p">,</span> <span class="kt">int</span> <span class="n">count</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="n">toWorkspace</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Shadow</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowShadowAndRimParameters</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">float</span> <span class="n">standardDeviation</span><span class="p">,</span> <span class="kt">float</span> <span class="n">density</span><span class="p">,</span> <span class="kt">int</span> <span class="n">offsetX</span><span class="p">,</span> <span class="kt">int</span> <span class="n">offsetY</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowShadowAndRimParameters</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">standardDeviation</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">density</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">offsetX</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">offsetY</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span><span class="n">flags</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Properties</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowProperty</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSValue</span> <span class="n">key</span><span class="p">,</span> <span class="n">CGSValue</span> <span class="o">*</span><span class="n">outValue</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowProperty</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSValue</span> <span class="n">key</span><span class="p">,</span> <span class="n">CGSValue</span> <span class="o">*</span><span class="n">outValue</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Owner</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowOwner</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSConnection</span> <span class="o">*</span><span class="n">ownerCid</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSConnectionGetPID</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="kt">pid_t</span> <span class="o">*</span><span class="n">pid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">ownerCid</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#pragma mark Window Tags</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">CGSTagNone</span>          <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>        <span class="c1">// No tags</span>
+</span><span class='line'>    <span class="n">CGSTagExposeFade</span>    <span class="o">=</span> <span class="mh">0x0002</span><span class="p">,</span>    <span class="c1">// Fade out when Expose activates.</span>
+</span><span class='line'>    <span class="n">CGSTagNoShadow</span>      <span class="o">=</span> <span class="mh">0x0008</span><span class="p">,</span>    <span class="c1">// No window shadow.</span>
+</span><span class='line'>    <span class="n">CGSTagTransparent</span>   <span class="o">=</span> <span class="mh">0x0200</span><span class="p">,</span>   <span class="c1">// Transparent to mouse clicks.</span>
+</span><span class='line'>    <span class="n">CGSTagSticky</span>        <span class="o">=</span> <span class="mh">0x0800</span><span class="p">,</span>    <span class="c1">// Appears on all workspaces.</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">CGSWindowTag</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// thirtyTwo must = 32 for some reason.</span>
+</span><span class='line'>  <span class="c1">// tags is a pointer to an array of ints (size 2?). First entry holds window tags.</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowTags</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSWindowTag</span> <span class="o">*</span><span class="n">tags</span><span class="p">,</span> <span class="kt">int</span> <span class="n">thirtyTwo</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowTags</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSWindowTag</span> <span class="o">*</span><span class="n">tags</span><span class="p">,</span> <span class="kt">int</span> <span class="n">thirtyTwo</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSClearWindowTags</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSWindowTag</span> <span class="o">*</span><span class="n">tags</span><span class="p">,</span> <span class="kt">int</span> <span class="n">thirtyTwo</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowEventMask</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="o">*</span><span class="n">mask</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowEventMask</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">mask</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp"># pragma mark Window Warping</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="bp">CGPoint</span> <span class="n">local</span><span class="p">;</span>
+</span><span class='line'>    <span class="bp">CGPoint</span> <span class="n">global</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">CGPointWarp</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWindowWarp</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">int</span> <span class="n">w</span><span class="p">,</span> <span class="kt">int</span> <span class="n">h</span><span class="p">,</span> <span class="n">CGPointWarp</span> <span class="n">mesh</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">w</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp"># pragma mark Window Core Image Filters</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="kt">void</span> <span class="o">*</span><span class="n">CGSWindowFilterRef</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSNewCIFilterByName</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CFStringRef</span> <span class="n">filterName</span><span class="p">,</span> <span class="n">CGSWindowFilterRef</span> <span class="o">*</span><span class="n">outFilter</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSAddWindowFilter</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindowID</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSWindowFilterRef</span> <span class="n">filter</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSRemoveWindowFilter</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindowID</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSWindowFilterRef</span> <span class="n">filter</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSReleaseCIFilter</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindowFilterRef</span> <span class="n">filter</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetCIFilterValuesFromDictionary</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindowFilterRef</span> <span class="n">filter</span><span class="p">,</span> <span class="n">CFDictionaryRef</span> <span class="n">filterValues</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#pragma mark Transitions</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">CGSNone</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>          <span class="c1">// No transition effect.</span>
+</span><span class='line'>    <span class="n">CGSFade</span><span class="p">,</span>              <span class="c1">// Cross-fade.</span>
+</span><span class='line'>    <span class="n">CGSZoom</span><span class="p">,</span>              <span class="c1">// Zoom/fade towards us.</span>
+</span><span class='line'>    <span class="n">CGSReveal</span><span class="p">,</span>            <span class="c1">// Reveal new desktop under old.</span>
+</span><span class='line'>    <span class="n">CGSSlide</span><span class="p">,</span>              <span class="c1">// Slide old out and new in.</span>
+</span><span class='line'>    <span class="n">CGSWarpFade</span><span class="p">,</span>          <span class="c1">// Warp old and fade out revealing new.</span>
+</span><span class='line'>    <span class="n">CGSSwap</span><span class="p">,</span>              <span class="c1">// Swap desktops over graphically.</span>
+</span><span class='line'>    <span class="n">CGSCube</span><span class="p">,</span>              <span class="c1">// The well-known cube effect.</span>
+</span><span class='line'>    <span class="n">CGSWarpSwitch</span><span class="p">,</span>        <span class="c1">// Warp old, switch and un-warp.</span>
+</span><span class='line'>    <span class="n">CGSFlip</span><span class="p">,</span>              <span class="c1">// Flip over</span>
+</span><span class='line'>    <span class="n">CGSTransparentBackgroundMask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">7</span><span class="p">)</span> <span class="c1">// OR this with any other type to get a transparent background</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">CGSTransitionType</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">CGSDown</span><span class="p">,</span>              <span class="c1">// Old desktop moves down.</span>
+</span><span class='line'>    <span class="n">CGSLeft</span><span class="p">,</span>              <span class="c1">// Old desktop moves left.</span>
+</span><span class='line'>    <span class="n">CGSRight</span><span class="p">,</span>              <span class="c1">// Old desktop moves right.</span>
+</span><span class='line'>    <span class="n">CGSInRight</span><span class="p">,</span>            <span class="c1">// CGSSwap: Old desktop moves into screen, new comes from right.</span>
+</span><span class='line'>    <span class="n">CGSBottomLeft</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>    <span class="c1">// CGSSwap: Old desktop moves to bl, new comes from tr.</span>
+</span><span class='line'>    <span class="n">CGSBottomRight</span><span class="p">,</span>        <span class="c1">// CGSSwap: Old desktop to br, New from tl.</span>
+</span><span class='line'>    <span class="n">CGSDownTopRight</span><span class="p">,</span>      <span class="c1">// CGSSwap: Old desktop moves down, new from tr.</span>
+</span><span class='line'>    <span class="n">CGSUp</span><span class="p">,</span>                <span class="c1">// Old desktop moves up.</span>
+</span><span class='line'>    <span class="n">CGSTopLeft</span><span class="p">,</span>            <span class="c1">// Old desktop moves tl.</span>
+</span><span class='line'>    <span class="n">CGSTopRight</span><span class="p">,</span>          <span class="c1">// CGSSwap: old to tr. new from bl.</span>
+</span><span class='line'>    <span class="n">CGSUpBottomRight</span><span class="p">,</span>      <span class="c1">// CGSSwap: old desktop up, new from br.</span>
+</span><span class='line'>    <span class="n">CGSInBottom</span><span class="p">,</span>          <span class="c1">// CGSSwap: old in, new from bottom.</span>
+</span><span class='line'>    <span class="n">CGSLeftBottomRight</span><span class="p">,</span>    <span class="c1">// CGSSwap: old one moves left, new from br.</span>
+</span><span class='line'>    <span class="n">CGSRightBottomLeft</span><span class="p">,</span>    <span class="c1">// CGSSwap: old one moves right, new from bl.</span>
+</span><span class='line'>    <span class="n">CGSInBottomRight</span><span class="p">,</span>      <span class="c1">// CGSSwap: onl one in, new from br.</span>
+</span><span class='line'>    <span class="n">CGSInOut</span>              <span class="c1">// CGSSwap: old in, new out.</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">CGSTransitionOption</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">uint32_t</span> <span class="n">unknown1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">CGSTransitionType</span> <span class="n">type</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">CGSTransitionOption</span> <span class="n">option</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">;</span>      <span class="cm">/* Can be 0 for full-screen */</span>
+</span><span class='line'>    <span class="kt">float</span> <span class="o">*</span><span class="n">backColour</span><span class="p">;</span>  <span class="cm">/* Null for black otherwise pointer to 3 float array with RGB value */</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">CGSTransitionSpec</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSNewTransition</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSTransitionSpec</span><span class="o">*</span> <span class="n">spec</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">pTransitionHandle</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSInvokeTransition</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="kt">int</span> <span class="n">transitionHandle</span><span class="p">,</span> <span class="kt">float</span> <span class="n">duration</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSReleaseTransition</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="kt">int</span> <span class="n">transitionHandle</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#pragma mark Workspaces</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWorkspace</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="o">*</span><span class="n">workspace</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSGetWindowWorkspace</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="k">const</span> <span class="n">CGSWindow</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="o">*</span><span class="n">workspace</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWorkspace</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="n">workspace</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSSetWorkspaceWithTransition</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWorkspace</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">CGSTransitionType</span> <span class="n">transition</span><span class="p">,</span> <span class="n">CGSTransitionOption</span> <span class="n">subtype</span><span class="p">,</span> <span class="kt">float</span> <span class="n">transitionTime</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">CGSScreenResolutionChangedEvent</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown2</span> <span class="o">=</span> <span class="mi">101</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown3</span> <span class="o">=</span> <span class="mi">102</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown4</span> <span class="o">=</span> <span class="mi">103</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSClientEnterFullscreen</span> <span class="o">=</span> <span class="mi">106</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSClientExitFullscreen</span> <span class="o">=</span> <span class="mi">107</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown7</span> <span class="o">=</span> <span class="mi">750</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown8</span> <span class="o">=</span> <span class="mi">751</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSWorkspaceConfigurationDisabledEvent</span> <span class="o">=</span> <span class="mi">761</span><span class="p">,</span> <span class="c1">// Seems to occur when objects are removed (rows/columns), or disabled</span>
+</span><span class='line'>    <span class="n">CGSWorkspaceConfigurationEnabledEvent</span> <span class="o">=</span> <span class="mi">762</span><span class="p">,</span>  <span class="c1">// Seems to occur when objects are added (rows/columns), or enabled</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown9</span> <span class="o">=</span> <span class="mi">763</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown10</span> <span class="o">=</span> <span class="mi">764</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown11</span> <span class="o">=</span> <span class="mi">806</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown12</span> <span class="o">=</span> <span class="mi">807</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown13</span> <span class="o">=</span> <span class="mi">1201</span><span class="p">,</span>  <span class="c1">// Seems to occur when applications are launched/quit. Is this a connection being created/destroyed by the application to the window server?</span>
+</span><span class='line'>    <span class="n">CGSWorkspaceChangedEvent</span> <span class="o">=</span> <span class="mi">1401</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown14</span> <span class="o">=</span> <span class="mi">1409</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown15</span> <span class="o">=</span> <span class="mi">1410</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown16</span> <span class="o">=</span> <span class="mi">1411</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown17</span> <span class="o">=</span> <span class="mi">1412</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown18</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown19</span> <span class="o">=</span> <span class="mi">1501</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">CGSConnectionNotifyEventUnknown20</span> <span class="o">=</span> <span class="mi">1700</span>
+</span><span class='line'>  <span class="p">}</span> <span class="n">CGSConnectionNotifyEvent</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/* Prototype for the Spaces change notification callback.</span>
+</span><span class='line'><span class="cm">   *</span>
+</span><span class='line'><span class="cm">   * data1 -- returns whatever value is passed to data1 parameter in CGSRegisterConnectionNotifyProc</span>
+</span><span class='line'><span class="cm">   * data2 -- indeterminate (always a large negative integer; seems to be limited to a small set of values)</span>
+</span><span class='line'><span class="cm">   * data3 -- indeterminate (always returns the number &#39;4&#39; for me)</span>
+</span><span class='line'><span class="cm">   * userParameter -- returns whatever value is passed to userParameter in CGSRegisterConnectionNotifyProc</span>
+</span><span class='line'><span class="cm">   */</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">*</span><span class="n">CGConnectionNotifyProc</span><span class="p">)(</span><span class="kt">int</span> <span class="n">data1</span><span class="p">,</span> <span class="kt">int</span> <span class="n">data2</span><span class="p">,</span> <span class="kt">int</span> <span class="n">data3</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">userParameter</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/* Register a callback function to receive notifications about when</span>
+</span><span class='line'><span class="cm">   the current Space is changing.</span>
+</span><span class='line'><span class="cm">   *</span>
+</span><span class='line'><span class="cm">   * cid -- Current connection</span>
+</span><span class='line'><span class="cm">   * function -- A pointer to the intended callback function (must be in C; cannot be an Objective-C selector)</span>
+</span><span class='line'><span class="cm">   * event -- indeterminate (this is hard-coded to 0x579 in Spaces.menu...perhpas some kind of event filter code?) -- use CGSWorkspaceChangedEvent in this for now</span>
+</span><span class='line'><span class="cm">   * userParameter -- pointer to user-defined auxiliary information structure; passed directly to callback proc</span>
+</span><span class='line'><span class="cm">   */</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// For spaces notifications: CGSRegisterConnectionNotifyProc(_CGSDefaultConnection(), spacesCallback, 1401, (void*)userInfo);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSRegisterConnectionNotifyProc</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGConnectionNotifyProc</span> <span class="n">function</span><span class="p">,</span> <span class="n">CGSConnectionNotifyEvent</span> <span class="n">event</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">userParameter</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSRemoveConnectionNotifyProc</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGConnectionNotifyProc</span> <span class="n">function</span><span class="p">,</span> <span class="n">CGSConnectionNotifyEvent</span> <span class="n">event</span><span class="p">,</span> <span class="kt">void</span><span class="o">*</span> <span class="n">userParameter</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp"># pragma mark Miscellaneous</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Regions</span>
+</span><span class='line'>  <span class="k">typedef</span> <span class="kt">void</span> <span class="o">*</span><span class="n">CGSRegionRef</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSNewRegionWithRect</span><span class="p">(</span><span class="bp">CGRect</span> <span class="k">const</span> <span class="o">*</span><span class="n">inRect</span><span class="p">,</span> <span class="n">CGSRegionRef</span> <span class="o">*</span><span class="n">outRegion</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSNewEmptyRegion</span><span class="p">(</span><span class="n">CGSRegionRef</span> <span class="o">*</span><span class="n">outRegion</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSReleaseRegion</span><span class="p">(</span><span class="n">CGSRegionRef</span> <span class="n">region</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Creating Windows</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSNewWindowWithOpaqueShape</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="kt">int</span> <span class="n">always2</span><span class="p">,</span> <span class="kt">float</span> <span class="n">x</span><span class="p">,</span> <span class="kt">float</span> <span class="n">y</span><span class="p">,</span> <span class="n">CGSRegionRef</span> <span class="n">shape</span><span class="p">,</span> <span class="n">CGSRegionRef</span> <span class="n">opaqueShape</span><span class="p">,</span> <span class="kt">int</span> <span class="n">unknown1</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">unknownPtr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">always32</span><span class="p">,</span> <span class="n">CGSWindowID</span> <span class="o">*</span><span class="n">outWID</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSReleaseWindow</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindowID</span> <span class="n">wid</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGContextRef</span> <span class="nf">CGWindowContextCreate</span><span class="p">(</span><span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">CGSWindowID</span> <span class="n">wid</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">unknown</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Values</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="kt">int</span> <span class="nf">CGSIntegerValue</span><span class="p">(</span><span class="n">CGSValue</span> <span class="n">intVal</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="kt">void</span> <span class="o">*</span><span class="nf">CGSReleaseGenericObj</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Deprecated in 10.5</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGSValue</span> <span class="nf">CGSCreateCStringNoCopy</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">str</span><span class="p">);</span> <span class="c1">//Normal CFStrings will work</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="n">CGSValue</span> <span class="nf">CGSCreateCString</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">extern</span> <span class="kt">char</span><span class="o">*</span> <span class="nf">CGSCStringValue</span><span class="p">(</span><span class="n">CGSValue</span> <span class="n">string</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Missing functions</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//CGSIntersectRegionWithRect</span>
+</span><span class='line'>  <span class="c1">//CGSSetWindowTransformsAtPlacement</span>
+</span><span class='line'>  <span class="c1">//CGSSetWindowListGlobalClipShape</span>
+</span><span class='line'>  <span class="c1">//extern CGError CGSWindowAddRectToDirtyShape(const CGSConnection cid, const CGSWindow wid, CGRect *rect);</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#ifdef __cplusplus</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="cp">#endif</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Over</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-04-27T19:22:15+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/appkit/'>appkit</a>, <a class='category' href='/blog/categories/cocoa/'>cocoa</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+</div>
+	
+	<div class="comments"><a href="#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://openfibers.github.io/blog/2015/04/27/transparent-window-in-osx/';
+        var disqus_url = 'http://openfibers.github.io/blog/2015/04/27/transparent-window-in-osx/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

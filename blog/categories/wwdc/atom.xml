@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: wwdc | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/wwdc/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[WWDC 2015 带来的新玩法]]></title>
+    <link href="http://openfibers.github.io/blog/2015/06/19/wwdc-2015-features/"/>
+    <updated>2015-06-19T15:07:10+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/06/19/wwdc-2015-features</id>
+    <content type="html"><![CDATA[<p>WWDC 2015 更新了五大产品线：OS X EI，iOS 9，watchOS 2，Xcode 7，Swift 2.</p>
+
+<h2>1. OS X EI</h2>
+
+<h3>Metal APIs</h3>
+
+<p>Metal是一个开销极低的一种访问 GPU 的框架。<br/>
+Metal framework 提供了 GPU 加速的先进的3D渲染和数据并行计算能力。<br/>
+Metal 提供了流水线式的 API（streamlined API），预编译着色器（precompiled shaders），以及高性能的多线程支持。这些 features 可以帮助你把你的游戏或 app 的性能提升一个档次。<br/>
+Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。</p>
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/metal/">Metal Home Page</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40014221-CH1-SW1">Metal Programming Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalShadingLanguageGuide/Introduction/Introduction.html">Metal Shading Language Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalFrameworkReference/index.html">Metal Framework Reference</a></p>
+
+<!--more-->
+
+
+<h3>支持 Swift2</h3>
+
+<p>这个话题太大了就不详细介绍了。</p>
+
+<h3>Force Touch APIs for Safari</h3>
+
+<p>OS X 从10.10.3开始支持 Force Touch。<br/>
+Force Touch trackpad 为 mac 带来了新的交互方式:<br/>
+1. Force click<br/>
+    用力点击可以支持和点击不同的操作。<br/>
+2. Accelerators<br/>
+    比如用力按下时拖拽可以加速拖拽。<br/>
+3. Pressure sensitivity<br/>
+    压力感应：软件可根据触摸压力更改行为。比如画图软件可以在用力按下时让画笔变粗。<br/>
+4. Drag and drop
+    拖拽可以增加新的交互了。比如用力压下的拖拽可以直接打开拖拽目标。</p>
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/osx/force-touch/">Force Touch Home Page</a></p>
+
+<h3>App Extensions for Photos</h3>
+
+<p>可以给 Photos 开发插件，比如自定义的 filter 或者编辑工具。<br/>
+看来苹果想一统 OS X 上的看图软件。</p>
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/library/prerelease/mac/documentation/General/Conceptual/ExtensibilityPG/index.html">App Extension Programming Guide</a></p>
+
+<h2>2. iOS 9</h2>
+
+<h3>Multitasking</h3>
+
+<p>iPad 可以同一屏显示两个 App 了。<br/>
+支持以下模式：Slide Over, Split View, 和 Picture in Picture。</p>
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/library/prerelease/ios/documentation/WindowsViews/Conceptual/AdoptingMultitaskingOniPad/index.html">Adopting Multitasking Enhancements on iPad</a><br/>
+<a href="https://developer.apple.com/library/prerelease/ios/samplecode/Lister/Introduction/Intro.html#//apple_ref/doc/uid/TP40014701">Lister (for watchOS, iOS, and OS X)</a></p>
+
+<h3>Search</h3>
+
+<p>包括 App history、允许用户使用 Spotlight 搜索 App 内容和 web markup。<br/>
+1. App history
+    让用户可以回到他上次打开 app 时在 app 的位置。据说只要声明 app 已支持 Search，就能自动实现这一点。<br/>
+2. Content indexing
+    用Core Spotlight支持 Spotlight 中搜索文件内容。<br/>
+3. Web markup
+    可以在 app 中标记 app 可以访问的 web 资源，以便让这些 web 资源支持 Search。<br/>
+    可以支持 universal link，在 web 和 app 之间跳转。</p>
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/library/prerelease/ios/releasenotes/General/WhatsNewIniOS/Articles/iOS9.html#//apple_ref/doc/uid/TP40016198-DontLinkElementID_1">#Search in What&rsquo;s New in iOS 9</a></p>
+
+<h3>游戏框架</h3>
+
+<p><a href="https://developer.apple.com/scenekit/">SceneKit</a>,<a href="https://developer.apple.com/spritekit/">SpriteKit</a>,<a href="https://developer.apple.com/metal/">Metal</a>,<a href="https://developer.apple.com/library/prerelease/ios/documentation/General/Conceptual/GameplayKit_Guide/index.html#//apple_ref/doc/uid/TP40015172">GameplayKit</a>,<a href="https://developer.apple.com/library/prerelease/ios/samplecode/DemoBots/Introduction/Intro.html">ReplayKit</a>,<a href="https://developer.apple.com/library/prerelease/ios/documentation/ModelIO/Reference/ModelIO_Framework/index.html">Model I/O</a></p>
+
+<h3>App Thinning</h3>
+
+<p>允许用户下载App时只下载CPU对应的binary的architecture，和屏幕的scale对应的图片资源。同时iOS9的rom尺寸也大幅下降。</p>
+
+<h3>HomeKit</h3>
+
+<h3>HealthKit</h3>
+
+<h3>MapKit</h3>
+
+<h3>CloudKit</h3>
+
+<h3>Safari and Web Content</h3>
+
+<h3>News Publisher</h3>
+
+<h3>Swift 2</h3>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

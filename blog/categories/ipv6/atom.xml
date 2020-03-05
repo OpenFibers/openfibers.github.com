@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ipv6 | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/ipv6/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[检查iOS App是否支持IPv6-only Network]]></title>
+    <link href="http://openfibers.github.io/blog/2016/06/20/support-ipv6-only-network-in-ios/"/>
+    <updated>2016-06-20T14:37:10+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/06/20/support-ipv6-only-network-in-ios</id>
+    <content type="html"><![CDATA[<p>从2016年6月1号开始，苹果强制要求上架AppStore的应用支持IPv6-only network。<br/>
+本文分为两部分：通过代码检查是否兼容IPv6-only网络，以及如何搭建IPv6-only网络的测试环境。旨在帮助快速检查app是否支持IPv6-only Network。可以当做<a href="https://developer.apple.com/library/mac/documentation/NetworkingInternetWeb/Conceptual/NetworkingOverview/UnderstandingandPreparingfortheIPv6Transition/UnderstandingandPreparingfortheIPv6Transition.html#//apple_ref/doc/uid/TP40010220-CH213-SW1">Supporting IPv6 DNS64/NAT64 Networks</a>中<strong>Ensuring IPv6 DNS64/NAT64 Compatibility</strong>一节的速成版本。</p>
+
+<h2>通过搭建IPv6-only网络的测试环境测试</h2>
+
+<p>最便捷的检查方式是：找一台Mac，共享Internet到IPv6 DNS64/NAT64网络，然后让待测试设备连接到此网络，并测试app功能是否正常。<br/>
+需注意，OS X 10.11后才支持创建IPv6 DNS64/NAT64网络。如果待测试设备不是iOS或OS X或macOS设备（比如要测试Andr**d上的app是否兼容IPv6-only网络），请确保设备支持<a href="https://tools.ietf.org/html/rfc6106">RFC6106</a>。</p>
+
+<!--more-->
+
+
+<p>用在OS X(macOS)上创建IPv6 DNS64/NAT64网络很简单，只需要：</p>
+
+<ol>
+<li><strong>Mac带有两块网卡</strong>。如果是Macbook Pro with retina display或者Macbook Air，可以买一块Thunderbolt或USB转RJ45接口的网卡来解决这个问题。</li>
+<li><p>打开System Preference，按住Option点击Sharing，松开Option：<br/>
+<img class="left" src="/images/blog/support_ipv6_only_network_in_ios/systempreferences_sharing_2x.png" width="633"></p></li>
+<li><p>勾选 <strong>Create NAT64 Network</strong>，把来自其他网卡的Internet共享给Wifi：<br/>
+<img class="left" src="/images/blog/support_ipv6_only_network_in_ios/systempreferences_sharing_internetsharing_ipv6_2x.png" width="633"></p></li>
+<li><p>将测试设备连接到此Wifi，并测试App功能是否正常。</p></li>
+</ol>
+
+
+<h2>检查代码是否兼容IPv6-only网络</h2>
+
+<h4>1. 尽量使用高级API</h4>
+
+<p>尽量使用以下框架实现网络请求：</p>
+
+<ul>
+<li><strong>WebKit</strong>.</li>
+<li><strong>Cocoa URL loading system</strong>. 比如NSURLSession, NSURLRequest, 和 NSURLConnection。</li>
+<li><strong>CFNetwork</strong>.</li>
+</ul>
+
+
+<h4>2. 避免使用IPv4地址</h4>
+
+<ul>
+<li><strong>确保在代码中不会传递点分十进制表示的IPv4地址字符串(xxx.xxx.xxx.xxx)到底层网络API</strong>：比如确保不要传递点分十进制表示的IPv4地址字符串到<em>getaddrinfo</em>或<em>SCNetworkReachabilityCreateWithName</em>。需注意前面提到的高级API则会自动转换点分十进制表示的IPv4地址字符串到IPv6，所以在使用高级API时传递点分十进制表示的IPv4地址字符串时仍然可以正常工作。虽然如此，使用高级API时也应避免直接使用点分十进制表示的IPv4地址字符串。</li>
+<li><strong>使用地址无关的API</strong>：尽量传递主机名或全称域名（FQDN）给<em>getaddrinfo</em>或<em>getnameinfo</em>。</li>
+</ul>
+
+
+<h4>3. 避免使用网络检查</h4>
+
+<ul>
+<li>如果有条件，自己创建网络连接，检查错误状态来代替Reachability（这成本有点大，苹果有点站着说话不腰疼）。</li>
+</ul>
+
+
+<h4>4. 不能避免使用网络检查，则正确使用Reachability API</h4>
+
+<ul>
+<li>不要传递0.0.0.0到<strong>SCNetworkReachabilityCreateWithAddress</strong>。这只会检查网络中是否有router，并不代表真正能连接到互联网。</li>
+<li>不要传递169.254.0.0（自分配的本地地址）到<strong>SCNetworkReachabilityCreateWithAddress</strong>来检查Wi-Fi是否激活。如需检查是否连接到Wi-Fi，请使用<strong>kSCNetworkReachabilityFlagsIsWWAN</strong>。</li>
+</ul>
+
+
+<h4>5. 正确使用Address Containers</h4>
+
+<ul>
+<li>使用足够大的结构来存储IPv6地址来避免溢出，比如<em>sockaddr_storage</em>。</li>
+</ul>
+
+
+<h4>6. 检查是否使用了不兼容IPv6的API</h4>
+
+<p>检查是否使用过IPv4特定的API，包括但不仅限于：</p>
+
+<pre><code class="c">inet_addr()
+inet_aton()
+inet_lnaof()
+inet_makeaddr()
+inet_netof()
+inet_network()
+inet_ntoa()
+inet_ntoa_r()
+bindresvport()
+getipv4sourcefilter()
+setipv4sourcefilter()
+</code></pre>
+
+<p>如果代码中需要检查IPv4类型，则也应一并检查IPv6类型：</p>
+
+<table>
+<thead>
+<tr>
+<th>IPv4 </th>
+<th> IPv6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AF_INET </td>
+<td> AF_INET6</td>
+</tr>
+<tr>
+<td>PF_INET </td>
+<td> PF_INET6</td>
+</tr>
+<tr>
+<td>struct in_addr </td>
+<td> struct in_addr6</td>
+</tr>
+<tr>
+<td>struct sockaddr_in </td>
+<td> struct sockaddr_in6</td>
+</tr>
+<tr>
+<td>kDNSServiceProtocol_IPv4 </td>
+<td> kDNSServiceProtocol_IPv6</td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>7. 连接IPv4-only的服务器时，使用getaddrinfo来保证app兼容IPv6-only网络</h4>
+
+<p>如果app需要连接到没有域名的IPv4-only服务器，请使用<em>getaddrinfo</em>处理IPv4地址，好处是当app处于IPv6-only网络时，<em>getaddrinfo</em>会生成一个对应的IPv6地址。</p>
+
+<p>下面的代码展示了如何使用<em>getaddrinfo</em>正确处理IP地址。内存中<em>ipv4_or_ipv6_str</em>存储了一个IP地址（可以是IPv4或IPv6），然后使用<em>getaddrinfo</em>生成了自适应IPv4/IPv6的sockaddr，然后尝试连接到此地址。<br/>
+此处有一坑。苹果修改了<em>getaddrinfo</em>以兼容两种网络，但是NAT64下有个bug：第二个参数传port number string，生成的sockaddr的sin_port/sin6_port始终为0；unix原始版本的getaddrinfo则没有这个问题。按照官方文档做法直接在<em>getaddrinfo</em>设置port number string是死活连不上的，建议参考下面代码40行/46行的hack方式，在<em>getaddrinfo</em>后手动设置port number给<em>sockaddr</em>。Demo可以<a href="https://github.com/OpenFibers/openfibers.github.com/raw/source/source/images/blog/support_ipv6_only_network_in_ios/ipv6_test.zip">点此下载</a>：</p>
+
+<pre><code class="c">#include &lt;sys/socket.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;err.h&gt;
+
+    struct addrinfo hints, *res, *res0;
+    int error, s;
+    const char *cause = NULL;
+
+    const char *ipv4_or_ipv6_str = "192.0.2.1";//or IPv6 address string is well
+    NSUInteger port = 80;//port of connecting server
+
+    memset(&amp;hints, 0, sizeof(hints));
+    hints.ai_family = PF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_DEFAULT;
+    error = getaddrinfo(ipv4_or_ipv6_str, NULL, &amp;hints, &amp;res0);
+    if (error)
+    {
+        errx(1, "%s", gai_strerror(error));
+        /*NOTREACHED*/
+    }
+    s = -1;
+    for (res = res0; res; res = res-&gt;ai_next)
+    {
+        s = socket(res-&gt;ai_family,
+                   res-&gt;ai_socktype,
+                   res-&gt;ai_protocol);
+        if (s &lt; 0)
+        {
+            cause = "socket";
+            continue;
+        }
+
+        switch(res-&gt;ai_addr-&gt;sa_family)
+        {
+            case AF_INET:
+            {
+                struct sockaddr_in *v4sa = (struct sockaddr_in *)res-&gt;ai_addr;
+                v4sa-&gt;sin_port = htons(port);
+            }
+                break;
+            case AF_INET6:
+            {
+                struct sockaddr_in6 *v6sa = (struct sockaddr_in6 *)res-&gt;ai_addr;
+                v6sa-&gt;sin6_port = htons(port);
+            }
+                break;
+        }
+
+        if (connect(s, res-&gt;ai_addr, res-&gt;ai_addrlen) &lt; 0)
+        {
+            cause = "connect";
+            close(s);
+            s = -1;
+            continue;
+        }
+
+        break;  /* okay we got one */
+    }
+    if (s &lt; 0)
+    {
+        err(1, "%s", cause);
+        /*NOTREACHED*/
+    }
+    else
+    {
+        printf("connected");
+    }
+    freeaddrinfo(res0);
+</code></pre>
+
+<p>需注意，<em>getaddrinfo</em>兼容自动转换至IPv6地址的特性是iOS 9.2和OS X 10.11.2以后才支持的，但是这段代码可以保证在老的操作系统上的兼容性。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

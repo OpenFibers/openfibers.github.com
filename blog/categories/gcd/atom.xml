@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: gcd | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/gcd/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[GCD异步同步互转]]></title>
+    <link href="http://openfibers.github.io/blog/2016/01/26/gcd-sync-async/"/>
+    <updated>2016-01-26T17:32:35+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/01/26/gcd-sync-async</id>
+    <content type="html"><![CDATA[<h2>同步转异步</h2>
+
+<p>这个是GCD最常见的用法之一，耗时长的操作放在global queue中做，完成之后将结果交给主线程处理：</p>
+
+<pre><code class="objective-c">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    id result = [self longTimeTask];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self handleResultOnMainThread:result];
+    });
+});
+</code></pre>
+
+<h2>异步转同步</h2>
+
+<p>这个本人并不常用，偶尔有不得不用的场景。<br/>
+在异步操作开始前create信号量，然后使用dispatch_semaphore_wait等待此信号量。在异步操作完成后对此信号量发送signal:<br/>
+<code>objective-c
+dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+[self someAsyncTaskWithCallback:^(BOOL successed) {
+    dispatch_semaphore_signal(sema);
+}];
+dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+</code></p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

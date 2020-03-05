@@ -1,0 +1,506 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Python/Numpy 性能优化 - Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="Cython 将 Python 翻译成 c/c++ 再编译执行。
+比原生 Python 快 1.5 倍左右。
+缺点是要写个 makefile pypy 优点是无需像 cython 一样需要修改代码，写 makefile 和 main，缺点是有些三方库不支持。 安装： 1
+brew install &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Python/Numpy 性能优化</h2>
+	<div class="entry-content"><h1>Cython</h1>
+
+<p>将 Python 翻译成 c/c++ 再编译执行。<br/>
+比原生 Python 快 1.5 倍左右。<br/>
+缺点是要写个 makefile</p>
+
+<h1>pypy</h1>
+
+<p>优点是无需像 cython 一样需要修改代码，写 makefile 和 main，缺点是有些三方库不支持。</p>
+
+<p>安装：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install pypy3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后安装 pypy pip。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pypy3 -m ensurepip
+</span><span class='line'><span class="nb">export </span><span class="nv">ALL_PROXY</span><span class="o">=</span>
+</span><span class='line'>pypy3 -m pip install pip --upgrade
+</span><span class='line'>pypy3 -m pip install setuptools --upgrade
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>将 pypy3 path 加入 $PATH 不然安装 tables 的时候报 warning:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/usr/local/share/pypy3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>安装依赖（举点例子）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pypy3 -m pip install numpy
+</span><span class='line'>pypy3 -m pip install TA-Lib
+</span><span class='line'>pypy3 -m pip install requests
+</span><span class='line'>pypy3 -m pip install ccxt
+</span><span class='line'>pypy3 -m pip install tables
+</span><span class='line'>pypy3 -m pip install matplotlib
+</span><span class='line'>pypy3 -m pip install coloredlogs
+</span><span class='line'>pypy3 -m pip install pandas
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果 macOS 遇到 pypy 安装 numpy 时提示：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Checking <span class="k">for</span> cc... ld: library not found <span class="k">for</span> -lgcc_s.10.4
+</span><span class='line'>clang: error: linker <span class="nb">command </span>failed with <span class="nb">exit </span>code <span class="m">1</span> <span class="o">(</span>use -v to see invocation<span class="o">)</span>
+</span><span class='line'>...
+</span><span class='line'>RuntimeError: Broken toolchain: cannot link a simple C program
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>尝试下面命令后再次重试安装 numpy：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">cd</span> /usr/local/lib
+</span><span class='line'>sudo ln -s ../../lib/libSystem.B.dylib libgcc_s.10.4.dylib
+</span><span class='line'><span class="nb">cd</span> -
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Numpy</h1>
+
+<p>比原生 Python 快 10 倍左右。</p>
+
+<h1>numexpr</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numexpr</span> <span class="kn">as</span> <span class="nn">ne</span>
+</span><span class='line'><span class="n">N</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="mi">5</span>
+</span><span class='line'><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span><span class='line'><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</span><span class='line'><span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s">&#39;a ** 2 + b ** 2&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比 Numpy 快 2 到 10 倍。</p>
+
+<!--more-->
+
+
+<h1>Pandas: 避免大量 df.append() 或 df.iloc() 调用</h1>
+
+<p>如果有频繁的 append 操作，使用 list 而非 df，CPU 耗时、内存消耗都降低很多。3600 行的回测运行 10 次，df 改为 list，运行时间从 49 秒降低至 13.35 秒，性能提升 267%。<br/>
+如果有频繁的 iloc 操作，想办法使用 list + dict 代替 iloc + key 取数，还是刚才那个 3600 行跑 10 次，14.5 秒缩短到 9 秒，性能提升 55%。</p>
+
+<h1>CPU 耗时分析</h1>
+
+<h2>pprofile</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pip3 install pprofile
+</span><span class='line'>pprofile hard_work.py <span class="p">|</span> grep -v 0.00% &gt; hard_work.log
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>结果如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>Command line: hard_work.py
+</span><span class='line'>Total duration: 12.2936s
+</span><span class='line'>File: /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py
+</span><span class='line'>File duration: 2.11106s <span class="o">(</span>17.17%<span class="o">)</span>
+</span><span class='line'>Line <span class="c">#|      Hits|         Time| Time per hit|      %|Source code</span>
+</span><span class='line'>------+----------+-------------+-------------+-------+-----------
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>   0.00452113<span class="p">|</span>   0.00452113<span class="p">|</span>  0.04%<span class="p">|</span><span class="c"># &lt;frozen importlib._bootstrap&gt;:1009 _handle_fromlist</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         8<span class="p">|</span>   0.00171661<span class="p">|</span>  0.000214577<span class="p">|</span>  0.01%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py:72 __init__</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>    0.0330989<span class="p">|</span>    0.0330989<span class="p">|</span>  0.27%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:250 _setup_queues</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>    0.0355132<span class="p">|</span>    0.0355132<span class="p">|</span>  0.29%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:227 _repopulate_pool</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>  0.000757217<span class="p">|</span>  0.000757217<span class="p">|</span>  0.01%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:758 __init__</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>   0.00308776<span class="p">|</span>   0.00308776<span class="p">|</span>  0.03%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:829 start</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>  0.000803709<span class="p">|</span>  0.000803709<span class="p">|</span>  0.01%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:829 start</span>
+</span><span class='line'>   218<span class="p">|</span>         8<span class="p">|</span>   0.00123382<span class="p">|</span>  0.000154227<span class="p">|</span>  0.01%<span class="p">|</span>            <span class="nv">worker</span> <span class="o">=</span> self._pool<span class="o">[</span>i<span class="o">]</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         8<span class="p">|</span>   0.00212884<span class="p">|</span>  0.000266105<span class="p">|</span>  0.02%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:152 Process</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         8<span class="p">|</span>    0.0311823<span class="p">|</span>   0.00389779<span class="p">|</span>  0.25%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/process.py:101 start</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>   0.00201011<span class="p">|</span>   0.00201011<span class="p">|</span>  0.02%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:212 _join_exited_workers</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>    0.0309622<span class="p">|</span>    0.0309622<span class="p">|</span>  0.25%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/context.py:109 SimpleQueue</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>   0.00208473<span class="p">|</span>   0.00208473<span class="p">|</span>  0.02%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/context.py:109 SimpleQueue</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>   0.00138021<span class="p">|</span>   0.00138021<span class="p">|</span>  0.01%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:650 get</span>
+</span><span class='line'>   411<span class="p">|</span>        19<span class="p">|</span>  0.000627041<span class="p">|</span>  3.30022e-05<span class="p">|</span>  0.01%<span class="p">|</span>        <span class="k">while</span> thread._state <span class="o">==</span> RUN or <span class="o">(</span>pool._cache and thread._state !<span class="o">=</span> TERMINATE<span class="o">)</span>:
+</span><span class='line'>   412<span class="p">|</span>        19<span class="p">|</span>    0.0777183<span class="p">|</span>   0.00409043<span class="p">|</span>  0.63%<span class="p">|</span>            pool._maintain_pool<span class="o">()</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>   0.00205207<span class="p">|</span>   0.00205207<span class="p">|</span>  0.02%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:244 _maintain_pool</span>
+</span><span class='line'>   413<span class="p">|</span>        18<span class="p">|</span>      2.02267<span class="p">|</span>     0.112371<span class="p">|</span> 16.45%<span class="p">|</span>            time.sleep<span class="o">(</span>0.1<span class="o">)</span>
+</span><span class='line'>   422<span class="p">|</span>         1<span class="p">|</span>   0.00222588<span class="p">|</span>   0.00222588<span class="p">|</span>  0.02%<span class="p">|</span>        <span class="k">for</span> taskseq, set_length in iter<span class="o">(</span>taskqueue.get, None<span class="o">)</span>:
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>   0.00127983<span class="p">|</span>   0.00127983<span class="p">|</span>  0.01%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py:534 wait</span>
+</span><span class='line'><span class="o">(</span>call<span class="o">)</span><span class="p">|</span>         1<span class="p">|</span>    0.0013001<span class="p">|</span>    0.0013001<span class="p">|</span>  0.01%<span class="p">|</span><span class="c"># /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/multiprocessing/pool.py:647 wait</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>vprof</h2>
+
+<p>如果使用 cython，直接：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>vprof -c h hard_work.py <span class="c"># code heatmap (first call below)</span>
+</span><span class='line'>vprof -c p hard_work.py <span class="c"># code profiling (second call below)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果不使用 cython 而是 pypy：</p>
+
+<p>使用 pypy pip 安装 vprof。注意 pypy pip 不支持 socks5 代理，可能需要关闭或指定 http 代理：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">export </span><span class="nv">ALL_PROXY</span><span class="o">=</span>
+</span><span class='line'>pypy3 -m pip install vprof
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后 pypy3 下要安装原有的 pip 各种依赖，最后跑 vprof：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>pypy3 -m vprof -c h hard_work.py <span class="c"># code heatmap (first call below)</span>
+</span><span class='line'>pypy3 -m vprof -c p hard_work.py <span class="c"># code profiling (second call below)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>多线程与多进程并发</h1>
+
+<p>由于全局解释器的存在，多线程基本没用，用线程池最多优化个5%顶天了。</p>
+
+<p>直接上进程池。进程池的好处是：<br/>
+    1) CPU 层面不受全局解释器的负面影响，可以发挥处理器的最大性能；<br/>
+    2) 内存层面，如果同一进程一直执行大内存操作（稍微大点的 DataFrame），进程会一直申请内存不释放(python 用完的对象的内存会留给后面的 python 对象使用，不会还给系统)。而单独的进程结束的时候，系统会释放掉进程分配的内存。参考以下两个链接：<br/>
+        * <a href="http://effbot.org/pyfaq/why-doesnt-python-release-the-memory-when-i-delete-a-large-object.htm">Why doesn&rsquo;t Python release the memory when I delete a large object?</a><br/>
+        * <a href="https://stackoverflow.com/questions/15455048/releasing-memory-in-python">https://stackoverflow.com/questions/15455048/releasing-memory-in-python</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">multiprocessing</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">single_job</span><span class="p">(</span><span class="n">param</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">cpu_count_m</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">pool</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">cpu_count_m</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">result_m</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">single_job</span><span class="p">,</span> <span class="p">[</span><span class="n">param</span><span class="p">])</span>
+</span><span class='line'>    <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在4代i5上（双核四线程），测试了一个原本单进程执行的287秒的操作，设置进程池数量为2，最终时间为187秒（提升53%），进程池数量为4，最终时间为127秒（提升126%）。也就是线程池数量设置直接用<code>multiprocessing.cpu_count()</code>即可，不必考虑物理核数。<br/>
+内存从原本的峰值10+G降到了0.6G。4代i7（四核八线程）跑起来会更快（懒的测没测大概四倍多吧），内存峰值也稍微会多一点（1.2G）。老电脑没到期，8代i7要9月份才能换到，性能应该强更多了吧。。。。</p>
+
+<h4>matplot 无法在进程池绘制问题</h4>
+
+<p>如果弹 The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec(). 错误：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">The</span> <span class="n">process</span> <span class="n">has</span> <span class="n">forked</span> <span class="ow">and</span> <span class="n">you</span> <span class="n">cannot</span> <span class="n">use</span> <span class="n">this</span> <span class="n">CoreFoundation</span> <span class="n">functionality</span> <span class="n">safely</span><span class="o">.</span> <span class="n">You</span> <span class="n">MUST</span> <span class="k">exec</span><span class="p">()</span><span class="o">.</span>
+</span><span class='line'><span class="n">Break</span> <span class="n">on</span> <span class="n">__THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__</span><span class="p">()</span> <span class="n">to</span> <span class="n">debug</span><span class="o">.</span>
+</span><span class='line'><span class="n">The</span> <span class="n">process</span> <span class="n">has</span> <span class="n">forked</span> <span class="ow">and</span> <span class="n">you</span> <span class="n">cannot</span> <span class="n">use</span> <span class="n">this</span> <span class="n">CoreFoundation</span> <span class="n">functionality</span> <span class="n">safely</span><span class="o">.</span> <span class="n">You</span> <span class="n">MUST</span> <span class="k">exec</span><span class="p">()</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>不用把fork进程的数据回主进程渲染。直接更新 matplot 到 3.0.3 以上版本：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">pip3</span> <span class="n">install</span> <span class="n">matplotlib</span> <span class="o">--</span><span class="n">upgrade</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>CuPy</h1>
+
+<p>使用 CUDA 计算，直接将 numpy 替换成 cupy。<br/>
+比原生 Python 快 250 倍左右。<br/>
+问题就是 Macbook Pro 新款都是 A 卡，真、苹果与狗不得入内。</p>
+
+<h1>多显卡</h1>
+
+<p>使用 cupy.cuda.Device(cuda_index) 切换显卡设备：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">with</span> <span class="n">cupy</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">x_on_gpu1</span> <span class="o">=</span> <span class="n">cupy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里 x_on_gpu1 将在 GPU 1 上分配。</p>
+
+<h1>使用 Chainer 简化主存/显存切换</h1>
+
+<p>本小节内容摘自 <a href="https://bennix.github.io/blog/2017/12/14/chain_gpu/">在Chainer中使用GPU</a>，更多详细信息请参考原文。</p>
+
+<p>Chainer将CuPy的默认分配器更改为内存池，因此用户可以直接使用CuPy的功能而不需要处理内存分配器。</p>
+
+<p>Chainer提供了一些方便的功能来自动切换和选择设备。例如，chainer.cuda.to_gpu（）函数将numpy.ndarray对象复制到指定的设备：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">x_cpu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span class='line'><span class="n">x_gpu</span> <span class="o">=</span> <span class="n">cuda</span><span class="o">.</span><span class="n">to_gpu</span><span class="p">(</span><span class="n">x_cpu</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它相当于使用CuPy的以下代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">x_cpu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span class='line'><span class="k">with</span> <span class="n">cupy</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">Device</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">x_gpu</span> <span class="o">=</span> <span class="n">cupy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x_cpu</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>更多并发骚操作，参考<a href="https://python-parallel-programmning-cookbook.readthedocs.io/zh_CN/latest/index.html">Python并行编程</a>。</p>
+
+<p>Over</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-02-11T10:53:30+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ai/'>ai</a>, <a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/numpy/'>numpy</a>, <a class='category' href='/blog/categories/python/'>python</a>
+
+
+</div>
+	
+	<div class="comments"><a href="#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+		
+		<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+		
+		
+		<a class="addthis_button_tweet"></a>
+		
+		
+		
+	</div>
+	
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://openfibers.github.io/blog/2019/02/11/python-optimize/';
+        var disqus_url = 'http://openfibers.github.io/blog/2019/02/11/python-optimize/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

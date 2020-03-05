@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: push | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/push/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[使用nomad cli测试iOS的Push Notification]]></title>
+    <link href="http://openfibers.github.io/blog/2015/12/30/test-push-notification-with-nomad-cli/"/>
+    <updated>2015-12-30T11:53:21+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/12/30/test-push-notification-with-nomad-cli</id>
+    <content type="html"><![CDATA[<h3>安装和使用</h3>
+
+<p>Nomad cli是一个ruby工具，涵盖了多项打包，测试功能。<br/>
+首先，安装nomad cli：<br/>
+<code>bash
+gem install nomad cli
+</code>
+然后即可使用apn push命令发送push了：</p>
+
+<pre><code class="bash">apn push devicetoken8fd63xxxxxxxxxxxxxxxxxxe27bc82a3b313475bb488ee92092d3c -c push_cert.pem -n -m "A message from openthread"
+</code></pre>
+
+<!--more-->
+
+
+<p>另外，这是一个测试工具，一般是不应拿到线上用的，虽没看过性能，猜测并未给大规模push做性能优化。</p>
+
+<h3>参数</h3>
+
+<p>apn push支持push所需各种场景，包括badge number、消息标题、正文、声音的设置，是否激活new stand，用户自定义载荷内承载的数据等：</p>
+
+<pre><code class="bash">-m, --alert ALERT    Body of the alert to send in the push notification
+
+-b, --badge NUMBER   Badge number to set with the push notification 
+-s, --sound SOUND    Sound to play with the notification 
+-y, --category CATEGORY Category of notification 
+-n, --[no]-newsstand Indicates content available for Newsstand 
+-d, --data KEY=VALUE Passes custom data to payload (as comma-delimited
+"key=value" declarations) 
+-P, --payload PAYLOAD JSON payload for notifications 
+-e, --environment ENV Environment to send push notification (production
+or development (default)) 
+-c, --certificate CERTIFICATE Path to certificate (.pem) file 
+-p, --[no]-passphrase Prompt for a certificate passphrase 
+</code></pre>
+
+<h3>简化脚本</h3>
+
+<p>使用说明：<br/>
+1. 将下面脚本保存成文件，命名为hello，添加可执行属性<br/>
+2. 将证书保存为无密码pem格式，命名成push_cert.pem，和脚本放在同一个路径<br/>
+3. 将hello软链到任意$PATH下，建议使用~/bin<br/>
+4. 在任意路径执行<code>hello token</code>即可发送测试push</p>
+
+<pre><code class="bash">#!/bin/sh
+#给指定token发送一个hello message
+
+#未安装nomad cli
+command -v apn &gt;/dev/null 2&gt;&amp;1 || 
+{ 
+    echo &gt;&amp;2 "Require nomad cli but it's not installed. Aborting.\nRun 'gem install nomad cli' and try again"; exit 1; 
+}
+
+#参数不正确，返回
+if [ "$#" -ne 1 ]; then
+    echo "Usage: hello [push token]"
+    exit 2
+fi
+
+#拼接message
+message="A hello message from "
+whoami=`whoami`
+message=\"$message$whoami\"
+
+#查找脚本绝对路径
+#当前执行文件位置，可能是link
+scriptAbsolutePath=$(cd `dirname "${BASH_SOURCE[0]}"` &amp;&amp; pwd)/`basename "${BASH_SOURCE[0]}"`
+
+#寻找有没有link
+linkedTarget=$(readlink "$scriptAbsolutePath")
+
+#若存在link，使用linked target
+path=$scriptAbsolutePath
+if [ -n "$linkedTarget" ]; then
+    path=$linkedTarget
+fi
+
+#获取脚本的parent directory
+parentDir="$(dirname "$path")"
+
+#拼接command
+cmd="apn push "$1" -c '"$parentDir"/push_cert.pem' -n -m "$message
+
+#显示提示信息
+echo 'saying hello to' $1
+echo 'sending '$message' ...'
+echo $cmd
+
+#尝试push
+eval $cmd 
+
+#e.g.: 
+#apn push 80fb524a058fd63xxxxxxxxxxxxxxxxxxe27bc82a3b313475bb488ee92092d3c -c push_cert.pem -n -m "A message from openthread"
+</code></pre>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

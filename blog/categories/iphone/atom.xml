@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: iphone | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/iphone/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[iPhone SDK Bug Collection]]></title>
+    <link href="http://openfibers.github.io/blog/2015/11/01/iphone-sdk-bug-collection/"/>
+    <updated>2015-11-01T21:01:42+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/11/01/iphone-sdk-bug-collection</id>
+    <content type="html"><![CDATA[<ol>
+<li><p>convertRect:fromView 返回乘以screen scale以后的结果：<br/>
+在iOS8上，view如果未添加到任何window，调用此方法可能会出现此后果。</p></li>
+<li><p>定高UITextView输入时，文字超过text view高度，输入光标被遮挡或截断，显示不全，继续输入时正在输入的内容也被遮挡:<br/>
+参考<a href="http://openfibers.github.io/blog/2015/11/30/uitextview-auto-scroll-in-ios8/">iOS8的UITextView输入光标显示不全的hack</a>。</p></li>
+<li><p>window.rootViewController设置后，老的rootViewController的view仍然贴在window上：<br/>
+参考<a href="http://openfibers.github.io/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/">[UIWindow setRootViewController:]后view无限叠加的问题修复</a>。</p></li>
+</ol>
+
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

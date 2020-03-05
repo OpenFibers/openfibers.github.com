@@ -1,0 +1,1069 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: runtime | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/runtime/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[dispatch_once造成的死锁----分析、解决与自动检测]]></title>
+    <link href="http://openfibers.github.io/blog/2016/10/22/deadlock-caused-by-dispatch-once/"/>
+    <updated>2016-10-22T03:40:14+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/10/22/deadlock-caused-by-dispatch-once</id>
+    <content type="html"><![CDATA[<h3>现象</h3>
+
+<p>最近遇到了一个死锁crash，主线程在dispatch_once时卡住了：</p>
+
+<pre><code class="objective-c">Thread 0 name:  Dispatch queue: com.apple.main-thread
+Thread 0 Crashed:
+0   __ulock_wait + 8
+1   _dispatch_unfair_lock_wait + 48
+2   _dispatch_gate_wait_slow + 56
+3   dispatch_once_f + 124
+4   +[OTPolicyCenter sharedInstance] (once.h:68)
+7   +[OTWebViewUtil completeUrlScheme:] (OTWebViewUtil.m:26)
+...
+30  start + 4
+</code></pre>
+
+<p>卡死的代码很简单，世界上的单例基本上都是这么开的：</p>
+
+<pre><code>+ (OTPolicyCenter *)sharedInstance
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        policyCenterInstance = [[OTPolicyCenter alloc] init];
+    });
+    return policyCenterInstance;
+}
+</code></pre>
+
+<!--more-->
+
+
+<p>其他线程大多数也都卡住了（除了带runloop的线程和事情还没做完的线程）：</p>
+
+<pre><code>Thread 1:
+0   __psynch_cvwait + 8
+1   _pthread_cond_wait + 640
+2   -[__NSOperationInternal _waitUntilFinished:] + 132
+3   -[__NSObserver _doit:] + 232
+4   __CFNOTIFICATIONCENTER_IS_CALLING_OUT_TO_AN_OBSERVER__ + 20
+5   _CFXRegistrationPost + 400
+6   ___CFXNotificationPost_block_invoke + 60
+7   -[_CFXNotificationRegistrar find:object:observer:enumerator:] + 1504
+8   _CFXNotificationPost + 376
+9   -[NSNotificationCenter postNotificationName:object:userInfo:] + 68
+10  -[CTTelephonyNetworkInfo queryDataMode] + 408
+11  -[CTTelephonyNetworkInfo init] + 336
+12  -[OTReachability networkStatusForFlags:] (AFReachability.m:216)
+...
+25  start_wqthread + 4
+
+Thread 4:
+0   __semwait_signal + 8
+1   nanosleep + 212
+2   usleep + 64
+3   wpthread_main + 216
+4   _pthread_body + 240
+5   _pthread_body + 0
+6   thread_start + 4
+
+Thread 7 name:  Dispatch queue: com.apple.root.default-qos
+Thread 7:
+0   semaphore_wait_trap + 8
+1   _dispatch_semaphore_wait_slow + 216
+2   CFURLConnectionSendSynchronousRequest + 284
+3   +[NSURLConnection sendSynchronousRequest:returningResponse:error:] + 120
+4   +[UTMCHttpHelper post:url:dict:len:errorCode:] + 1864
+5   __39-[UTMCOnlineConfManager syncOnlineconf]_block_invoke + 660
+6   _dispatch_call_block_and_release + 24
+7   _dispatch_client_callout + 16
+8   _dispatch_queue_override_invoke + 732
+9   _dispatch_root_queue_drain + 572
+10  _dispatch_worker_thread3 + 124
+11  _pthread_wqthread + 1288
+12  start_wqthread + 4
+
+Thread 18 name:  Dispatch queue: com.apple.NSURLSession-work
+Thread 18:
+0   __psynch_cvwait + 8
+1   _pthread_cond_wait + 640
+2   -[__NSOperationInternal _waitUntilFinished:] + 132
+3   -[__NSObserver _doit:] + 232
+4   __CFNOTIFICATIONCENTER_IS_CALLING_OUT_TO_AN_OBSERVER__ + 20
+5   _CFXRegistrationPost + 400
+6   ___CFXNotificationPost_block_invoke + 60
+7   -[_CFXNotificationRegistrar find:object:observer:enumerator:] + 1504
+8   _CFXNotificationPost + 376
+9   -[NSNotificationCenter postNotificationName:object:userInfo:] + 68
+10  -[CTTelephonyNetworkInfo queryDataMode] + 408
+11  -[CTTelephonyNetworkInfo init] + 336
+12  -[OTPolicyCenter init] (OTPolicyCenter.m:52)
+13  __31+[OTPolicyCenter sharedInstance]_block_invoke (OTPolicyCenter.m:43)
+14  _dispatch_client_callout + 16
+15  dispatch_once_f + 56
+16  +[OTPolicyCenter sharedInstance] (once.h:68)
+17  +[OTUtils singletonObject:getter:] (OTUtils.m:271)
+...
+43  start_wqthread + 4
+</code></pre>
+
+<h3>原因</h3>
+
+<p>在主线程中卡死前的一行<code>[OTPolicyCenter sharedInstance]</code>，在线程18中也找到了相同的调用。</p>
+
+<p>再来看一眼这个简单的单例方法：</p>
+
+<pre><code>+ (OTPolicyCenter *)sharedInstance
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&amp;onceToken, ^{
+        policyCenterInstance = [[OTPolicyCenter alloc] init];
+    });
+    return policyCenterInstance;
+}
+</code></pre>
+
+<p>线程18首先进入了<code>sharedInstance</code>，在<code>dispatch_once(&amp;onceToken, ^)</code>时锁住了<code>onceToken</code>，主线程稍后进入<code>sharedInstance</code>，阻塞在<code>dispatch_once(&amp;onceToken, ^)</code>这里，而线程18继续往下执行到<code>[[OTPolicyCenter alloc] init]</code>。</p>
+
+<p>此时线程18阻塞式的向主线程发出了操作：<code>[__NSOperationInternal _waitUntilFinished:]</code>。因为主线程在阻塞中等待<code>onceToken</code>，所以主线程不能接收线程18的通知，于是线程18一直在等主线程接受通知，也不会去释放<code>onceToken</code>，死锁生成。</p>
+
+<p>至于为什么<code>[NSNotificationCenter postNotificationName:object:userInfo:]</code>会同步等待主线程返回，猜测苹果自己在实现中接收通知是这样做的，要求接收通知的block在mainQueue上执行：<br/>
+<code>
+[[NSNotificationCenter defaultCenter]
+  addObserverForName:NotificationName
+              object:nil
+               queue:[NSOperationQueue mainQueue]
+          usingBlock:^(NSNotification *ns) {
+              NSLog(@"Notification %@", ns);
+}];
+</code></p>
+
+<p>当然此时线程18上如果不是发了一个阻塞式的通知，而是做了一些其他的需要在主线程执行并同步返回的事，也会造成死锁。</p>
+
+<p><img class="left" src="/images/blog/dispatch_once_deadlock/dispatch_once_deadlock.jpg" width="592"></p>
+
+<h3>解决方案</h3>
+
+<ol>
+<li><p>自动解决或加保护？<br/>
+如果围绕自动解决或者加保护的方式来做，禁止子线程同步调用主线程也好是不现实的（总有业务限制），禁止子线程和主线程共享单例也是不现实的（总有业务限制），所有单例串行执行可能会造成性能问题而且风险很大。目前还没想到可行的方案。</p></li>
+<li><p>静态检测工具？<br/>
+首先要做静态分析，毕竟之前没做过，门槛太高，性价比低，放弃。</p></li>
+<li><p>运行时检测工具？<br/>
+想做运行时检测有两件事要做：<br/>
+<strong>第一件事，在线程申请加锁和解锁once token时，对线程打标记：</strong><br/>
+自己的代码中可以用宏定义改掉dispatch_once的实现，在其中对线程打标记，这个应该不难。<br/>
+别人的代码中只能在运行时里面换出sharedInstance, defaultManager等方法来打标记。<br/>
+<strong>第二件事，找出子线程准备锁主线程的位置：</strong><br/>
+仅可以 hook objective-c 实现的同步方法，不能 hook GCD 的同步方法，所以仍要靠人肉review，而且只能review自己代码，不能review SDK。<br/>
+结论是制作此工具可以用作预检，减轻我们部分负担。有时间可以尝试写一下。</p></li>
+<li><p>使用的时候人肉多加注意？<br/>
+为保证稳定不在dispatch_once中同步执行主线程任务。但是人肉保证难度大。</p></li>
+</ol>
+
+
+<p>结论是3和4可以尝试做一下。</p>
+
+<p>相关问题：<a href="https://medium.com/@elfenlaid/the-good-the-bad-and-the-notification-275198fa2e86#.pyvxgndad">The Good, the Bad and the Notification</a>。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[objective-c使用运行时dump Class的方法列表]]></title>
+    <link href="http://openfibers.github.io/blog/2016/04/12/dump-class-methods-using-runtime/"/>
+    <updated>2016-04-12T14:38:48+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/04/12/dump-class-methods-using-runtime</id>
+    <content type="html"><![CDATA[<p>最近需要对UIWebView内请求的静态文件做缓存，还要把Gif替换成静态图以节约CPU资源等，于是查了一下私有API可不可以抓取UIWebView内的请求打个标记，以便NSURLProtocol中可以准确判断是不是UIWebView发出的请求。<br/>
+经调试发现hook<code>webThreadWebView:resource:willSendRequest:redirectResponse:fromDataSource:</code>可以做这件事。调试过程就不细说了。</p>
+
+<p>首先是dump类方法列表的函数：</p>
+
+<pre><code class="objective-c">#include &lt;objc/runtime.h&gt;
+void DumpObjcMethods(Class clz)
+{
+    unsigned int methodCount = 0;
+    Method *methods = class_copyMethodList(clz, &amp;methodCount);
+    printf("Found %d methods on '%s'\n", methodCount, class_getName(clz));
+
+    for (unsigned int i = 0; i &lt; methodCount; i++)
+    {
+        Method method = methods[i];
+
+        printf("\t'%s' has method named '%s' of encoding '%s'\n",
+               class_getName(clz),
+               sel_getName(method_getName(method)),
+               method_getTypeEncoding(method));    
+        /**
+         *  Or do whatever you need here...
+         */
+    }
+    free(methods);
+}
+</code></pre>
+
+<!--more-->
+
+
+<p>然后附一份iOS9.3/8.4的NSURLRequest和UIWebView的方法列表。</p>
+
+<p>iOS 9.3
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+<span class='line-number'>151</span>
+<span class='line-number'>152</span>
+<span class='line-number'>153</span>
+<span class='line-number'>154</span>
+<span class='line-number'>155</span>
+<span class='line-number'>156</span>
+<span class='line-number'>157</span>
+<span class='line-number'>158</span>
+<span class='line-number'>159</span>
+<span class='line-number'>160</span>
+<span class='line-number'>161</span>
+<span class='line-number'>162</span>
+<span class='line-number'>163</span>
+<span class='line-number'>164</span>
+<span class='line-number'>165</span>
+<span class='line-number'>166</span>
+<span class='line-number'>167</span>
+<span class='line-number'>168</span>
+<span class='line-number'>169</span>
+<span class='line-number'>170</span>
+<span class='line-number'>171</span>
+<span class='line-number'>172</span>
+<span class='line-number'>173</span>
+<span class='line-number'>174</span>
+<span class='line-number'>175</span>
+<span class='line-number'>176</span>
+<span class='line-number'>177</span>
+<span class='line-number'>178</span>
+<span class='line-number'>179</span>
+<span class='line-number'>180</span>
+<span class='line-number'>181</span>
+<span class='line-number'>182</span>
+<span class='line-number'>183</span>
+<span class='line-number'>184</span>
+<span class='line-number'>185</span>
+<span class='line-number'>186</span>
+<span class='line-number'>187</span>
+<span class='line-number'>188</span>
+<span class='line-number'>189</span>
+<span class='line-number'>190</span>
+<span class='line-number'>191</span>
+<span class='line-number'>192</span>
+<span class='line-number'>193</span>
+<span class='line-number'>194</span>
+<span class='line-number'>195</span>
+<span class='line-number'>196</span>
+<span class='line-number'>197</span>
+<span class='line-number'>198</span>
+<span class='line-number'>199</span>
+<span class='line-number'>200</span>
+<span class='line-number'>201</span>
+<span class='line-number'>202</span>
+<span class='line-number'>203</span>
+<span class='line-number'>204</span>
+<span class='line-number'>205</span>
+<span class='line-number'>206</span>
+<span class='line-number'>207</span>
+<span class='line-number'>208</span>
+<span class='line-number'>209</span>
+<span class='line-number'>210</span>
+<span class='line-number'>211</span>
+<span class='line-number'>212</span>
+<span class='line-number'>213</span>
+<span class='line-number'>214</span>
+<span class='line-number'>215</span>
+<span class='line-number'>216</span>
+<span class='line-number'>217</span>
+<span class='line-number'>218</span>
+<span class='line-number'>219</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Found 44 methods on &lsquo;NSURLRequest&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;dealloc&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;copyWithZone:&rsquo; of encoding &lsquo;@12@0:4^{&lt;em&gt;NSZone=}8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;mutableCopyWithZone:&rsquo; of encoding &lsquo;@12@0:4^{&lt;/em&gt;NSZone=}8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;description&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;hash&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;isEqual:&rsquo; of encoding &lsquo;c12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;initWithURL:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;init&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;CFURLRequest&rsquo; of encoding &lsquo;^{&lt;/em&gt;CFURLRequest=}8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;initWithCFURLRequest:&rsquo; of encoding &lsquo;@12@0:4^{&lt;/em&gt;CFURLRequest=}8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPBodyStream&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPBody&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;valueForHTTPHeaderField:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;URL&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;encodeWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;initWithCoder:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;startTimeoutDate&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;payloadTransmissionTimeout&rsquo; of encoding &lsquo;d8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;initWithURL:cachePolicy:timeoutInterval:&rsquo; of encoding &lsquo;@24@0:4@8I12d16&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPMethod&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;mainDocumentURL&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;URLHasScheme:&rsquo; of encoding &lsquo;c12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;isSafeRequestForBackgroundDownload&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;propertyForKey:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;setProperty:forKey:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;removePropertyForKey:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPShouldHandleCookies&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;allHTTPHeaderFields&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;timeWindowDelay&rsquo; of encoding &lsquo;d8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;timeWindowDuration&rsquo; of encoding &lsquo;d8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;requiresShortConnectionTimeout&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;cachePolicy&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;timeoutInterval&rsquo; of encoding &lsquo;d8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;_copyReplacingURLWithURL:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;networkServiceType&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;allowsCellularAccess&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;boundInterfaceIdentifier&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPContentType&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPExtraCookies&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPReferrer&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPUserAgent&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPShouldUsePipelining&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;contentDispositionEncodingFallbackArray&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;expectedWorkload&rsquo; of encoding &lsquo;Q8@0:4&rsquo;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;Found 172 methods on &lsquo;UIWebView&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;populateArchivedSubviews:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidScroll:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidZoom:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewWillBeginDragging:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidEndDragging:willDecelerate:&rsquo; of encoding &lsquo;v16@0:4@8c12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidEndDecelerating:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;viewForZoomingInScrollView:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewWillBeginZooming:withView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidEndZooming:withView:atScale:&rsquo; of encoding &lsquo;v20@0:4@8@12f16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidScrollToTop:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;sizeThatFits:&rsquo; of encoding &lsquo;{CGSize=ff}16@0:4{CGSize=ff}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;canPerformAction:withSender:&rsquo; of encoding &lsquo;c16@0:4:8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;alertView:didDismissWithButtonIndex:&rsquo; of encoding &lsquo;v16@0:4@8i12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;encodeRestorableStateWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;decodeRestorableStateWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;newSnapshotWithRect:&rsquo; of encoding &lsquo;^{CGImage=}24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;createSnapshotWithRect:&rsquo; of encoding &lsquo;^{CGImage=}24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;appliesExclusiveTouchToSubviewTree&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;pageCount&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setDataDetectorTypes:&rsquo; of encoding &lsquo;v12@0:4I8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;dataDetectorTypes&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;selectAll:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;copy:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;define:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;share:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;lookup:&rsquo; of encoding &lsquo;v16@0:4{CGPoint=ff}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;addShortcut:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;select:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;printFormatterClass&rsquo; of encoding &lsquo;#8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;loadHTMLString:baseURL:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;view:didSetFrame:oldFrame:&rsquo; of encoding &lsquo;v44@0:4@8{CGRect={CGPoint=ff}{CGSize=ff}}12{CGRect={CGPoint=ff}{CGSize=ff}}28&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidFinishLoad:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidFailLoad:withError:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidCommitLoad:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;saveStateToHistoryItem:forWebView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;restoreStateFromHistoryItem:forWebView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setMediaPlaybackAllowsAirPlay:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;mediaPlaybackAllowsAirPlay&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setDetectsPhoneNumbers:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;detectsPhoneNumbers&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setSuppressesIncrementalRendering:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;alwaysConstrainsScale&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;allowsLinkPreview&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;webView:previewIsAllowedForPosition:&rsquo; of encoding &lsquo;c20@0:4@8{CGPoint=ff}12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;webView:previewViewControllerForURL:&rsquo; of encoding &lsquo;@16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;webView:willPresentPreview:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;webView:didDismissPreview:committing:&rsquo; of encoding &lsquo;v20@0:4@8@12c16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;webView:commitPreview:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;webView:presentationSnapshotForPreview:&rsquo; of encoding &lsquo;@16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;webView:presentationRectsForPreview:&rsquo; of encoding &lsquo;@16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;pageCount&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;documentView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewWasRemoved:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scalesPageToFit&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;updateViewSettings&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;browserView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setScalesPageToFitViewportSettings&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setRichTextReaderViewportSettings&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;updateBrowserViewExposedScrollViewRect&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;updateCheckeredPattern&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setDrawInWebThread:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;updateOpaqueAndBackgroundColor&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;didRotate:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setScalesPageToFit:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;webViewCommonInitWithWebView:scalesPageToFit:&rsquo; of encoding &lsquo;v16@0:4@8c12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;stringByEvaluatingJavaScriptFromString:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setAllowsInlineMediaPlayback:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;allowsInlineMediaPlayback&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setMediaPlaybackRequiresUserAction:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;mediaPlaybackRequiresUserAction&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setAllowsLinkPreview:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;canGoBack&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;canGoForward&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;rescaleDocument&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;frameOrBoundsChanged&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;updateScrollerViewForInputView:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;didCompleteScrolling&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;reportError:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;updateRequest&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;makeAlertView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;paginationMode&rsquo; of encoding &lsquo;i8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;paginationMode&rsquo; of encoding &lsquo;i8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setPaginationMode:&rsquo; of encoding &lsquo;v12@0:4i8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setPaginationMode:&rsquo; of encoding &lsquo;v12@0:4i8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;paginationBreakingMode&rsquo; of encoding &lsquo;i8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;paginationBehavesLikeColumns&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setPaginationBreakingMode:&rsquo; of encoding &lsquo;v12@0:4i8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setPaginationBehavesLikeColumns:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;pageLength&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;pageLength&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setPageLength:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setPageLength:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;gapBetweenPages&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;gapBetweenPages&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setGapBetweenPages:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setGapBetweenPages:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;keyboardDisplayRequiresUserAction&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setKeyboardDisplayRequiresUserAction:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;initWithFrame:enableReachability:&rsquo; of encoding &lsquo;@28@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8c24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;beginRotation&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;finishRotation&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidFirstVisuallyNonEmptyLayoutInFrame:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;initWithWebView:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;pdfViewHandler&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setOverridesOrientationChangeEventHandling:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setDrawsCheckeredPattern:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setWebSelectionEnabled:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setAlwaysConstrainsScale:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setAlwaysDispatchesScrollEvents:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;alwaysDispatchesScrollEvents&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setAudioSessionCategoryOverride:&rsquo; of encoding &lsquo;v12@0:4I8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;audioSessionCategoryOverride&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setAllowsPictureInPictureVideo:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;allowsPictureInPictureVideo&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setNetworkInterfaceName:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;networkInterfaceName&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;configureWithSettings:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;isElementAccessibilityExposedToInterfaceBuilder&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;dealloc&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setDelegate:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setBackgroundColor:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;initWithFrame:&rsquo; of encoding &lsquo;@24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;loadData:MIMEType:textEncodingName:baseURL:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setFrame:&rsquo; of encoding &lsquo;v24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setBounds:&rsquo; of encoding &lsquo;v24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;goBack&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;goForward&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:&rsquo; of encoding &lsquo;c20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:&rsquo; of encoding &lsquo;@24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:printFrameView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:frame:exceededDatabaseQuotaForSecurityOrigin:database:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:exceededApplicationCacheOriginQuotaForSecurityOrigin:totalSpaceNeeded:&rsquo; of encoding &lsquo;v20@0:4@8@12I16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;isLoading&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForNavigationAction:request:frame:decisionListener:&rsquo; of encoding &lsquo;v28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForNewWindowAction:request:newFrameName:decisionListener:&rsquo; of encoding &lsquo;v28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForMIMEType:request:frame:decisionListener:&rsquo; of encoding &lsquo;v28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:unableToImplementPolicyWithError:frame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewClose:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewSupportedOrientationsUpdated:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didStartProvisionalLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didReceiveServerRedirectForProvisionalLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFailProvisionalLoadWithError:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didCommitLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didReceiveTitle:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFinishLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFailLoadWithError:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didChangeLocationWithinPageForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didClearWindowObject:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFirstLayoutInFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;scrollView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;loadRequest:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;reload&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:identifierForInitialRequest:fromDataSource:&rsquo; of encoding &lsquo;@20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webThreadWebView:resource:willSendRequest:redirectResponse:fromDataSource:&rsquo; of encoding &lsquo;@28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didReceiveAuthenticationChallenge:fromDataSource:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:canAuthenticateAgainstProtectionSpace:forDataSource:&rsquo; of encoding &lsquo;c24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:connectionPropertiesForResource:dataSource:&rsquo; of encoding &lsquo;@20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didCancelAuthenticationChallenge:fromDataSource:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didFinishLoadingFromDataSource:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didFailLoadingWithError:fromDataSource:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForGeolocationRequestFromOrigin:frame:listener:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;suppressesIncrementalRendering&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;allowsPictureInPictureMediaPlayback&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setAllowsPictureInPictureMediaPlayback:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setOpaque:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;stopLoading&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;encodeWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;initWithCoder:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;request&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;delegate&rsquo; of encoding &lsquo;@8@0:4&rsquo;</span></code></pre></td></tr></table></div></figure></p>
+
+<p>iOS 8.4<br/>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+<span class='line-number'>151</span>
+<span class='line-number'>152</span>
+<span class='line-number'>153</span>
+<span class='line-number'>154</span>
+<span class='line-number'>155</span>
+<span class='line-number'>156</span>
+<span class='line-number'>157</span>
+<span class='line-number'>158</span>
+<span class='line-number'>159</span>
+<span class='line-number'>160</span>
+<span class='line-number'>161</span>
+<span class='line-number'>162</span>
+<span class='line-number'>163</span>
+<span class='line-number'>164</span>
+<span class='line-number'>165</span>
+<span class='line-number'>166</span>
+<span class='line-number'>167</span>
+<span class='line-number'>168</span>
+<span class='line-number'>169</span>
+<span class='line-number'>170</span>
+<span class='line-number'>171</span>
+<span class='line-number'>172</span>
+<span class='line-number'>173</span>
+<span class='line-number'>174</span>
+<span class='line-number'>175</span>
+<span class='line-number'>176</span>
+<span class='line-number'>177</span>
+<span class='line-number'>178</span>
+<span class='line-number'>179</span>
+<span class='line-number'>180</span>
+<span class='line-number'>181</span>
+<span class='line-number'>182</span>
+<span class='line-number'>183</span>
+<span class='line-number'>184</span>
+<span class='line-number'>185</span>
+<span class='line-number'>186</span>
+<span class='line-number'>187</span>
+<span class='line-number'>188</span>
+<span class='line-number'>189</span>
+<span class='line-number'>190</span>
+<span class='line-number'>191</span>
+<span class='line-number'>192</span>
+<span class='line-number'>193</span>
+<span class='line-number'>194</span>
+<span class='line-number'>195</span>
+<span class='line-number'>196</span>
+<span class='line-number'>197</span>
+<span class='line-number'>198</span>
+<span class='line-number'>199</span>
+<span class='line-number'>200</span>
+<span class='line-number'>201</span>
+<span class='line-number'>202</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Found 44 methods on &lsquo;NSURLRequest&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;web_HTTPReferrer&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;web_HTTPContentType&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;web_isConditionalRequest&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;copyWithZone:&rsquo; of encoding &lsquo;@12@0:4^{&lt;/em&gt;NSZone=}8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;mutableCopyWithZone:&rsquo; of encoding &lsquo;@12@0:4^{&lt;em&gt;NSZone=}8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;description&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;dealloc&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;hash&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;isEqual:&rsquo; of encoding &lsquo;c12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;initWithURL:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;init&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;CFURLRequest&rsquo; of encoding &lsquo;^{&lt;em&gt;CFURLRequest=}8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;initWithCFURLRequest:&rsquo; of encoding &lsquo;@12@0:4^{&lt;em&gt;CFURLRequest=}8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPBodyStream&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPBody&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;valueForHTTPHeaderField:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;URL&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;encodeWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;initWithCoder:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;initWithURL:cachePolicy:timeoutInterval:&rsquo; of encoding &lsquo;@24@0:4@8I12d16&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPMethod&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;mainDocumentURL&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;URLHasScheme:&rsquo; of encoding &lsquo;c12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;isSafeRequestForBackgroundDownload&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;propertyForKey:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;setProperty:forKey:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;removePropertyForKey:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;cachePolicy&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPShouldHandleCookies&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;allHTTPHeaderFields&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;em&gt;timeWindowDelay&rsquo; of encoding &lsquo;d8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;&lt;/em&gt;timeWindowDuration&rsquo; of encoding &lsquo;d8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;timeoutInterval&rsquo; of encoding &lsquo;d8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;_copyReplacingURLWithURL:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;networkServiceType&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;allowsCellularAccess&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;boundInterfaceIdentifier&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPContentType&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPExtraCookies&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPReferrer&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPUserAgent&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;HTTPShouldUsePipelining&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;contentDispositionEncodingFallbackArray&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;NSURLRequest&rsquo; has method named &lsquo;expectedWorkload&rsquo; of encoding &lsquo;Q8@0:4&rsquo;&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;Found 155 methods on &lsquo;UIWebView&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;populateArchivedSubviews:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidScroll:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidZoom:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewWillBeginDragging:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidEndDragging:willDecelerate:&rsquo; of encoding &lsquo;v16@0:4@8c12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidEndDecelerating:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;viewForZoomingInScrollView:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewWillBeginZooming:withView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidEndZooming:withView:atScale:&rsquo; of encoding &lsquo;v20@0:4@8@12f16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewDidScrollToTop:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;sizeThatFits:&rsquo; of encoding &lsquo;{CGSize=ff}16@0:4{CGSize=ff}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;canPerformAction:withSender:&rsquo; of encoding &lsquo;c16@0:4:8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;alertView:didDismissWithButtonIndex:&rsquo; of encoding &lsquo;v16@0:4@8i12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;encodeRestorableStateWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;decodeRestorableStateWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;newSnapshotWithRect:&rsquo; of encoding &lsquo;^{CGImage=}24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;createSnapshotWithRect:&rsquo; of encoding &lsquo;^{CGImage=}24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;appliesExclusiveTouchToSubviewTree&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setDataDetectorTypes:&rsquo; of encoding &lsquo;v12@0:4I8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;dataDetectorTypes&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;selectAll:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;copy:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;define:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;addShortcut:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;select:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;printFormatterClass&rsquo; of encoding &lsquo;#8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;loadHTMLString:baseURL:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;view:didSetFrame:oldFrame:&rsquo; of encoding &lsquo;v44@0:4@8{CGRect={CGPoint=ff}{CGSize=ff}}12{CGRect={CGPoint=ff}{CGSize=ff}}28&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidFinishLoad:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidFailLoad:withError:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidCommitLoad:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;saveStateToHistoryItem:forWebView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;restoreStateFromHistoryItem:forWebView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setMediaPlaybackAllowsAirPlay:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setDetectsPhoneNumbers:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;detectsPhoneNumbers&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setSuppressesIncrementalRendering:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;pageCount&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;documentView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scrollViewWasRemoved:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;scalesPageToFit&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;updateViewSettings&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;browserView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setScalesPageToFitViewportSettings&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setRichTextReaderViewportSettings&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;updateBrowserViewExposedScrollViewRect&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;updateCheckeredPattern&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setDrawInWebThread:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;updateOpaqueAndBackgroundColor&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;didRotate:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setScalesPageToFit:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;webViewCommonInitWithWebView:scalesPageToFit:&rsquo; of encoding &lsquo;v16@0:4@8c12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;stringByEvaluatingJavaScriptFromString:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setAllowsInlineMediaPlayback:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;allowsInlineMediaPlayback&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setMediaPlaybackRequiresUserAction:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;mediaPlaybackRequiresUserAction&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;canGoBack&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;canGoForward&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;rescaleDocument&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;frameOrBoundsChanged&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;updateScrollerViewForInputView:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;didCompleteScrolling&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;reportError:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;updateRequest&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;makeAlertView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;paginationMode&rsquo; of encoding &lsquo;i8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;paginationMode&rsquo; of encoding &lsquo;i8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setPaginationMode:&rsquo; of encoding &lsquo;v12@0:4i8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setPaginationMode:&rsquo; of encoding &lsquo;v12@0:4i8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;paginationBreakingMode&rsquo; of encoding &lsquo;i8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;paginationBehavesLikeColumns&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setPaginationBreakingMode:&rsquo; of encoding &lsquo;v12@0:4i8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setPaginationBehavesLikeColumns:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;pageLength&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;pageLength&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setPageLength:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setPageLength:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;gapBetweenPages&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;gapBetweenPages&rsquo; of encoding &lsquo;f8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setGapBetweenPages:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setGapBetweenPages:&rsquo; of encoding &lsquo;v12@0:4f8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;pageCount&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;keyboardDisplayRequiresUserAction&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setKeyboardDisplayRequiresUserAction:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;initWithFrame:enableReachability:&rsquo; of encoding &lsquo;@28@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8c24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;beginRotation&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;finishRotation&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewMainFrameDidFirstVisuallyNonEmptyLayoutInFrame:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;initWithWebView:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;pdfViewHandler&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setOverridesOrientationChangeEventHandling:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setDrawsCheckeredPattern:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;setWebSelectionEnabled:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setAlwaysDispatchesScrollEvents:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;alwaysDispatchesScrollEvents&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setAudioSessionCategoryOverride:&rsquo; of encoding &lsquo;v12@0:4I8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;audioSessionCategoryOverride&rsquo; of encoding &lsquo;I8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;em&gt;setNetworkInterfaceName:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;&lt;/em&gt;networkInterfaceName&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;configureWithSettings:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;isElementAccessibilityExposedToInterfaceBuilder&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;dealloc&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setDelegate:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setBackgroundColor:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;initWithFrame:&rsquo; of encoding &lsquo;@24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;loadData:MIMEType:textEncodingName:baseURL:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setFrame:&rsquo; of encoding &lsquo;v24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setBounds:&rsquo; of encoding &lsquo;v24@0:4{CGRect={CGPoint=ff}{CGSize=ff}}8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;goBack&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;goForward&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:&rsquo; of encoding &lsquo;c20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:&rsquo; of encoding &lsquo;@24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:printFrameView:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:frame:exceededDatabaseQuotaForSecurityOrigin:database:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:exceededApplicationCacheOriginQuotaForSecurityOrigin:totalSpaceNeeded:&rsquo; of encoding &lsquo;v20@0:4@8@12I16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;isLoading&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:unableToImplementPolicyWithError:frame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForMIMEType:request:frame:decisionListener:&rsquo; of encoding &lsquo;v28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForNavigationAction:request:frame:decisionListener:&rsquo; of encoding &lsquo;v28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForNewWindowAction:request:newFrameName:decisionListener:&rsquo; of encoding &lsquo;v28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewClose:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webViewSupportedOrientationsUpdated:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didStartProvisionalLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didReceiveServerRedirectForProvisionalLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFailProvisionalLoadWithError:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didCommitLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didReceiveTitle:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFinishLoadForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFailLoadWithError:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didChangeLocationWithinPageForFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didClearWindowObject:forFrame:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:didFirstLayoutInFrame:&rsquo; of encoding &lsquo;v16@0:4@8@12&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;_scrollView&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;loadRequest:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;reload&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:identifierForInitialRequest:fromDataSource:&rsquo; of encoding &lsquo;@20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webThreadWebView:resource:willSendRequest:redirectResponse:fromDataSource:&rsquo; of encoding &lsquo;@28@0:4@8@12@16@20@24&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didReceiveAuthenticationChallenge:fromDataSource:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:canAuthenticateAgainstProtectionSpace:forDataSource:&rsquo; of encoding &lsquo;c24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:connectionPropertiesForResource:dataSource:&rsquo; of encoding &lsquo;@20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didCancelAuthenticationChallenge:fromDataSource:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didFinishLoadingFromDataSource:&rsquo; of encoding &lsquo;v20@0:4@8@12@16&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:resource:didFailLoadingWithError:fromDataSource:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;webView:decidePolicyForGeolocationRequestFromOrigin:frame:listener:&rsquo; of encoding &lsquo;v24@0:4@8@12@16@20&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;suppressesIncrementalRendering&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;mediaPlaybackAllowsAirPlay&rsquo; of encoding &lsquo;c8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;setOpaque:&rsquo; of encoding &lsquo;v12@0:4c8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;stopLoading&rsquo; of encoding &lsquo;v8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;encodeWithCoder:&rsquo; of encoding &lsquo;v12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;initWithCoder:&rsquo; of encoding &lsquo;@12@0:4@8&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;request&rsquo; of encoding &lsquo;@8@0:4&rsquo;
+</span><span class='line'>    &lsquo;UIWebView&rsquo; has method named &lsquo;delegate&rsquo; of encoding &lsquo;@8@0:4&rsquo;</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

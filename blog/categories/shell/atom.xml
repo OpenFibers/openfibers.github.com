@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: shell | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/shell/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[zsh中对cd命令的hook]]></title>
+    <link href="http://openfibers.github.io/blog/2018/12/31/cd-hook-for-zsh/"/>
+    <updated>2018-12-31T12:45:47+08:00</updated>
+    <id>http://openfibers.github.io/blog/2018/12/31/cd-hook-for-zsh</id>
+    <content type="html"><![CDATA[<p>zsh中预留了一个<code>chpwd()</code>用于hook各种cd命令，包括<code>cd</code> <code>pushd</code> <code>popd</code>等。</p>
+
+<p>首先打开<code>~/.zshrc</code>，增加<code>chpwd</code>函数。作用是在ccproj或其子目录，使用全局代理，否则关闭代理。</p>
+
+<pre><code class="bash">chpwd()
+    case $PWD in
+        (*/ccproj)
+            echo using proxy
+            allproxy
+            ;;
+        (*/ccproj/*)
+            echo using proxy
+            allproxy
+            ;;
+        (*)
+            noproxy
+            ;;
+    esac
+</code></pre>
+
+<p>其中<code>allproxy</code>和<code>noproxy</code>的定义如下:</p>
+
+<!--more-->
+
+
+<pre><code class="bash">alias allproxy='export ALL_PROXY=socks5://127.0.0.1:9050'
+alias noproxy='export ALL_PROXY='
+</code></pre>
+
+<p>经过设置，每次切换路径就会自动切换代理。但是新开的terminal窗口是不会被hook的。我们手动在<code>~/.zshrc</code>中增加新窗口打开后原地执行一次<code>cd .</code>命令，修改后的<code>~/.zshrc</code>如下:</p>
+
+<pre><code class="bash">alias allproxy='export ALL_PROXY=socks5://127.0.0.1:9050'
+alias noproxy='export ALL_PROXY='
+
+chpwd()
+    case $PWD in
+        (*/ccproj)
+            echo using proxy
+            allproxy
+            ;;
+        (*/ccproj/*)
+            echo using proxy
+            allproxy
+            ;;
+        (*)
+            noproxy
+            ;;
+    esac
+
+cd .
+</code></pre>
+
+<p>以后就可以随意切路径不会忘了改代理了。<br/>
+Over</p>
+]]></content>
+  </entry>
+  
+</feed>

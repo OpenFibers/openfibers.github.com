@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: cocoapods | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/cocoapods/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[安装指定版本的CocoaPods]]></title>
+    <link href="http://openfibers.github.io/blog/2015/09/06/fuck-cocoapods/"/>
+    <updated>2015-09-06T10:50:14+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/09/06/fuck-cocoapods</id>
+    <content type="html"><![CDATA[<p>在同事机器上，pod 工作的很正常，到了我的机器上，就 link error，原因是他的 pod 自动生成的.a 和我的 pod 自动生成的 .a 带的前缀不一样。</p>
+
+<!--more-->
+
+
+<p>解决过程也很梦幻，看了同事的 CocoaPods版本是 0.37.1，我的是 0.38.0，于是卸载了 0.38.0，装了 0.37.1，再更新 pod，就康复了：</p>
+
+<pre><code class="bash">#删除当前版本pod，安装指定版本的pod
+sudo gem uninstall cocoapods
+sudo gem install cocoapods -v 0.37.1
+
+#清空pod缓存后更新由pod管理的libs
+rm -rf "${HOME}/Library/Caches/CocoaPods"
+rm -rf "`pwd`/Pods/"
+pod update
+</code></pre>
+
+<p>参考<a href="https://gist.github.com/mbinna/4202236">mbinna/podforceupdate.sh</a>。</p>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

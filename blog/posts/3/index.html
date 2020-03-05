@@ -1,0 +1,810 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="概述 开发者可以为 iOS 10 的 Messages app 创建 extension。用户在其中可以发送文字、表情、媒体文件、交互式消息（交互式消息即 interactive messages，是一种允许被对话的参与者更新状态的消息）。 第三方软件可以使用 Messages &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/10/22/message-app-development/">
+		
+			Messages Framework 开发文档（Sticker Packs 与 iMessage Apps）</a>
+	</h2>
+	<div class="entry-content">
+		<h2>概述</h2>
+
+<p>开发者可以为 iOS 10 的 Messages app 创建 extension。用户在其中可以发送文字、表情、媒体文件、交互式消息（交互式消息即 interactive messages，是一种允许被对话的参与者更新状态的消息）。</p>
+
+<p>第三方软件可以使用 Messages framework 创建两种 app extension: 表情包（Sticker packs）和 iMessage apps。这两种 app extension 都可以作为现有主 app 的 extension 来发布，也可以单独发布。</p>
+
+<p><strong>为了方便理解后文内容，强烈建议先玩一下：</strong><br/>
+1. Sticker pack 比如知乎刘看山<br/>
+2. GamePigeon中的台球<br/>
+3. 大众点评的订电影票</p>
+
+
+		
+		<a href="/blog/2016/10/22/message-app-development/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-10-22T04:22:11+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/imessage-apps/'>imessage apps</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/messages-extension/'>messages extension</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/10/22/message-app-development/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/10/22/deadlock-caused-by-dispatch-once/">
+		
+			Dispatch_once造成的死锁&#8212;-分析、解决与自动检测</a>
+	</h2>
+	<div class="entry-content">
+		<h3>现象</h3>
+
+<p>最近遇到了一个死锁crash，主线程在dispatch_once时卡住了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">Thread</span> <span class="mi">0</span> <span class="nl">name</span><span class="p">:</span>  <span class="n">Dispatch</span> <span class="nl">queue</span><span class="p">:</span> <span class="n">com</span><span class="p">.</span><span class="n">apple</span><span class="p">.</span><span class="n">main</span><span class="o">-</span><span class="kr">thread</span>
+</span><span class='line'><span class="n">Thread</span> <span class="mi">0</span> <span class="nl">Crashed</span><span class="p">:</span>
+</span><span class='line'><span class="mi">0</span>   <span class="n">__ulock_wait</span> <span class="o">+</span> <span class="mi">8</span>
+</span><span class='line'><span class="mi">1</span>   <span class="n">_dispatch_unfair_lock_wait</span> <span class="o">+</span> <span class="mi">48</span>
+</span><span class='line'><span class="mi">2</span>   <span class="n">_dispatch_gate_wait_slow</span> <span class="o">+</span> <span class="mi">56</span>
+</span><span class='line'><span class="mi">3</span>   <span class="n">dispatch_once_f</span> <span class="o">+</span> <span class="mi">124</span>
+</span><span class='line'><span class="mi">4</span>   <span class="o">+</span><span class="p">[</span><span class="n">OTPolicyCenter</span> <span class="n">sharedInstance</span><span class="p">]</span> <span class="p">(</span><span class="n">once</span><span class="p">.</span><span class="nl">h</span><span class="p">:</span><span class="mi">68</span><span class="p">)</span>
+</span><span class='line'><span class="mi">7</span>   <span class="o">+</span><span class="p">[</span><span class="n">OTWebViewUtil</span> <span class="nl">completeUrlScheme</span><span class="p">:]</span> <span class="p">(</span><span class="n">OTWebViewUtil</span><span class="p">.</span><span class="nl">m</span><span class="p">:</span><span class="mi">26</span><span class="p">)</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="mi">30</span>  <span class="n">start</span> <span class="o">+</span> <span class="mi">4</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>卡死的代码很简单，世界上的单例基本上都是这么开的：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">+</span> <span class="p">(</span><span class="n">OTPolicyCenter</span> <span class="o">*</span><span class="p">)</span><span class="nf">sharedInstance</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">static</span> <span class="kt">dispatch_once_t</span> <span class="n">onceToken</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">onceToken</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">policyCenterInstance</span> <span class="o">=</span> <span class="p">[[</span><span class="n">OTPolicyCenter</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">policyCenterInstance</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2016/10/22/deadlock-caused-by-dispatch-once/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-10-22T03:40:14+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/runtime/'>runtime</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/10/22/deadlock-caused-by-dispatch-once/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/06/20/support-ipv6-only-network-in-ios/">
+		
+			检查iOS App是否支持IPv6-only Network</a>
+	</h2>
+	<div class="entry-content">
+		<p>从2016年6月1号开始，苹果强制要求上架AppStore的应用支持IPv6-only network。<br/>
+本文分为两部分：通过代码检查是否兼容IPv6-only网络，以及如何搭建IPv6-only网络的测试环境。旨在帮助快速检查app是否支持IPv6-only Network。可以当做<a href="https://developer.apple.com/library/mac/documentation/NetworkingInternetWeb/Conceptual/NetworkingOverview/UnderstandingandPreparingfortheIPv6Transition/UnderstandingandPreparingfortheIPv6Transition.html#//apple_ref/doc/uid/TP40010220-CH213-SW1">Supporting IPv6 DNS64/NAT64 Networks</a>中<strong>Ensuring IPv6 DNS64/NAT64 Compatibility</strong>一节的速成版本。</p>
+
+<h2>通过搭建IPv6-only网络的测试环境测试</h2>
+
+<p>最便捷的检查方式是：找一台Mac，共享Internet到IPv6 DNS64/NAT64网络，然后让待测试设备连接到此网络，并测试app功能是否正常。<br/>
+需注意，OS X 10.11后才支持创建IPv6 DNS64/NAT64网络。如果待测试设备不是iOS或OS X或macOS设备（比如要测试Andr**d上的app是否兼容IPv6-only网络），请确保设备支持<a href="https://tools.ietf.org/html/rfc6106">RFC6106</a>。</p>
+
+
+		
+		<a href="/blog/2016/06/20/support-ipv6-only-network-in-ios/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-06-20T14:37:10+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/ipv6/'>ipv6</a>, <a class='category' href='/blog/categories/network/'>network</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/06/20/support-ipv6-only-network-in-ios/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/04/12/dump-class-methods-using-runtime/">
+		
+			Objective-c使用运行时dump Class的方法列表</a>
+	</h2>
+	<div class="entry-content">
+		<p>最近需要对UIWebView内请求的静态文件做缓存，还要把Gif替换成静态图以节约CPU资源等，于是查了一下私有API可不可以抓取UIWebView内的请求打个标记，以便NSURLProtocol中可以准确判断是不是UIWebView发出的请求。<br/>
+经调试发现hook<code>webThreadWebView:resource:willSendRequest:redirectResponse:fromDataSource:</code>可以做这件事。调试过程就不细说了。</p>
+
+<p>首先是dump类方法列表的函数：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#include &lt;objc/runtime.h&gt;</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">DumpObjcMethods</span><span class="p">(</span><span class="kt">Class</span> <span class="n">clz</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">methodCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Method</span> <span class="o">*</span><span class="n">methods</span> <span class="o">=</span> <span class="n">class_copyMethodList</span><span class="p">(</span><span class="n">clz</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">methodCount</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Found %d methods on &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">methodCount</span><span class="p">,</span> <span class="n">class_getName</span><span class="p">(</span><span class="n">clz</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">methodCount</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">Method</span> <span class="n">method</span> <span class="o">=</span> <span class="n">methods</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&#39;%s&#39; has method named &#39;%s&#39; of encoding &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+</span><span class='line'>               <span class="n">class_getName</span><span class="p">(</span><span class="n">clz</span><span class="p">),</span>
+</span><span class='line'>               <span class="n">sel_getName</span><span class="p">(</span><span class="n">method_getName</span><span class="p">(</span><span class="n">method</span><span class="p">)),</span>
+</span><span class='line'>               <span class="n">method_getTypeEncoding</span><span class="p">(</span><span class="n">method</span><span class="p">));</span>
+</span><span class='line'>        <span class="cm">/**</span>
+</span><span class='line'><span class="cm">         *  Or do whatever you need here...</span>
+</span><span class='line'><span class="cm">         */</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">free</span><span class="p">(</span><span class="n">methods</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2016/04/12/dump-class-methods-using-runtime/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-04-12T14:38:48+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>, <a class='category' href='/blog/categories/runtime/'>runtime</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/04/12/dump-class-methods-using-runtime/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/03/18/debug-ios-traffic/">
+		
+			iOS抓包（使用BurpSuite和tcpdump）</a>
+	</h2>
+	<div class="entry-content">
+		<h2>Introduce</h2>
+
+<p>开发过程中我们经常会需要对网络请求抓包，本次介绍的是使用BurpSuite抓取HTTP/HTTPS包，以及不越狱使用tcpdump抓取iPhone的网络包。</p>
+
+<h2>使用BurpSuite对HTTP/HTTPS抓包</h2>
+
+<p>开发中我们经常会需要对HTTP/HTTPS请求进行抓包。<br/>
+抓包实际上是在中间机器开了一个代理服务，让需要抓包的请求经过代理，我们就可以看到这些请求了。本质上是中间人攻击。<br/>
+BurpSuite是一个常用的调试工具。</p>
+
+<h4>1. 下载BurpSuite</h4>
+
+<p>从<a href="http://portswigger.net/burp/download.html">BurpSuite</a>官网下载jar包，右键点击，运行：</p>
+
+<p><img class="left" src="/images/blog/ios_burp/BurpSuite_1.jpg" width="947"></p>
+
+
+		
+		<a href="/blog/2016/03/18/debug-ios-traffic/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-18T14:39:33+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/burpsuite/'>burpsuite</a>, <a class='category' href='/blog/categories/debug/'>debug</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/tcpdump/'>tcpdump</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/03/18/debug-ios-traffic/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/03/04/open-sandbox-folder-in-lldb/">
+		
+			在lldb中一键打开模拟器sandbox路径</a>
+	</h2>
+	<div class="entry-content">
+		<p>打开~/.lldbinit，在里面加入一行：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">command alias </span>sb script from subprocess import call<span class="p">;</span> call<span class="o">([</span><span class="s2">&quot;open&quot;</span>, <span class="s1">&#39;{0:s}&#39;</span>.format<span class="o">(</span>lldb.frame.EvaluateExpression<span class="o">(</span><span class="s2">&quot;NSHomeDirectory()&quot;</span><span class="o">))</span>.split<span class="o">(</span><span class="s2">&quot;\&quot;&quot;</span><span class="o">)[</span>1<span class="o">]])</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后中断时，在lldb里打sb回车，就能打开模拟器当前运行的app的沙箱路径了。</p>
+
+
+		
+		<a href="/blog/2016/03/04/open-sandbox-folder-in-lldb/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-04T10:39:55+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/lldb/'>lldb</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/03/04/open-sandbox-folder-in-lldb/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/02/26/othttprequest/">
+		
+			OTHTTPRequest v2.0 Release</a>
+	</h2>
+	<div class="entry-content">
+		<p>这几天重写了OTHTTPRequest的大部分代码，发布了2.0版。<br/>
+改动主要是上传文件功能，以前做的比较粗，是整个文件读到内存再上传的，不能支撑大文件上传，现在multipart/form请求全部改为流上传。此外增加了上传速度计算的功能。</p>
+
+<p>最早做这个的原因是13年5月份做网易云音乐的下载性能优化，ASIHTTPRequest下载文件占用CPU时间太长，而当时iPhone4还有一定占有量，做了这个库来提升下载性能。<br/>
+这次发布2.0，修改上传功能，是因为用ASIHTTPRequest做大文件上传时，进度回调有bug，尝试修结果没修成，于是花了点时间做了这个版本。</p>
+
+<p>和1.0一样，整个框架基于NSURLRequest和NSURLConnection。</p>
+
+<p><a href="https://github.com/openfibers/othttprequest">Github链接</a></p>
+
+
+		
+		<a href="/blog/2016/02/26/othttprequest/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-26T14:49:47+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/network/'>network</a>, <a class='category' href='/blog/categories/othttprequest/'>othttprequest</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/02/26/othttprequest/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/">
+		
+			Xcode/lldb自动导入UIKit</a>
+	</h2>
+	<div class="entry-content">
+		<h2>lldb导入UIKit</h2>
+
+<p>使用lldb调试app时，lldb经常提示view.bounds无法打印：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import1.png" width="428" height="58"></p>
+
+<p>实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import UIKit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>即可解决：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import2.png" width="396" height="57"></p>
+
+<p>在开发Mac App时也是一样的，比如不导入AppKit则无法打印frame属性，手动导入AppKit即可：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import AppKit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import3.png" width="297" height="113"></p>
+
+<h2>工程自动导入</h2>
+
+<p>但是大部分人都换有懒癌，对于每次调试都要手打一行命令是难以接受的。我们可以在main上加个断点：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import4.png" width="799" height="113"></p>
+
+<p>在main中断时执行<code>expr @import UIKit</code>，并自动continue:</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import5.png" width="647" height="370"></p>
+
+<p>然后在工程启动时就会自动导入UIKit到lldb了。</p>
+
+<h2>全局自动导入</h2>
+
+<p>对于懒癌晚期的患者，每个工程单独配置还是挺麻烦的，可以在lldbinit中设置全局自动导入UIKit。在命令行中执行：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo </span>display @import UIKit &gt;&gt; ~/.lldbinit
+</span><span class='line'><span class="nb">echo </span>display @import AppKit &gt;&gt; ~/.lldbinit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再重新启动调试即可（Xcode7测试时无需重启Xcode）。</p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-24T10:22:27+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/lldb/'>lldb</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/01/26/gcd-sync-async/">
+		
+			GCD异步同步互转</a>
+	</h2>
+	<div class="entry-content">
+		<h2>同步转异步</h2>
+
+<p>这个是GCD最常见的用法之一，耗时长的操作放在global queue中做，完成之后将结果交给主线程处理：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_BACKGROUND</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>  <span class="kt">id</span> <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">longTimeTask</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>      <span class="p">[</span><span class="nb">self</span> <span class="nl">handleResultOnMainThread</span><span class="p">:</span><span class="n">result</span><span class="p">];</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>异步转同步</h2>
+
+<p>这个本人并不常用，偶尔有不得不用的场景。<br/>
+在异步操作开始前create信号量，然后使用dispatch_semaphore_wait等待此信号量。在异步操作完成后对此信号量发送signal:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="kt">dispatch_semaphore_t</span> <span class="n">sema</span> <span class="o">=</span> <span class="n">dispatch_semaphore_create</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">someAsyncTaskWithCallback</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">BOOL</span> <span class="n">successed</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">dispatch_semaphore_signal</span><span class="p">(</span><span class="n">sema</span><span class="p">);</span>
+</span><span class='line'><span class="p">}];</span>
+</span><span class='line'><span class="n">dispatch_semaphore_wait</span><span class="p">(</span><span class="n">sema</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-26T17:32:35+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/gcd/'>gcd</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/01/26/gcd-sync-async/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/01/14/fucking-bitcode/">
+		
+			App/Framework/Static Library开启BitCode，既踩坑笔记</a>
+	</h2>
+	<div class="entry-content">
+		<p>苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。</p>
+
+<p>下面介绍一下如何开启BitCode，以及我掉的坑有哪些。</p>
+
+
+		
+		<a href="/blog/2016/01/14/fucking-bitcode/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-14T18:06:54+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/bitcode/'>bitcode</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/01/14/fucking-bitcode/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+<nav id="pagenavi">
+    
+        
+            <a href="/blog/posts/2" class="prev">Prev</a>
+        
+    
+    
+        <a href="/blog/posts/4" class="next">Next</a>
+    
+    <div class="center"><a href="/blog/archives">Blog Archives</a></div>
+</nav>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

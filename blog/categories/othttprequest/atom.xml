@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: othttprequest | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/othttprequest/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[OTHTTPRequest v2.0 release]]></title>
+    <link href="http://openfibers.github.io/blog/2016/02/26/othttprequest/"/>
+    <updated>2016-02-26T14:49:47+08:00</updated>
+    <id>http://openfibers.github.io/blog/2016/02/26/othttprequest</id>
+    <content type="html"><![CDATA[<p>这几天重写了OTHTTPRequest的大部分代码，发布了2.0版。<br/>
+改动主要是上传文件功能，以前做的比较粗，是整个文件读到内存再上传的，不能支撑大文件上传，现在multipart/form请求全部改为流上传。此外增加了上传速度计算的功能。</p>
+
+<p>最早做这个的原因是13年5月份做网易云音乐的下载性能优化，ASIHTTPRequest下载文件占用CPU时间太长，而当时iPhone4还有一定占有量，做了这个库来提升下载性能。<br/>
+这次发布2.0，修改上传功能，是因为用ASIHTTPRequest做大文件上传时，进度回调有bug，尝试修结果没修成，于是花了点时间做了这个版本。</p>
+
+<p>和1.0一样，整个框架基于NSURLRequest和NSURLConnection。</p>
+
+<p><a href="https://github.com/openfibers/othttprequest">Github链接</a></p>
+
+<!--more-->
+
+
+<p>用法和大部分网络框架一样，都是很简洁的。</p>
+
+<h4>Get request</h4>
+
+<pre><code class="objective-c">OTHTTPRequest *request = [[OTHTTPRequest alloc] initWithURL:[NSURL URLWithString:@"https://www.google.com"]];
+request.delegate = self;
+request.getParams = @{@"gws_rd": @"ssl"};
+[request start];
+</code></pre>
+
+<h4>Post request</h4>
+
+<pre><code class="objective-c">OTHTTPRequest *request = [[OTHTTPRequest alloc] initWithURL:[NSURL URLWithString:@"https://www.google.com"]];
+request.delegate = self;
+request.postParams = @{@"gws_rd": @"ssl"};
+[request start];
+</code></pre>
+
+<h4>Upload request</h4>
+
+<pre><code class="objective-c">OTHTTPRequest *request = [[OTHTTPRequest alloc] initWithURL:[NSURL URLWithString:@"https://www.google.com"]];
+request.delegate = self;
+request.postParams = @{@"gws_rd": @"ssl"};
+[request addFileForKey:@"file" filePath:filePath fileName:@"Default.png" MIMEType:nil];
+[request start];
+</code></pre>
+
+<h4>Download request</h4>
+
+<pre><code class="objective-c">OTHTTPDownloadRequest *request = [[OTHTTPDownloadRequest alloc] initWithURL:downloadURLString
+                                                cacheFile:cacheFilePath
+                                         finishedFilePath:finishedFilePath];
+request.delegate = self;
+[request start];
+</code></pre>
+
+<p>Over</p>
+]]></content>
+  </entry>
+  
+</feed>

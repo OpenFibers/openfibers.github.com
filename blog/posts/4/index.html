@@ -1,0 +1,776 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hack Life of OpenFibers</title>
+	<meta name="author" content="OpenFibers">
+
+	
+	<meta name="description" content="场景和产生原因 在我的一个view controller里（为方便我们成为controller A），有一个doSomething方法，每次调用时，会延迟5秒调用delayAction，如果在5秒之内再次调用，会取消上次的延迟调用delayAction，再在5秒之后调用delayAction。 &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Hack Life of OpenFibers" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Hack Life of OpenFibers</a></h1>
+<nav id="main-nav"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="/about">About</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:openfibers.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="http://twitter.com/OpenFibers" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/OpenFibers" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+    
+	</div>
+	<form class="search" action="https://www.google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:openfibers.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/01/07/self-dealloced-when-excute-method-handling/">
+		
+			Self在执行方法的过程中dealloc引起的崩溃处理</a>
+	</h2>
+	<div class="entry-content">
+		<h3>场景和产生原因</h3>
+
+<p>在我的一个view controller里（为方便我们成为controller A），有一个doSomething方法，每次调用时，会延迟5秒调用delayAction，如果在5秒之内再次调用，会取消上次的延迟调用delayAction，再在5秒之后调用delayAction。</p>
+
+<p>这在UI操作中是一个稀松平常的需求，代码如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">doSomething</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="bp">NSObject</span> <span class="nl">cancelPreviousPerformRequestsWithTarget</span><span class="p">:</span><span class="nb">self</span> <span class="nl">selector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">delayAction</span><span class="p">)</span> <span class="nl">object</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="nl">performSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">delayAction</span><span class="p">)</span> <span class="nl">withObject</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">afterDelay</span><span class="p">:</span><span class="mi">5</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然而就在某种情况下，这个正常工作的代码崩溃了，原因是第4行代码self已经释放，成为了僵尸指针，调用performSelector时造成了崩溃。</p>
+
+
+		
+		<a href="/blog/2016/01/07/self-dealloced-when-excute-method-handling/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-07T11:27:54+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/01/07/self-dealloced-when-excute-method-handling/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/12/30/test-push-notification-with-nomad-cli/">
+		
+			使用nomad cli测试iOS的Push Notification</a>
+	</h2>
+	<div class="entry-content">
+		<h3>安装和使用</h3>
+
+<p>Nomad cli是一个ruby工具，涵盖了多项打包，测试功能。<br/>
+首先，安装nomad cli：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem install nomad cli
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后即可使用apn push命令发送push了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>apn push devicetoken8fd63xxxxxxxxxxxxxxxxxxe27bc82a3b313475bb488ee92092d3c -c push_cert.pem -n -m <span class="s2">&quot;A message from openthread&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2015/12/30/test-push-notification-with-nomad-cli/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-30T11:53:21+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/push/'>push</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/12/30/test-push-notification-with-nomad-cli/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/12/16/xcode7-manually-symbolicate/">
+		
+			Xcode 中手动 Symbolicate Crash Log</a>
+	</h2>
+	<div class="entry-content">
+		<p>从 Xcode7 开始 Organizer 集成了查看崩溃日志的功能，若 Xcode 可以定位到 crash 的 build，则可以直接在 Organizer 中查看崩溃是在具体哪一行。<br/>
+但是不能自动定位到 build 的情况也非常常见，此时地址不能自动转换成符号：</p>
+
+<p><img class="left" src="/images/blog/xcode7_manually_symbolicate1/xcode7_manually_symbolicate1.JPG"></p>
+
+<p>此时即需要手动转换。</p>
+
+
+		
+		<a href="/blog/2015/12/16/xcode7-manually-symbolicate/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-16T10:45:23+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/12/16/xcode7-manually-symbolicate/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/12/15/controller-without-navigation-bar-push-new-navigation/">
+		
+			不带导航条的UIViewController推出带导航条的UIViewController</a>
+	</h2>
+	<div class="entry-content">
+		<p>左侧controller A隐藏导航条，推出右侧controller B显示导航条，类似这个效果：</p>
+
+<p><img class="left" src="/images/blog/push_navigation_bar/push_navigation_bar1.JPG" width="375" height="667"></p>
+
+
+		
+		<a href="/blog/2015/12/15/controller-without-navigation-bar-push-new-navigation/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-15T17:55:19+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/12/15/controller-without-navigation-bar-push-new-navigation/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/">
+		
+			[UIWindow setRootViewController:]后view无限叠加的问题修复</a>
+	</h2>
+	<div class="entry-content">
+		<p>工程中有时会直接修改window.rootViewController，来导航到新的页面。<br/>
+按理说对window的rootViewController属性设好了新值，老的rootViewController被释放了，UIKit应当自动把老的rootViewController的view一并remove掉，然而实测并非如此。<br/>
+在iOS8/9中（更老版本没有测试），当window有rootViewController时，把新的controller赋值给window.rootViewController，老的rootViewController的view还是会留在window上。这些被遗留的view虽然看不见，但是浪费了内存，造成了view泄露；而且view的controller已经dealloc，此时view如果回调或通知controller的话，有造成崩溃的隐患。</p>
+
+<p>多次设置rootViewController后，view结构如图，window上加了多个UILayoutContainerView:</p>
+
+<p><img class="left" src="/images/blog/window_setrootviewcontroller/window_setrootviewcontroller1.JPG"></p>
+
+
+		
+		<a href="/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-15T17:22:34+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/11/30/uitextview-auto-scroll-in-ios8/">
+		
+			iOS8的UITextView输入光标显示不全的hack</a>
+	</h2>
+	<div class="entry-content">
+		<p>在iOS8及以下版本的系统上，在定高的UITextView中，输入内容超过Text View高度后，输入光标有时会在Text View的底部显示不全，如<a href="http://stackoverflow.com/questions/18070537/how-to-make-a-uitextview-scroll-while-typing-editing">how-to-make-a-uitextview-scroll-while-typing-editing</a>中截图所描述。</p>
+
+<p>尝试了各种方案，挑选了一种体验较好的。在<code>textViewDidChanged:</code>中，检测到正在编辑的区域在文字最下行，无动画滚动到结尾：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">textViewDidChange:</span><span class="p">(</span><span class="bp">UITextView</span> <span class="o">*</span><span class="p">)</span><span class="nv">textView</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">//hack for iOS8</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isLessThanIOS9</span><span class="p">)</span><span class="c1">//in iOS9 Apple has already fixed this bug</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="bp">CGRect</span> <span class="n">line</span> <span class="o">=</span> <span class="p">[</span><span class="n">textView</span> <span class="nl">caretRectForPosition</span><span class="p">:</span>
+</span><span class='line'>                       <span class="n">textView</span><span class="p">.</span><span class="n">selectedTextRange</span><span class="p">.</span><span class="n">start</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">CGFloat</span> <span class="n">overflow</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">line</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span>
+</span><span class='line'>        <span class="o">-</span> <span class="p">(</span><span class="n">textView</span><span class="p">.</span><span class="n">contentOffset</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">textView</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span>
+</span><span class='line'>           <span class="o">-</span> <span class="n">textView</span><span class="p">.</span><span class="n">contentInset</span><span class="p">.</span><span class="n">bottom</span> <span class="o">-</span> <span class="n">textView</span><span class="p">.</span><span class="n">contentInset</span><span class="p">.</span><span class="n">top</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">overflow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="c1">//If at the bottom of text view</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">//disable animation. Otherwise, when a input confirm scroll animation is doing, input new text, animation will re-do from animation beginning, which looks strange.</span>
+</span><span class='line'>            <span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationsEnabled</span><span class="p">:</span><span class="nb">NO</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//scroll to text end</span>
+</span><span class='line'>            <span class="p">[</span><span class="n">textView</span> <span class="nl">scrollRangeToVisible</span><span class="p">:</span><span class="n">NSMakeRange</span><span class="p">([</span><span class="n">textView</span><span class="p">.</span><span class="n">text</span> <span class="n">length</span><span class="p">],</span> <span class="mi">0</span><span class="p">)];</span>
+</span><span class='line'>            <span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationsEnabled</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-30T14:47:21+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/11/30/uitextview-auto-scroll-in-ios8/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/11/10/objective-c-properties-begin-with-new/">
+		
+			Objective-c中property以new开头报错</a>
+	</h2>
+	<div class="entry-content">
+		<p>在ARC中，属性名使用new开头会报错。比如说更改密码中原始密码的输入框叫<code>oldPasswordTextField</code>，可以；新密码的输入框叫<code>newPasswordTextField</code>，对不起，不行，编译错误。</p>
+
+<p>在ARC出现之前，方法名如果以alloc、copy、init、mutableCopy和new开头，标准做法是返回一个retain count+1的对象。在ARC中，默认声明时强制遵守了这一规范：方法名如果以alloc、copy、init、mutableCopy和new开头，会被隐式声明为attribute((ns_returns_retained))。此行为可被显示声明attribute((ns_returns_not_retained))覆盖。</p>
+
+<p>一般情况下不要使用attribute((ns_returns_not_retained))更改这一行为，除非有什么不得不履行的大义。</p>
+
+<p>引用<a href="http://clang.llvm.org/docs/AutomaticReferenceCounting.html#retained-return-values">Clang 3.5 documentation | Objective-C Automatic Reference Counting | Retained return values</a>:</p>
+
+<blockquote><p>A function or method which returns a retainable object pointer type may be marked as returning a retained value, signifying that the caller expects to take ownership of a +1 retain count.</p>
+
+<p>…</p>
+
+<p>Methods in the alloc, copy, init, mutableCopy, and new families are implicitly marked attribute((ns_returns_retained)). This may be suppressed by explicitly marking the method attribute((ns_returns_not_retained)).</p></blockquote>
+
+<p>参考帖子：<a href="http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios">http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios</a></p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-10T15:11:27+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/11/10/objective-c-properties-begin-with-new/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/11/03/strong-weak-dance-mistakes/">
+		
+			Strong-weak Dance 错误两则</a>
+	</h2>
+	<div class="entry-content">
+		<h2>第一则：RAC中strong-weak dance不完整造成内存泄露</h2>
+
+<p>今天在工程中发现了RAC导致的retain cycle:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>相对于正常的RAC用法:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，strong-weak dance是必须做的，不做strong-weak dance就会循环引用。</p>
+
+
+		
+		<a href="/blog/2015/11/03/strong-weak-dance-mistakes/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-03T10:12:32+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/rac/'>rac</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/11/03/strong-weak-dance-mistakes/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/11/01/iphone-sdk-bug-collection/">
+		
+			iPhone SDK Bug Collection</a>
+	</h2>
+	<div class="entry-content">
+		<ol>
+<li><p>convertRect:fromView 返回乘以screen scale以后的结果：<br/>
+在iOS8上，view如果未添加到任何window，调用此方法可能会出现此后果。</p></li>
+<li><p>定高UITextView输入时，文字超过text view高度，输入光标被遮挡或截断，显示不全，继续输入时正在输入的内容也被遮挡:<br/>
+参考<a href="http://openfibers.github.io/blog/2015/11/30/uitextview-auto-scroll-in-ios8/">iOS8的UITextView输入光标显示不全的hack</a>。</p></li>
+<li><p>window.rootViewController设置后，老的rootViewController的view仍然贴在window上：<br/>
+参考<a href="http://openfibers.github.io/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/">[UIWindow setRootViewController:]后view无限叠加的问题修复</a>。</p></li>
+</ol>
+
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-01T21:01:42+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/iphone/'>iphone</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/11/01/iphone-sdk-bug-collection/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/10/27/install-3proxy-on-debian/">
+		
+			在Debina VPS上安装3proxy，支持HTTP、HTTPS、SOCKS代理</a>
+	</h2>
+	<div class="entry-content">
+		<p><a href="https://3proxy.ru/">3proxy</a>是俄罗斯人写的代理软件。</p>
+
+<p>首先在debian上安装，推荐<a href="https://github.com/benjamin74/3proxy">安装脚本</a>：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget --no-check-certificate https://raw.github.com/benjamin74/3proxy/master/3proxyinstaller.sh
+</span><span class='line'>chmod +x 3proxyinstaller.sh
+</span><span class='line'>./3proxyinstaller.sh
+</span><span class='line'>  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后编辑设置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/3proxy/3proxy.cfg</span></code></pre></td></tr></table></div></figure>
+
+
+<p>修改登录帐号密码，将users行改为如下内容，后面即可使用用户名user1/密码passwd1，或用户名user2/密码passwd2登录：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>users user1:CL:passwd1
+</span><span class='line'>users user2:CL:passwd2</span></code></pre></td></tr></table></div></figure>
+
+
+<p>修改代理端口，在3128端口开启HTTP和HTTPS代理，1080端口开启SOCKS代理：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>proxy -a -p3128
+</span><span class='line'>socks -a -p1080</span></code></pre></td></tr></table></div></figure>
+
+
+<p>启动3proxy：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/3proxy/3proxy /etc/3proxy/3proxy.cfg &</span></code></pre></td></tr></table></div></figure>
+
+
+<p>另外安装脚本已经自带开机启动设置了。</p>
+
+<p>更多设置参考<a href="https://3proxy.ru/doc/man3/3proxy.cfg.3.html">3proxy manual</a></p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-27T11:26:27+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/10/27/install-3proxy-on-debian/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
+
+<nav id="pagenavi">
+    
+        
+            <a href="/blog/posts/3" class="prev">Prev</a>
+        
+    
+    
+        <a href="/blog/posts/5" class="next">Next</a>
+    
+    <div class="center"><a href="/blog/archives">Blog Archives</a></div>
+</nav>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2020
+
+    OpenFibers
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'openthread';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//go.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-80038715-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

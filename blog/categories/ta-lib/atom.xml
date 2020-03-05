@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ta-lib | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/ta-lib/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[python talib 的一些基础用法]]></title>
+    <link href="http://openfibers.github.io/blog/2018/12/31/python-talib-basics/"/>
+    <updated>2018-12-31T14:27:06+08:00</updated>
+    <id>http://openfibers.github.io/blog/2018/12/31/python-talib-basics</id>
+    <content type="html"><![CDATA[<p>首先还是导入一些业界标准库：</p>
+
+<pre><code class="python">import pandas as pd
+import numpy as np
+import talib as ta
+</code></pre>
+
+<h3>计算RSI</h3>
+
+<pre><code class="python">close = np.array(bars.close)
+print(ta.RSI(close))  # 默认15根bars
+</code></pre>
+
+<h3>计算MA</h3>
+
+<pre><code class="python">ta.MA(close)  # 默认 30 根 bars，即 MA30
+</code></pre>
+
+<h3>设置计算用的时长，比如计算 MA5</h3>
+
+<pre><code class="python">ta.MA(close, timeperiod=5)
+</code></pre>
+
+<h3>计算 EMA11 和 EMA22</h3>
+
+<pre><code class="python">ta.EMA(close, timeperiod=11)
+ta.EMA(close, timeperiod=22)
+</code></pre>
+
+<h3>全部指标和方法列表</h3>
+
+<p><a href="http://mrjbq7.github.io/ta-lib/funcs.html">http://mrjbq7.github.io/ta-lib/funcs.html</a></p>
+]]></content>
+  </entry>
+  
+</feed>

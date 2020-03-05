@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: octopress | Hack Life of OpenFibers]]></title>
+  <link href="http://openfibers.github.io/blog/categories/octopress/atom.xml" rel="self"/>
+  <link href="http://openfibers.github.io/"/>
+  <updated>2020-03-05T15:41:46+08:00</updated>
+  <id>http://openfibers.github.io/</id>
+  <author>
+    <name><![CDATA[OpenFibers]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Hello Octopress]]></title>
+    <link href="http://openfibers.github.io/blog/2015/02/13/hello-octopress/"/>
+    <updated>2015-02-13T11:42:24+08:00</updated>
+    <id>http://openfibers.github.io/blog/2015/02/13/hello-octopress</id>
+    <content type="html"><![CDATA[<h1>Octopress好像挺好玩啊</h1>
+
+<p>主题选了Medium Fox，页脚有点奇怪，怎么不是长在页脚上的。。。。</p>
+]]></content>
+  </entry>
+  
+</feed>
