@@ -5,5 +5,5 @@ echo "git@github.com:OpenFibers/openfibers.github.com.git" | rake setup_github_p
 rake generate
 rake deploy
 cd _deploy
-g push origin master -u -f
+git push origin master -u -f
 cd -
