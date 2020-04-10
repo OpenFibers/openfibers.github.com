@@ -3,11 +3,11 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Strong-weak dance 错误两则 - Hack Life of OpenFibers</title>
+	<title>Weak-strong dance 错误两则 - Hack Life of OpenFibers</title>
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="第一则：RAC中strong-weak dance不完整造成内存泄露 今天在工程中发现了RAC导致的retain cycle: 1
+	<meta name="description" content="第一则：RAC中weak-strong dance不完整造成内存泄露 今天在工程中发现了RAC导致的retain cycle: 1
 2
 3
 4
@@ -85,8 +85,8 @@
 		
 	
 	<div id="content" class="inner"><article class="post">
-	<h2 class="title">Strong-weak Dance 错误两则</h2>
-	<div class="entry-content"><h2>第一则：RAC中strong-weak dance不完整造成内存泄露</h2>
+	<h2 class="title">Weak-strong Dance 错误两则</h2>
+	<div class="entry-content"><h2>第一则：RAC中weak-strong dance不完整造成内存泄露</h2>
 
 <p>今天在工程中发现了RAC导致的retain cycle:</p>
 
@@ -116,14 +116,14 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，strong-weak dance是必须做的，不做strong-weak dance就会循环引用。</p>
+<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，weak-strong dance是必须做的，不做weak-strong dance就会循环引用。</p>
 
 <!--more-->
 
 
-<h3>1. 为何RAC以外的block可以不使用strong-weak dance</h3>
+<h3>1. 为何RAC以外的block可以不使用weak-strong dance</h3>
 
-<p>然而对于「传统」的strong-weak dance来说，如果不需避免block体执行过程中self中途变空，不strong回来也是非常正常的做法，换言之，strong-weak dance是保证block执行过程中weakSelf不变空的一种技巧。比如：</p>
+<p>然而对于「传统」的weak-strong dance来说，如果不需避免block体执行过程中self中途变空，不strong回来也是非常正常的做法，换言之，weak-strong dance是保证block执行过程中weakSelf不变空的一种技巧。比如：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -155,7 +155,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>2. 为何RAC中不用strong-weak dance就会内存泄露</h3>
+<h3>2. 为何RAC中不用weak-strong dance就会内存泄露</h3>
 
 <p>参考该贴：<a href="http://stackoverflow.com/questions/21716982/explanation-of-how-weakify-and-strongify-work-in-reactivecocoa-libextobjc">Explanation of how weakify and strongify work in ReactiveCocoa / libextobjc</a></p>
 
@@ -207,10 +207,10 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>可以看到<strong>@weakify</strong>在block外声明了一个weak的<strong>self_weak_</strong>，赋值为标准意义的<strong>self</strong>，<strong>@strongify</strong>在block内声明了一个strong的名为<strong>self</strong>的变量，retain了<strong>self_weak_</strong>，覆盖了标准意义的<strong>self</strong>，于是在block内直接使用<strong>self</strong>实际是使用的<strong>strong <strong>typeof</strong>(self) self</strong>，并不是使用的标准意义的<strong>self</strong>，完成了完整的strong-weak dance。<br/>
+<p>可以看到<strong>@weakify</strong>在block外声明了一个weak的<strong>self_weak_</strong>，赋值为标准意义的<strong>self</strong>，<strong>@strongify</strong>在block内声明了一个strong的名为<strong>self</strong>的变量，retain了<strong>self_weak_</strong>，覆盖了标准意义的<strong>self</strong>，于是在block内直接使用<strong>self</strong>实际是使用的<strong>strong <strong>typeof</strong>(self) self</strong>，并不是使用的标准意义的<strong>self</strong>，完成了完整的weak-strong dance。<br/>
  而删除<strong>@strongify(self)</strong>，在block内则直接使用了标准意义的<strong>self</strong>，造成循环引用。</p>
 
-<h2>第二则 在dealloc中使用strong-weak dance造成崩溃</h2>
+<h2>第二则 在dealloc中使用weak-strong dance造成崩溃</h2>
 
 <p>此类崩溃其实很容易定位，只要运行到，崩溃是必现的。只怕业务逻辑使得有此dealloc不是每次运行都会进，再加上有稍懒同事提交了以下代码且没测试，就会造成崩溃：</p>
 
@@ -312,8 +312,8 @@ objc[16870]: Cannot form weak reference to instance (0x7fc02081ae50) of class Fo
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://openfibers.github.io/blog/2015/11/03/strong-weak-dance-mistakes/';
-        var disqus_url = 'http://openfibers.github.io/blog/2015/11/03/strong-weak-dance-mistakes/';
+        var disqus_identifier = 'http://openfibers.github.io/blog/2015/11/03/weak-strong-dance-mistakes/';
+        var disqus_url = 'http://openfibers.github.io/blog/2015/11/03/weak-strong-dance-mistakes/';
         var disqus_script = 'embed.js';
       
     (function () {
