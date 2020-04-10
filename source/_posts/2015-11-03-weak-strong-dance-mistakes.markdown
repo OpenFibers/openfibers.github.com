@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "Strong-weak dance 错误两则"
+title: "Weak-strong dance 错误两则"
 date: 2015-11-03 10:12:32 +0800
 comments: true
 categories: ['iOS', 'RAC']
 ---
 
-## 第一则：RAC中strong-weak dance不完整造成内存泄露
+## 第一则：RAC中weak-strong dance不完整造成内存泄露
 
 今天在工程中发现了RAC导致的retain cycle:  
 
@@ -27,13 +27,13 @@ categories: ['iOS', 'RAC']
 }];
 ```
 
-少了一行**@strongify(self)**即造成了循环引用，即对于RAC来说，strong-weak dance是必须做的，不做strong-weak dance就会循环引用。  
+少了一行**@strongify(self)**即造成了循环引用，即对于RAC来说，weak-strong dance是必须做的，不做weak-strong dance就会循环引用。  
 
 <!--more-->
 
-### 1. 为何RAC以外的block可以不使用strong-weak dance
+### 1. 为何RAC以外的block可以不使用weak-strong dance
 
-然而对于「传统」的strong-weak dance来说，如果不需避免block体执行过程中self中途变空，不strong回来也是非常正常的做法，换言之，strong-weak dance是保证block执行过程中weakSelf不变空的一种技巧。比如：  
+然而对于「传统」的weak-strong dance来说，如果不需避免block体执行过程中self中途变空，不strong回来也是非常正常的做法，换言之，weak-strong dance是保证block执行过程中weakSelf不变空的一种技巧。比如：  
 
 ```
 //不需避免block体执行过程中weakSelf中途变空，可以这样用
@@ -53,7 +53,7 @@ __weak id weakSelf = self;
 }];
 ```
 
-### 2. 为何RAC中不用strong-weak dance就会内存泄露
+### 2. 为何RAC中不用weak-strong dance就会内存泄露
 
 参考该贴：[Explanation of how weakify and strongify work in ReactiveCocoa / libextobjc](http://stackoverflow.com/questions/21716982/explanation-of-how-weakify-and-strongify-work-in-reactivecocoa-libextobjc)  
 
@@ -86,10 +86,10 @@ __weak id weakSelf = self;
     }];
 ```
 
-可以看到**@weakify**在block外声明了一个weak的**self_weak_**，赋值为标准意义的**self**，**@strongify**在block内声明了一个strong的名为**self**的变量，retain了**self_weak_**，覆盖了标准意义的**self**，于是在block内直接使用**self**实际是使用的**strong __typeof__(self) self**，并不是使用的标准意义的**self**，完成了完整的strong-weak dance。  
+可以看到**@weakify**在block外声明了一个weak的**self_weak_**，赋值为标准意义的**self**，**@strongify**在block内声明了一个strong的名为**self**的变量，retain了**self_weak_**，覆盖了标准意义的**self**，于是在block内直接使用**self**实际是使用的**strong __typeof__(self) self**，并不是使用的标准意义的**self**，完成了完整的weak-strong dance。  
  而删除**@strongify(self)**，在block内则直接使用了标准意义的**self**，造成循环引用。  
 
-## 第二则 在dealloc中使用strong-weak dance造成崩溃
+## 第二则 在dealloc中使用weak-strong dance造成崩溃
 
 此类崩溃其实很容易定位，只要运行到，崩溃是必现的。只怕业务逻辑使得有此dealloc不是每次运行都会进，再加上有稍懒同事提交了以下代码且没测试，就会造成崩溃：  
 
