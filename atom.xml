@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-04-10T11:02:27+08:00</updated>
+  <updated>2020-05-07T11:27:19+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -12,6 +12,552 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[C++ 10分钟速成]]></title>
+    <link href="http://openfibers.github.io/blog/2020/05/07/cpp-c++-quick-learn_in_10_min/"/>
+    <updated>2020-05-07T10:33:56+08:00</updated>
+    <id>http://openfibers.github.io/blog/2020/05/07/cpp-c++-quick-learn_in_10_min</id>
+    <content type="html"><![CDATA[<h2>IDE 选择</h2>
+
+<h3>PC</h3>
+
+<p>MinGW</p>
+
+<h3>macOS</h3>
+
+<p>CLion<br/>
+Xcode</p>
+
+<h2>1. 指针</h2>
+
+<h4>声明</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>int main() {
+</span><span class='line'>    string food = "Pizza";
+</span><span class='line'>    string* ptr = &food;
+</span><span class='line'>    cout &lt;&lt; food &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; &food &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; ptr &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; &ptr &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; sizeof(ptr) &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; sizeof(food) &lt;&lt; "\n";
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>执行结果</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Pizza
+</span><span class='line'>0x7ffeefbff560
+</span><span class='line'>0x7ffeefbff560
+</span><span class='line'>0x7ffeefbff558
+</span><span class='line'>8
+</span><span class='line'>24</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>类型</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>food std::__1::string    "Pizza" 
+</span><span class='line'>ptr       std::__1::string *  "Pizza" 0x00007ffeefbff560</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>内存 (macOS, big-endian)</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>0x7ffeefbff558          0x7ffeefbff560
+</span><span class='line'>⬇️                      ⬇️
+</span><span class='line'>60 F5 BF EF FE 7F 00 00 0A 50 69 7A 7A 61 00 00
+</span><span class='line'>`  õ  ¿  ï  þ  .  .  .     P  i  z  z  a  .  . 
+</span><span class='line'>
+</span><span class='line'>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+</span><span class='line'>.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  </span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<!--more-->
+
+
+<h2>2. 引用</h2>
+
+<h4>声明</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>void swapNums(int &x, int &y) {
+</span><span class='line'>    cout &lt;&lt; "address of ref " &lt;&lt; &x &lt;&lt; " " &lt;&lt; &y &lt;&lt; "\n";
+</span><span class='line'>    int z = x;
+</span><span class='line'>    x = y;
+</span><span class='line'>    y = z;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>    int firstNum = 10;
+</span><span class='line'>    int secondNum = 20;
+</span><span class='line'>
+</span><span class='line'>    cout &lt;&lt; "Before swap: " &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; firstNum  &lt;&lt; " " &lt;&lt; secondNum &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; "address of num " &lt;&lt; &firstNum &lt;&lt; " " &lt;&lt; &secondNum &lt;&lt; "\n";
+</span><span class='line'>
+</span><span class='line'>    // Call the function, which will change the values of firstNum and secondNum
+</span><span class='line'>    swapNums(firstNum, secondNum);
+</span><span class='line'>
+</span><span class='line'>    cout &lt;&lt; "After swap: " &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; firstNum  &lt;&lt; " " &lt;&lt; secondNum &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; sizeof(firstNum) &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; sizeof(secondNum) &lt;&lt; "\n";
+</span><span class='line'>    return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>执行结果</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Before swap: 
+</span><span class='line'>10 20
+</span><span class='line'>address of num 0x7ffeefbff578 0x7ffeefbff574
+</span><span class='line'>address of ref 0x7ffeefbff578 0x7ffeefbff574
+</span><span class='line'>After swap: 
+</span><span class='line'>20 10
+</span><span class='line'>4
+</span><span class='line'>4</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>类型</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>firstNum    int     10
+</span><span class='line'>secondNum   int     20
+</span><span class='line'>x           int &   0x00007ffeefbff578
+</span><span class='line'>y         int &   0x00007ffeefbff574</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>内存 (macOS, big-endian)</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>0x7ffeefbff574  0x00007ffeefbff578
+</span><span class='line'>⬇              ⬇️️
+</span><span class='line'>14  00  00  00  0A  00  00  00
+</span><span class='line'>20  0   0   0   10  0   0   0</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>3. OOP: Contructor and Initialize</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>class MyClass {     // The class
+</span><span class='line'>  public:           // Access specifier
+</span><span class='line'>    MyClass() {     // Constructor
+</span><span class='line'>      cout &lt;&lt; "Hello World!";
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>  MyClass myObj;    // Create an object of MyClass (this will call the constructor)
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>执行结果</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Hello World</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>4. 方法默认参数</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>void myFunction(string country = "Norway") {
+</span><span class='line'>  cout &lt;&lt; country &lt;&lt; "\n";
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>  myFunction("Sweden");
+</span><span class='line'>  myFunction("India");
+</span><span class='line'>  myFunction();
+</span><span class='line'>  myFunction("USA");
+</span><span class='line'>  return 0;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>// Sweden
+</span><span class='line'>// India
+</span><span class='line'>// Norway
+</span><span class='line'>// USA</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>5. 继承</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Base class
+</span><span class='line'>class Vehicle {
+</span><span class='line'>  public:
+</span><span class='line'>    string brand = "Ford";
+</span><span class='line'>    void honk() {
+</span><span class='line'>      cout &lt;&lt; "Tuut, tuut! \n" ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Derived class
+</span><span class='line'>class Car: public Vehicle {  // 继承方式：public
+</span><span class='line'>  public:
+</span><span class='line'>    string model = "Mustang";
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>  Car myCar;
+</span><span class='line'>  myCar.honk();
+</span><span class='line'>  cout &lt;&lt; myCar.brand + " " + myCar.model;
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>执行结果</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Tuut, tuut! 
+</span><span class='line'>Ford Mustang</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>继承权限</h4>
+
+<p>子类中直接继承获得的父类方法，访问权限遵循最小权限原则。<br/>
+权限范围： private &lt; protected &lt; public
+继承获得的方法，其权限 = min(父类方法访问权限，继承方式)
+举例：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Base class
+</span><span class='line'>class Vehicle {
+</span><span class='line'>  public:
+</span><span class='line'>    string brand = "Ford";
+</span><span class='line'>    void honk() {
+</span><span class='line'>      cout &lt;&lt; "Tuut, tuut! \n" ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Derived class
+</span><span class='line'>class Car: private Vehicle {  // 继承方式为 private
+</span><span class='line'>  public:
+</span><span class='line'>    string model = "Mustang";
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>  Car myCar;
+</span><span class='line'>  myCar.honk();  // 子类权限 = min(public, private)，也就是 private. 这里会产生编译错误
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>6. 多重继承</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Base class
+</span><span class='line'>class MyClass {
+</span><span class='line'>  public: 
+</span><span class='line'>    void myFunction() {
+</span><span class='line'>      cout &lt;&lt; "Some content in parent class." ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Another base class
+</span><span class='line'>class MyOtherClass {
+</span><span class='line'>  public: 
+</span><span class='line'>    void myOtherFunction() {
+</span><span class='line'>      cout &lt;&lt; "Some content in another class." ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Derived class 
+</span><span class='line'>class MyChildClass: public MyClass, public MyOtherClass {
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>  MyChildClass myObj;
+</span><span class='line'>  myObj.myFunction();
+</span><span class='line'>  myObj.myOtherFunction();
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>如果 MyClass 和 MyOtherClass 有同名函数，则允许继承但不允许调用</h4>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Base class
+</span><span class='line'>class MyClass {
+</span><span class='line'>  public:
+</span><span class='line'>    void myFunction() {
+</span><span class='line'>      cout &lt;&lt; "Some content in parent class." ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Another base class
+</span><span class='line'>class MyOtherClass {
+</span><span class='line'>  public:
+</span><span class='line'>    void myFunction() {
+</span><span class='line'>      cout &lt;&lt; "Some content in another class." ;
+</span><span class='line'>    }
+</span><span class='line'>    void myOtherFunction() {
+</span><span class='line'>      cout &lt;&lt; "Some content in another class." ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Derived class
+</span><span class='line'>class MyChildClass: public MyClass, public MyOtherClass {
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>  MyChildClass myObj;
+</span><span class='line'>  myObj.myFunction();  // err at compile time
+</span><span class='line'>  myObj.myOtherFunction();  // can execute properly
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>多重继承时的权限修饰符</h4>
+
+<p>和单继承的权限修饰同理，遵循权限相乘规则。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Base class
+</span><span class='line'>class MyClass {
+</span><span class='line'>  public:
+</span><span class='line'>    void myFunction() {
+</span><span class='line'>      cout &lt;&lt; "Some content in parent class." ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Another base class
+</span><span class='line'>class MyOtherClass {
+</span><span class='line'>  public:
+</span><span class='line'>    void myOtherFunction() {
+</span><span class='line'>      cout &lt;&lt; "Some content in another class." ;
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>// Derived class
+</span><span class='line'>class MyChildClass: private MyClass, public MyOtherClass {
+</span><span class='line'>  public:
+</span><span class='line'>    MyChildClass(){
+</span><span class='line'>      myFunction();  // can execute properly
+</span><span class='line'>    }
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>int main() {
+</span><span class='line'>  MyChildClass myObj;
+</span><span class='line'>  myObj.myFunction();  // 权限 = min(public, private) 也就是 private，err at compile time
+</span><span class='line'>  myObj.myOtherFunction();  // can execute properly
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Pytorch Walkthrough on macOS]]></title>
@@ -2587,108 +3133,6 @@ risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1
 
 
 <p>Over</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[zsh中对cd命令的hook]]></title>
-    <link href="http://openfibers.github.io/blog/2018/12/31/cd-hook-for-zsh/"/>
-    <updated>2018-12-31T12:45:47+08:00</updated>
-    <id>http://openfibers.github.io/blog/2018/12/31/cd-hook-for-zsh</id>
-    <content type="html"><![CDATA[<p>zsh中预留了一个<code>chpwd()</code>用于hook各种cd命令，包括<code>cd</code> <code>pushd</code> <code>popd</code>等。</p>
-
-<p>首先打开<code>~/.zshrc</code>，增加<code>chpwd</code>函数。作用是在ccproj或其子目录，使用全局代理，否则关闭代理。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>chpwd<span class="o">()</span>
-</span><span class='line'>  <span class="k">case</span> <span class="nv">$PWD</span> in
-</span><span class='line'>      <span class="o">(</span>*/ccproj<span class="o">)</span>
-</span><span class='line'>          <span class="nb">echo </span>using proxy
-</span><span class='line'>          allproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>      <span class="o">(</span>*/ccproj/*<span class="o">)</span>
-</span><span class='line'>          <span class="nb">echo </span>using proxy
-</span><span class='line'>          allproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>      <span class="o">(</span>*<span class="o">)</span>
-</span><span class='line'>          noproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>  <span class="k">esac</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其中<code>allproxy</code>和<code>noproxy</code>的定义如下:</p>
-
-<!--more-->
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">allproxy</span><span class="o">=</span><span class="s1">&#39;export ALL_PROXY=socks5://127.0.0.1:9050&#39;</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">noproxy</span><span class="o">=</span><span class="s1">&#39;export ALL_PROXY=&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>经过设置，每次切换路径就会自动切换代理。但是新开的terminal窗口是不会被hook的。我们手动在<code>~/.zshrc</code>中增加新窗口打开后原地执行一次<code>cd .</code>命令，修改后的<code>~/.zshrc</code>如下:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">alias </span><span class="nv">allproxy</span><span class="o">=</span><span class="s1">&#39;export ALL_PROXY=socks5://127.0.0.1:9050&#39;</span>
-</span><span class='line'><span class="nb">alias </span><span class="nv">noproxy</span><span class="o">=</span><span class="s1">&#39;export ALL_PROXY=&#39;</span>
-</span><span class='line'>
-</span><span class='line'>chpwd<span class="o">()</span>
-</span><span class='line'>  <span class="k">case</span> <span class="nv">$PWD</span> in
-</span><span class='line'>      <span class="o">(</span>*/ccproj<span class="o">)</span>
-</span><span class='line'>          <span class="nb">echo </span>using proxy
-</span><span class='line'>          allproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>      <span class="o">(</span>*/ccproj/*<span class="o">)</span>
-</span><span class='line'>          <span class="nb">echo </span>using proxy
-</span><span class='line'>          allproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>      <span class="o">(</span>*<span class="o">)</span>
-</span><span class='line'>          noproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>  <span class="k">esac</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">cd</span> .
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以后就可以随意切路径不会忘了改代理了。<br/>
-Over</p>
 ]]></content>
   </entry>
   

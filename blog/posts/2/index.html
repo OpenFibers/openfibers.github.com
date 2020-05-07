@@ -7,12 +7,10 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="第一章 人的行动的基本原理 第二章 直接交换 投机和供求表
-库存和总持有需求
-价格低时,市场的总需求提升;价格高时,市场的总需求降低
-市场会自行发现一个均衡价格,使得总库存需求等于总需求
-连续的市场与价格的变动
-大型市场中,打到均衡价格的速度快,投机行为趋向于改善对均衡点的预期,使均衡点快速到来 &hellip;">
+	<meta name="description" content=" 1
+2
+import pandas as pd
+import numpy as np Read on &rarr; Comments ">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -85,6 +83,53 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2019/06/04/python3-ta-indicators/">
+		
+			Python3 一些 Talib 没有的 Indicators</a>
+	</h2>
+	<div class="entry-content">
+		<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2019/06/04/python3-ta-indicators/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-06-04T16:05:32+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+</div>
+	
+	<div class="comments"><a href="/blog/2019/06/04/python3-ta-indicators/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -850,85 +895,6 @@ risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1
 </div>
 	
 	<div class="comments"><a href="/blog/2018/12/31/pandas-basics/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2018/12/31/cd-hook-for-zsh/">
-		
-			Zsh中对cd命令的hook</a>
-	</h2>
-	<div class="entry-content">
-		<p>zsh中预留了一个<code>chpwd()</code>用于hook各种cd命令，包括<code>cd</code> <code>pushd</code> <code>popd</code>等。</p>
-
-<p>首先打开<code>~/.zshrc</code>，增加<code>chpwd</code>函数。作用是在ccproj或其子目录，使用全局代理，否则关闭代理。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>chpwd<span class="o">()</span>
-</span><span class='line'>  <span class="k">case</span> <span class="nv">$PWD</span> in
-</span><span class='line'>      <span class="o">(</span>*/ccproj<span class="o">)</span>
-</span><span class='line'>          <span class="nb">echo </span>using proxy
-</span><span class='line'>          allproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>      <span class="o">(</span>*/ccproj/*<span class="o">)</span>
-</span><span class='line'>          <span class="nb">echo </span>using proxy
-</span><span class='line'>          allproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>      <span class="o">(</span>*<span class="o">)</span>
-</span><span class='line'>          noproxy
-</span><span class='line'>          <span class="p">;;</span>
-</span><span class='line'>  <span class="k">esac</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其中<code>allproxy</code>和<code>noproxy</code>的定义如下:</p>
-
-
-		
-		<a href="/blog/2018/12/31/cd-hook-for-zsh/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2018-12-31T12:45:47+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/shell/'>shell</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2018/12/31/cd-hook-for-zsh/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

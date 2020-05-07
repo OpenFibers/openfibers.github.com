@@ -7,7 +7,7 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="场景和产生原因 在我的一个view controller里（为方便我们成为controller A），有一个doSomething方法，每次调用时，会延迟5秒调用delayAction，如果在5秒之内再次调用，会取消上次的延迟调用delayAction，再在5秒之后调用delayAction。 &hellip;">
+	<meta name="description" content=" 苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。 下面介绍一下如何开启BitCode，以及我掉的坑有哪些。 Read on &rarr; bitcode, ios, xcode Comments ">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -80,6 +80,52 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/01/14/fucking-bitcode/">
+		
+			App/Framework/Static Library开启BitCode，既踩坑笔记</a>
+	</h2>
+	<div class="entry-content">
+		<p>苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。</p>
+
+<p>下面介绍一下如何开启BitCode，以及我掉的坑有哪些。</p>
+
+
+		
+		<a href="/blog/2016/01/14/fucking-bitcode/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-14T18:06:54+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/bitcode/'>bitcode</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/01/14/fucking-bitcode/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -624,95 +670,6 @@
 </div>
 	
 	<div class="comments"><a href="/blog/2015/11/01/iphone-sdk-bug-collection/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/10/27/install-3proxy-on-debian/">
-		
-			在Debina VPS上安装3proxy，支持HTTP、HTTPS、SOCKS代理</a>
-	</h2>
-	<div class="entry-content">
-		<p><a href="https://3proxy.ru/">3proxy</a>是俄罗斯人写的代理软件。</p>
-
-<p>首先在debian上安装，推荐<a href="https://github.com/benjamin74/3proxy">安装脚本</a>：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>wget --no-check-certificate https://raw.github.com/benjamin74/3proxy/master/3proxyinstaller.sh
-</span><span class='line'>chmod +x 3proxyinstaller.sh
-</span><span class='line'>./3proxyinstaller.sh
-</span><span class='line'>  </span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后编辑设置：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/3proxy/3proxy.cfg</span></code></pre></td></tr></table></div></figure>
-
-
-<p>修改登录帐号密码，将users行改为如下内容，后面即可使用用户名user1/密码passwd1，或用户名user2/密码passwd2登录：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>users user1:CL:passwd1
-</span><span class='line'>users user2:CL:passwd2</span></code></pre></td></tr></table></div></figure>
-
-
-<p>修改代理端口，在3128端口开启HTTP和HTTPS代理，1080端口开启SOCKS代理：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>proxy -a -p3128
-</span><span class='line'>socks -a -p1080</span></code></pre></td></tr></table></div></figure>
-
-
-<p>启动3proxy：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/3proxy/3proxy /etc/3proxy/3proxy.cfg &</span></code></pre></td></tr></table></div></figure>
-
-
-<p>另外安装脚本已经自带开机启动设置了。</p>
-
-<p>更多设置参考<a href="https://3proxy.ru/doc/man3/3proxy.cfg.3.html">3proxy manual</a></p>
-
-<p>Over</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-27T11:26:27+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/10/27/install-3proxy-on-debian/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

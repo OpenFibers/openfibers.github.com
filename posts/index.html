@@ -7,7 +7,19 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="All Posts Pytorch Walkthrough on macOS Env macOS 10.15 | python 3.8.2 | torch 1.4.0 | torchvision 0.5.0 Install via pip macOS binary 安装不支持 CUDA，如果需要 &hellip;">
+	<meta name="description" content="All Posts C++ 10分钟速成 IDE 选择 PC MinGW macOS CLion
+Xcode 1. 指针 声明 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+int main() { string food = "Pizza"; string* ptr = &food; &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -90,6 +102,160 @@
 
   <div class="article-list">
     <div class="container">
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2020/05/07/cpp-c++-quick-learn_in_10_min/">C++ 10分钟速成</a></h2>
+  
+  <p>
+    <h2>IDE 选择</h2>
+
+
+
+
+<h3>PC</h3>
+
+
+
+
+<p>MinGW</p>
+
+
+
+
+<h3>macOS</h3>
+
+
+
+
+<p>CLion<br/>
+Xcode</p>
+
+
+
+
+<h2>1. 指针</h2>
+
+
+
+
+<h4>声明</h4>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>int main() {
+</span><span class='line'>    string food = "Pizza";
+</span><span class='line'>    string* ptr = &food;
+</span><span class='line'>    cout &lt;&lt; food &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; &food &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; ptr &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; &ptr &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; sizeof(ptr) &lt;&lt; "\n";
+</span><span class='line'>    cout &lt;&lt; sizeof(food) &lt;&lt; "\n";
+</span><span class='line'>  return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h4>执行结果</h4>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Pizza
+</span><span class='line'>0x7ffeefbff560
+</span><span class='line'>0x7ffeefbff560
+</span><span class='line'>0x7ffeefbff558
+</span><span class='line'>8
+</span><span class='line'>24</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h4>类型</h4>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>food std::__1::string    "Pizza" 
+</span><span class='line'>ptr       std::__1::string *  "Pizza" 0x00007ffeefbff560</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<h4>内存 (macOS, big-endian)</h4>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>0x7ffeefbff558          0x7ffeefbff560
+</span><span class='line'>⬇️                      ⬇️
+</span><span class='line'>60 F5 BF EF FE 7F 00 00 0A 50 69 7A 7A 61 00 00
+</span><span class='line'>`  õ  ¿  ï  þ  .  .  .     P  i  z  z  a  .  . 
+</span><span class='line'>
+</span><span class='line'>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+</span><span class='line'>.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  </span></code></pre></td></tr></table></div></figure>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-05-07T10:33:56+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2020/05/07/cpp-c++-quick-learn_in_10_min/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
       
       
       <div class="row">

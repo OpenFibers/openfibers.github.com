@@ -7,8 +7,12 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="warning: 我的有台DNS因为装了dnsmasq没做加密，被服务商提示有被DDoS攻击风险，强制断线了。 1. 安装 首先连上VPS，安装dnsmasq： 1
-sudo apt-get install dnsmasq 我的VPS连接debian的APT服务器IPv6地址连不上， &hellip;">
+	<meta name="description" content="3proxy是俄罗斯人写的代理软件。 首先在debian上安装，推荐安装脚本： 1
+2
+3
+4
+wget --no-check-certificate https://raw.github.com/benjamin74/3proxy/master/3proxyinstaller.sh
+chmod &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -81,6 +85,95 @@ sudo apt-get install dnsmasq 我的VPS连接debian的APT服务器IPv6地址连�
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/10/27/install-3proxy-on-debian/">
+		
+			在Debina VPS上安装3proxy，支持HTTP、HTTPS、SOCKS代理</a>
+	</h2>
+	<div class="entry-content">
+		<p><a href="https://3proxy.ru/">3proxy</a>是俄罗斯人写的代理软件。</p>
+
+<p>首先在debian上安装，推荐<a href="https://github.com/benjamin74/3proxy">安装脚本</a>：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget --no-check-certificate https://raw.github.com/benjamin74/3proxy/master/3proxyinstaller.sh
+</span><span class='line'>chmod +x 3proxyinstaller.sh
+</span><span class='line'>./3proxyinstaller.sh
+</span><span class='line'>  </span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后编辑设置：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>vim /etc/3proxy/3proxy.cfg</span></code></pre></td></tr></table></div></figure>
+
+
+<p>修改登录帐号密码，将users行改为如下内容，后面即可使用用户名user1/密码passwd1，或用户名user2/密码passwd2登录：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>users user1:CL:passwd1
+</span><span class='line'>users user2:CL:passwd2</span></code></pre></td></tr></table></div></figure>
+
+
+<p>修改代理端口，在3128端口开启HTTP和HTTPS代理，1080端口开启SOCKS代理：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>proxy -a -p3128
+</span><span class='line'>socks -a -p1080</span></code></pre></td></tr></table></div></figure>
+
+
+<p>启动3proxy：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/3proxy/3proxy /etc/3proxy/3proxy.cfg &</span></code></pre></td></tr></table></div></figure>
+
+
+<p>另外安装脚本已经自带开机启动设置了。</p>
+
+<p>更多设置参考<a href="https://3proxy.ru/doc/man3/3proxy.cfg.3.html">3proxy manual</a></p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-27T11:26:27+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/vps/'>vps</a>, <a class='category' href='/blog/categories/fan-qiang/'>翻墙</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/10/27/install-3proxy-on-debian/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -669,53 +762,6 @@ Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。</p>
 </div>
 	
 	<div class="comments"><a href="/blog/2015/03/23/using-karabiner-to-change-key/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/03/17/make-a-hhkb-layout-gh60/">
-		
-			HHKB布局的GH60</a>
-	</h2>
-	<div class="entry-content">
-		<p>很喜欢HHKB的键位，但是静电容的手感不是太喜欢，type-s一直在吃灰。于是萌生了做一把HHKB布局的GH60的想法。<br/>
-GH60富有富玩法，穷有穷玩法，这次是最穷的玩法。200块钱的洋垃圾键帽，60块钱的poker2外壳，改好弹簧的内胆400块钱，35块钱的屏蔽滑块，总共700搞定。</p>
-
-<p><img class="left" src="/images/blog/GH60_HHKB/keyboard2.JPG"></p>
-
-
-		
-		<a href="/blog/2015/03/17/make-a-hhkb-layout-gh60/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-03-17T11:21:49+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/jian-pan/'>键盘</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/03/17/make-a-hhkb-layout-gh60/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

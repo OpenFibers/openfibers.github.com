@@ -7,7 +7,21 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="概述 开发者可以为 iOS 10 的 Messages app 创建 extension。用户在其中可以发送文字、表情、媒体文件、交互式消息（交互式消息即 interactive messages，是一种允许被对话的参与者更新状态的消息）。 第三方软件可以使用 Messages &hellip;">
+	<meta name="description" content="zsh中预留了一个chpwd()用于hook各种cd命令，包括cd pushd popd等。 首先打开~/.zshrc，增加chpwd函数。作用是在ccproj或其子目录，使用全局代理，否则关闭代理。 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+chpwd() case $ &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -80,6 +94,85 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2018/12/31/cd-hook-for-zsh/">
+		
+			Zsh中对cd命令的hook</a>
+	</h2>
+	<div class="entry-content">
+		<p>zsh中预留了一个<code>chpwd()</code>用于hook各种cd命令，包括<code>cd</code> <code>pushd</code> <code>popd</code>等。</p>
+
+<p>首先打开<code>~/.zshrc</code>，增加<code>chpwd</code>函数。作用是在ccproj或其子目录，使用全局代理，否则关闭代理。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>chpwd<span class="o">()</span>
+</span><span class='line'>  <span class="k">case</span> <span class="nv">$PWD</span> in
+</span><span class='line'>      <span class="o">(</span>*/ccproj<span class="o">)</span>
+</span><span class='line'>          <span class="nb">echo </span>using proxy
+</span><span class='line'>          allproxy
+</span><span class='line'>          <span class="p">;;</span>
+</span><span class='line'>      <span class="o">(</span>*/ccproj/*<span class="o">)</span>
+</span><span class='line'>          <span class="nb">echo </span>using proxy
+</span><span class='line'>          allproxy
+</span><span class='line'>          <span class="p">;;</span>
+</span><span class='line'>      <span class="o">(</span>*<span class="o">)</span>
+</span><span class='line'>          noproxy
+</span><span class='line'>          <span class="p">;;</span>
+</span><span class='line'>  <span class="k">esac</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中<code>allproxy</code>和<code>noproxy</code>的定义如下:</p>
+
+
+		
+		<a href="/blog/2018/12/31/cd-hook-for-zsh/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-12-31T12:45:47+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/shell/'>shell</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2018/12/31/cd-hook-for-zsh/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -701,52 +794,6 @@ BurpSuite是一个常用的调试工具。</p>
 </div>
 	
 	<div class="comments"><a href="/blog/2016/01/26/gcd-sync-async/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2016/01/14/fucking-bitcode/">
-		
-			App/Framework/Static Library开启BitCode，既踩坑笔记</a>
-	</h2>
-	<div class="entry-content">
-		<p>苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。</p>
-
-<p>下面介绍一下如何开启BitCode，以及我掉的坑有哪些。</p>
-
-
-		
-		<a href="/blog/2016/01/14/fucking-bitcode/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-01-14T18:06:54+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/bitcode/'>bitcode</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2016/01/14/fucking-bitcode/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>
