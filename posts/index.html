@@ -7,19 +7,11 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="All Posts C++ 10分钟速成 IDE 选择 PC MinGW macOS CLion
-Xcode 1. 指针 声明 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-int main() { string food = "Pizza"; string* ptr = &food; &hellip;">
+	<meta name="description" content="All Posts C++ 10分钟速成 IDE 选择 PC MinGW
+VSCode macOS CLion (花钱)
+Xcode 文章例子编译环境：
+方言： GNU++14[-std=gnu++14]
+Standard library：libc++ (LLVM C++ standard &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -120,7 +112,8 @@ int main() { string food = "Pizza"; string* ptr = &food; &hellip;">
 
 
 
-<p>MinGW</p>
+<p>MinGW<br/>
+VSCode</p>
 
 
 
@@ -130,8 +123,15 @@ int main() { string food = "Pizza"; string* ptr = &food; &hellip;">
 
 
 
-<p>CLion<br/>
+<p>CLion (花钱)<br/>
 Xcode</p>
+
+
+
+
+<p>文章例子编译环境：<br/>
+方言： GNU++14[-std=gnu++14]
+Standard library：libc++ (LLVM C++ standard library with C++11 support)</p>
 
 
 
@@ -146,7 +146,7 @@ Xcode</p>
 
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -157,17 +157,18 @@ Xcode</p>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>int main() {
-</span><span class='line'>    string food = "Pizza";
-</span><span class='line'>    string* ptr = &food;
-</span><span class='line'>    cout &lt;&lt; food &lt;&lt; "\n";
-</span><span class='line'>    cout &lt;&lt; &food &lt;&lt; "\n";
-</span><span class='line'>    cout &lt;&lt; ptr &lt;&lt; "\n";
-</span><span class='line'>    cout &lt;&lt; &ptr &lt;&lt; "\n";
-</span><span class='line'>    cout &lt;&lt; sizeof(ptr) &lt;&lt; "\n";
-</span><span class='line'>    cout &lt;&lt; sizeof(food) &lt;&lt; "\n";
-</span><span class='line'>  return 0;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">string</span> <span class="n">food</span> <span class="o">=</span> <span class="s">&quot;Pizza&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">string</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">food</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">food</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">&amp;</span><span class="n">food</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">ptr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="o">&amp;</span><span class="n">ptr</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">food</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 
@@ -177,18 +178,19 @@ Xcode</p>
 
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Pizza
-</span><span class='line'>0x7ffeefbff560
-</span><span class='line'>0x7ffeefbff560
-</span><span class='line'>0x7ffeefbff558
-</span><span class='line'>8
-</span><span class='line'>24</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="n">Pizza</span>
+</span><span class='line'><span class="mh">0x7ffeefbff560</span>
+</span><span class='line'><span class="mh">0x7ffeefbff560</span>
+</span><span class='line'><span class="mh">0x7ffeefbff558</span>
+</span><span class='line'><span class="mi">8</span>
+</span><span class='line'><span class="mi">24</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 
@@ -198,10 +200,11 @@ Xcode</p>
 
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>food std::__1::string    "Pizza" 
-</span><span class='line'>ptr       std::__1::string *  "Pizza" 0x00007ffeefbff560</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="n">food</span>  <span class="n">std</span><span class="o">::</span><span class="n">__1</span><span class="o">::</span><span class="n">string</span>    <span class="s">&quot;Pizza&quot;</span>  
+</span><span class='line'><span class="n">ptr</span>   <span class="n">std</span><span class="o">::</span><span class="n">__1</span><span class="o">::</span><span class="n">string</span> <span class="o">*</span>  <span class="s">&quot;Pizza&quot;</span> <span class="mh">0x00007ffeefbff560</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 
@@ -211,20 +214,21 @@ Xcode</p>
 
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>0x7ffeefbff558          0x7ffeefbff560
-</span><span class='line'>⬇️                      ⬇️
-</span><span class='line'>60 F5 BF EF FE 7F 00 00 0A 50 69 7A 7A 61 00 00
-</span><span class='line'>`  õ  ¿  ï  þ  .  .  .     P  i  z  z  a  .  . 
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="mh">0x7ffeefbff558</span>          <span class="mh">0x7ffeefbff560</span>
+</span><span class='line'><span class="err">⬇️</span>                      <span class="err">⬇️</span>
+</span><span class='line'><span class="mi">60</span> <span class="n">F5</span> <span class="n">BF</span> <span class="n">EF</span> <span class="n">FE</span> <span class="mf">7F</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mi">0</span><span class="n">A</span> <span class="mi">50</span> <span class="mi">69</span> <span class="mi">7</span><span class="n">A</span> <span class="mi">7</span><span class="n">A</span> <span class="mi">61</span> <span class="mo">00</span> <span class="mo">00</span>
+</span><span class='line'><span class="err">`</span>  <span class="err">õ</span>  <span class="err">¿</span>  <span class="err">ï</span>  <span class="err">þ</span>  <span class="err"></span><span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>     <span class="n">P</span>  <span class="n">i</span>  <span class="n">z</span>  <span class="n">z</span>  <span class="n">a</span>  <span class="p">.</span>  <span class="p">.</span>
 </span><span class='line'>
-</span><span class='line'>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-</span><span class='line'>.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  </span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span> <span class="mo">00</span>
+</span><span class='line'><span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>  <span class="p">.</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 
