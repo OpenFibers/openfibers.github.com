@@ -26,7 +26,7 @@ Standard library：libc++ (LLVM C++ standard library with C++11 support)
 
 #### 声明
 
-```
+```cpp
 int main() {
     string food = "Pizza";
     string* ptr = &food;
@@ -54,8 +54,8 @@ Pizza
 #### 类型
 
 ```
-food	std::__1::string	"Pizza"	
-ptr		std::__1::string *	"Pizza"	0x00007ffeefbff560
+food  std::__1::string    "Pizza"	
+ptr   std::__1::string *  "Pizza" 0x00007ffeefbff560
 ```
 
 #### 内存 (macOS, big-endian)
@@ -123,7 +123,7 @@ After swap:
 firstNum    int     10
 secondNum   int     20
 x           int &   0x00007ffeefbff578
-y	        int &   0x00007ffeefbff574
+y	          int &   0x00007ffeefbff574
 ```
 
 #### 内存 (macOS, big-endian)
