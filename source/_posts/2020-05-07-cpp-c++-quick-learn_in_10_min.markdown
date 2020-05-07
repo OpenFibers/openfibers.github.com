@@ -10,11 +10,16 @@ categories:
 ## IDE 选择
 
 ### PC
-MinGW
+MinGW  
+VSCode  
 
 ### macOS
-CLion  
-Xcode
+CLion (花钱)  
+Xcode  
+
+文章例子编译环境：  
+方言： GNU++14[-std=gnu++14]
+Standard library：libc++ (LLVM C++ standard library with C++11 support)
 
 
 ## 1. 指针
