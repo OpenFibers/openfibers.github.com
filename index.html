@@ -7,11 +7,8 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="IDE 选择 PC MinGW
-VSCode macOS CLion (花钱)
-Xcode 文章例子编译环境：
-方言： GNU++14[-std=gnu++14]
-Standard library：libc++ (LLVM C++ standard library with C++11 &hellip;">
+	<meta name="description" content="WeexSDK 增加 pods 依赖的时候提示： diff: /Manifest.lock: No such file or directory 查看 shell script： 1
+diff &quot;${PODS_PODFILE_DIR_PATH}/Podfile.lock&quot; & &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -84,6 +81,67 @@ Standard library：libc++ (LLVM C++ standard library with C++11 &hellip;">
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2020/06/24/pods-root-not-found/">
+		
+			Diff: /Manifest.lock: No Such File or Directory: PODS_ROOT Not Defined</a>
+	</h2>
+	<div class="entry-content">
+		<p>WeexSDK 增加 pods 依赖的时候提示：</p>
+
+<p>diff: /Manifest.lock: No such file or directory</p>
+
+<p>查看 shell script：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>diff <span class="s2">&quot;${PODS_PODFILE_DIR_PATH}/Podfile.lock&quot;</span> <span class="s2">&quot;${PODS_ROOT}/Manifest.lock&quot;</span> &gt; /dev/null
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>echo 发现 PODS_ROOT 为空，导致 diff 右值传递为 &lsquo;/Manifest.lock&#8217;，所以文件找不到。</p>
+
+<p>查看 <code>Pods-WeexSDK.debug.xcconfig</code> 中对 <code>PODS_ROOT</code> 有定义：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">PODS_ROOT</span> <span class="o">=</span> <span class="k">${</span><span class="nv">SRCROOT</span><span class="k">}</span>/Pods
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而且 project Info -> Configuration 下面指定了正确的 xcconfig。怀疑 PODS_ROOT 被某优先级更高的设置覆盖为空了。</p>
+
+<p>全局搜索 <code>PODS_ROOT</code>，发现 target -> Build Settings -> User Defined 中对 <code>PODS_ROOT</code> 设置了空值。删除后问题解决。</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-06-24T18:25:29+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+</div>
+	
+	<div class="comments"><a href="/blog/2020/06/24/pods-root-not-found/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -755,61 +813,6 @@ Edit - 取消 Automatically Sync Pasteboard<br/>
 </div>
 	
 	<div class="comments"><a href="/blog/2019/07/22/demark-sequential-using-numpy/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2019/07/22/cocoa-pods-branch-ref-bug/">
-		
-			CocoaPods 分支依赖时的 Bug</a>
-	</h2>
-	<div class="entry-content">
-		<h3>Pod 1.5.0 分支依赖，分支有新提交后，重新 pod install，pod 不更新</h3>
-
-<p>主工程源码依赖 SDK develop 分支，<code>pod install</code> 和 <code>pod install --fast-mode</code> ，拉下来的 SDK 均不是 develop 分支最新提交，而是上次执行 <code>pod install</code> 时 develop 分支的提交。</p>
-
-<p>清空 <code>./Pods</code> 和 <code>~/Library/Caches/CocoaPods/*</code> 均无效（缓存不在这里）。</p>
-
-<p>由于下载时间太长，不想清掉全量本地库，于是想了一个变通的方法。</p>
-
-<p>SDK 里 <code>gco -b feature/merge_main_proj</code>，主工程依赖 SDK <code>feature/merge_main_proj</code> 分支，重新 <code>pod install --fast-mode</code> 就好了，因为 pods 里没有对 <code>feature/merge_main_proj</code> 的缓存，此时肯定会好。</p>
-
-<p>然后主工程切回对 SDK <code>develop</code> 分支的依赖，重新 <code>pod install --fast-mode</code> 也好了。估计是对一个 pod 的多个分支只有一份缓存（pods 版本 1.5.0）。</p>
-
-<h3>新加的 pod 不更新</h3>
-
-<p>先来一次 <code>pod repo update</code> 再 <code>pod install</code> 。</p>
-
-<p>Over</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2019-07-22T15:22:31+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-</div>
-	
-	<div class="comments"><a href="/blog/2019/07/22/cocoa-pods-branch-ref-bug/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

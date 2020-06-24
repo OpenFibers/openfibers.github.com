@@ -7,21 +7,14 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="zsh中预留了一个chpwd()用于hook各种cd命令，包括cd pushd popd等。 首先打开~/.zshrc，增加chpwd函数。作用是在ccproj或其子目录，使用全局代理，否则关闭代理。 1
+	<meta name="description" content="首先我们导入一些‘业界标准’库 1
 2
 3
 4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-chpwd() case $ &hellip;">
+import pandas as pd
+import numpy as np
+import talib as ta
+import matplotlib.pyplot as plt Pandas 里有两种常用的结构，一种叫DataFrame， &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -94,6 +87,109 @@ chpwd() case $ &hellip;">
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2018/12/31/pandas-basics/">
+		
+			Pandas的一些基础用法</a>
+	</h2>
+	<div class="entry-content">
+		<p>首先我们导入一些‘业界标准’库</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pandas 里有两种常用的结构，一种叫<code>DataFrame</code>，作为二维的一张表格；另一种叫<code>Series</code>，是一维数组。<br/>
+<code>DataFrame</code>取单行和单列得到的都是<code>Series</code>类型的对象。</p>
+
+<h3>追加数据</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>获取最后一列数据</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>按行遍历</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>前十行组成子DataFrame</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>  <span class="c"># 含下标0到9的元素，不含下标10的元素</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>获取名为 close 的 column</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">close</span>
+</span><span class='line'><span class="err">或者</span>
+</span><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2018/12/31/pandas-basics/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-12-31T13:53:58+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/pandas/'>pandas</a>, <a class='category' href='/blog/categories/python/'>python</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2018/12/31/pandas-basics/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -714,86 +810,6 @@ BurpSuite是一个常用的调试工具。</p>
 </div>
 	
 	<div class="comments"><a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2016/01/26/gcd-sync-async/">
-		
-			GCD异步同步互转</a>
-	</h2>
-	<div class="entry-content">
-		<h2>同步转异步</h2>
-
-<p>这个是GCD最常见的用法之一，耗时长的操作放在global queue中做，完成之后将结果交给主线程处理：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_BACKGROUND</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>  <span class="kt">id</span> <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">longTimeTask</span><span class="p">];</span>
-</span><span class='line'>  <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>      <span class="p">[</span><span class="nb">self</span> <span class="nl">handleResultOnMainThread</span><span class="p">:</span><span class="n">result</span><span class="p">];</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>异步转同步</h2>
-
-<p>这个本人并不常用，偶尔有不得不用的场景。<br/>
-在异步操作开始前create信号量，然后使用dispatch_semaphore_wait等待此信号量。在异步操作完成后对此信号量发送signal:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="kt">dispatch_semaphore_t</span> <span class="n">sema</span> <span class="o">=</span> <span class="n">dispatch_semaphore_create</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">someAsyncTaskWithCallback</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">BOOL</span> <span class="n">successed</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="n">dispatch_semaphore_signal</span><span class="p">(</span><span class="n">sema</span><span class="p">);</span>
-</span><span class='line'><span class="p">}];</span>
-</span><span class='line'><span class="n">dispatch_semaphore_wait</span><span class="p">(</span><span class="n">sema</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Over</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-01-26T17:32:35+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/gcd/'>gcd</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2016/01/26/gcd-sync-async/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

@@ -7,10 +7,7 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content=" 1
-2
-import pandas as pd
-import numpy as np Read on &rarr; Comments ">
+	<meta name="description" content="Pod 1.5.0 分支依赖，分支有新提交后，重新 pod install，pod 不更新 主工程源码依赖 SDK develop 分支，pod install 和 pod install --fast-mode ，拉下来的 SDK 均不是 develop 分支最新提交，而是上次执行 pod &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -83,6 +80,61 @@ import numpy as np Read on &rarr; Comments ">
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2019/07/22/cocoa-pods-branch-ref-bug/">
+		
+			CocoaPods 分支依赖时的 Bug</a>
+	</h2>
+	<div class="entry-content">
+		<h3>Pod 1.5.0 分支依赖，分支有新提交后，重新 pod install，pod 不更新</h3>
+
+<p>主工程源码依赖 SDK develop 分支，<code>pod install</code> 和 <code>pod install --fast-mode</code> ，拉下来的 SDK 均不是 develop 分支最新提交，而是上次执行 <code>pod install</code> 时 develop 分支的提交。</p>
+
+<p>清空 <code>./Pods</code> 和 <code>~/Library/Caches/CocoaPods/*</code> 均无效（缓存不在这里）。</p>
+
+<p>由于下载时间太长，不想清掉全量本地库，于是想了一个变通的方法。</p>
+
+<p>SDK 里 <code>gco -b feature/merge_main_proj</code>，主工程依赖 SDK <code>feature/merge_main_proj</code> 分支，重新 <code>pod install --fast-mode</code> 就好了，因为 pods 里没有对 <code>feature/merge_main_proj</code> 的缓存，此时肯定会好。</p>
+
+<p>然后主工程切回对 SDK <code>develop</code> 分支的依赖，重新 <code>pod install --fast-mode</code> 也好了。估计是对一个 pod 的多个分支只有一份缓存（pods 版本 1.5.0）。</p>
+
+<h3>新加的 pod 不更新</h3>
+
+<p>先来一次 <code>pod repo update</code> 再 <code>pod install</code> 。</p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-07-22T15:22:31+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+</div>
+	
+	<div class="comments"><a href="/blog/2019/07/22/cocoa-pods-branch-ref-bug/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -792,109 +844,6 @@ risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1
 </div>
 	
 	<div class="comments"><a href="/blog/2018/12/31/python-talib-basics/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2018/12/31/pandas-basics/">
-		
-			Pandas的一些基础用法</a>
-	</h2>
-	<div class="entry-content">
-		<p>首先我们导入一些‘业界标准’库</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Pandas 里有两种常用的结构，一种叫<code>DataFrame</code>，作为二维的一张表格；另一种叫<code>Series</code>，是一维数组。<br/>
-<code>DataFrame</code>取单行和单列得到的都是<code>Series</code>类型的对象。</p>
-
-<h3>追加数据</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>获取最后一列数据</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>按行遍历</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>前十行组成子DataFrame</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>  <span class="c"># 含下标0到9的元素，不含下标10的元素</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>获取名为 close 的 column</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">close</span>
-</span><span class='line'><span class="err">或者</span>
-</span><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-
-		
-		<a href="/blog/2018/12/31/pandas-basics/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2018-12-31T13:53:58+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/pandas/'>pandas</a>, <a class='category' href='/blog/categories/python/'>python</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2018/12/31/pandas-basics/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

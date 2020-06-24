@@ -7,11 +7,7 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="All Posts C++ 10分钟速成 IDE 选择 PC MinGW
-VSCode macOS CLion (花钱)
-Xcode 文章例子编译环境：
-方言： GNU++14[-std=gnu++14]
-Standard library：libc++ (LLVM C++ standard &hellip;">
+	<meta name="description" content="All Posts Diff: /Manifest.lock: No Such File or Directory: PODS_ROOT Not Defined WeexSDK 增加 pods 依赖的时候提示： diff: /Manifest.lock: No such file or &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -94,6 +90,86 @@ Standard library：libc++ (LLVM C++ standard &hellip;">
 
   <div class="article-list">
     <div class="container">
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2020/06/24/pods-root-not-found/">Diff: /Manifest.lock: No Such File or Directory: PODS_ROOT Not Defined</a></h2>
+  
+  <p>
+    <p>WeexSDK 增加 pods 依赖的时候提示：</p>
+
+
+
+
+<p>diff: /Manifest.lock: No such file or directory</p>
+
+
+
+
+<p>查看 shell script：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>diff <span class="s2">&quot;${PODS_PODFILE_DIR_PATH}/Podfile.lock&quot;</span> <span class="s2">&quot;${PODS_ROOT}/Manifest.lock&quot;</span> &gt; /dev/null
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>echo 发现 PODS_ROOT 为空，导致 diff 右值传递为 &lsquo;/Manifest.lock&#8217;，所以文件找不到。</p>
+
+
+
+
+<p>查看 <code>Pods-WeexSDK.debug.xcconfig</code> 中对 <code>PODS_ROOT</code> 有定义：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">PODS_ROOT</span> <span class="o">=</span> <span class="k">${</span><span class="nv">SRCROOT</span><span class="k">}</span>/Pods
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<p>而且 project Info -> Configuration 下面指定了正确的 xcconfig。怀疑 PODS_ROOT 被某优先级更高的设置覆盖为空了。</p>
+
+
+
+
+<p>全局搜索 <code>PODS_ROOT</code>，发现 target -> Build Settings -> User Defined 中对 <code>PODS_ROOT</code> 设置了空值。删除后问题解决。</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-06-24T18:25:29+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
       
       
       <div class="row">

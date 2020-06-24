@@ -7,7 +7,13 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content=" 苹果对BitCode的介绍看上去很美，今天尝试了一下，掉入深坑，克服种种困难终于爬上来了。成功开启后的效果还是挺好的。 下面介绍一下如何开启BitCode，以及我掉的坑有哪些。 Read on &rarr; bitcode, ios, xcode Comments ">
+	<meta name="description" content="同步转异步 这个是GCD最常见的用法之一，耗时长的操作放在global queue中做，完成之后将结果交给主线程处理： 1
+2
+3
+4
+5
+6
+dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -80,6 +86,86 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/01/26/gcd-sync-async/">
+		
+			GCD异步同步互转</a>
+	</h2>
+	<div class="entry-content">
+		<h2>同步转异步</h2>
+
+<p>这个是GCD最常见的用法之一，耗时长的操作放在global queue中做，完成之后将结果交给主线程处理：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_BACKGROUND</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>  <span class="kt">id</span> <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">longTimeTask</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>      <span class="p">[</span><span class="nb">self</span> <span class="nl">handleResultOnMainThread</span><span class="p">:</span><span class="n">result</span><span class="p">];</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>异步转同步</h2>
+
+<p>这个本人并不常用，偶尔有不得不用的场景。<br/>
+在异步操作开始前create信号量，然后使用dispatch_semaphore_wait等待此信号量。在异步操作完成后对此信号量发送signal:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="kt">dispatch_semaphore_t</span> <span class="n">sema</span> <span class="o">=</span> <span class="n">dispatch_semaphore_create</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">someAsyncTaskWithCallback</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">BOOL</span> <span class="n">successed</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">dispatch_semaphore_signal</span><span class="p">(</span><span class="n">sema</span><span class="p">);</span>
+</span><span class='line'><span class="p">}];</span>
+</span><span class='line'><span class="n">dispatch_semaphore_wait</span><span class="p">(</span><span class="n">sema</span><span class="p">,</span> <span class="n">DISPATCH_TIME_FOREVER</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-26T17:32:35+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/gcd/'>gcd</a>, <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/01/26/gcd-sync-async/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -617,59 +703,6 @@
 </div>
 	
 	<div class="comments"><a href="/blog/2015/11/03/weak-strong-dance-mistakes/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/11/01/iphone-sdk-bug-collection/">
-		
-			iPhone SDK Bug Collection</a>
-	</h2>
-	<div class="entry-content">
-		<ol>
-<li><p>convertRect:fromView 返回乘以screen scale以后的结果：<br/>
-在iOS8上，view如果未添加到任何window，调用此方法可能会出现此后果。</p></li>
-<li><p>定高UITextView输入时，文字超过text view高度，输入光标被遮挡或截断，显示不全，继续输入时正在输入的内容也被遮挡:<br/>
-参考<a href="http://openfibers.github.io/blog/2015/11/30/uitextview-auto-scroll-in-ios8/">iOS8的UITextView输入光标显示不全的hack</a>。</p></li>
-<li><p>window.rootViewController设置后，老的rootViewController的view仍然贴在window上：<br/>
-参考<a href="http://openfibers.github.io/blog/2015/12/15/window-setrootviewcontroller-view-not-removed-hack/">[UIWindow setRootViewController:]后view无限叠加的问题修复</a>。</p></li>
-</ol>
-
-
-<p>Over</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-11-01T21:01:42+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/iphone/'>iphone</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/11/01/iphone-sdk-bug-collection/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

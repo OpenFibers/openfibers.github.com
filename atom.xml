@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-05-07T11:35:57+08:00</updated>
+  <updated>2020-06-24T18:32:16+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -12,6 +12,37 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[diff: /Manifest.lock: No such file or directory: PODS_ROOT not defined]]></title>
+    <link href="http://openfibers.github.io/blog/2020/06/24/pods-root-not-found/"/>
+    <updated>2020-06-24T18:25:29+08:00</updated>
+    <id>http://openfibers.github.io/blog/2020/06/24/pods-root-not-found</id>
+    <content type="html"><![CDATA[<p>WeexSDK 增加 pods 依赖的时候提示：</p>
+
+<p>diff: /Manifest.lock: No such file or directory</p>
+
+<p>查看 shell script：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>diff <span class="s2">&quot;${PODS_PODFILE_DIR_PATH}/Podfile.lock&quot;</span> <span class="s2">&quot;${PODS_ROOT}/Manifest.lock&quot;</span> &gt; /dev/null
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>echo 发现 PODS_ROOT 为空，导致 diff 右值传递为 &lsquo;/Manifest.lock&#8217;，所以文件找不到。</p>
+
+<p>查看 <code>Pods-WeexSDK.debug.xcconfig</code> 中对 <code>PODS_ROOT</code> 有定义：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">PODS_ROOT</span> <span class="o">=</span> <span class="k">${</span><span class="nv">SRCROOT</span><span class="k">}</span>/Pods
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而且 project Info -> Configuration 下面指定了正确的 xcconfig。怀疑 PODS_ROOT 被某优先级更高的设置覆盖为空了。</p>
+
+<p>全局搜索 <code>PODS_ROOT</code>，发现 target -> Build Settings -> User Defined 中对 <code>PODS_ROOT</code> 设置了空值。删除后问题解决。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[C++ 10分钟速成]]></title>
@@ -2998,163 +3029,6 @@ risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1
 <h3>全部指标和方法列表</h3>
 
 <p><a href="http://mrjbq7.github.io/ta-lib/funcs.html">http://mrjbq7.github.io/ta-lib/funcs.html</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[pandas的一些基础用法]]></title>
-    <link href="http://openfibers.github.io/blog/2018/12/31/pandas-basics/"/>
-    <updated>2018-12-31T13:53:58+08:00</updated>
-    <id>http://openfibers.github.io/blog/2018/12/31/pandas-basics</id>
-    <content type="html"><![CDATA[<p>首先我们导入一些‘业界标准’库</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Pandas 里有两种常用的结构，一种叫<code>DataFrame</code>，作为二维的一张表格；另一种叫<code>Series</code>，是一维数组。<br/>
-<code>DataFrame</code>取单行和单列得到的都是<code>Series</code>类型的对象。</p>
-
-<h3>追加数据</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>获取最后一列数据</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>按行遍历</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>前十行组成子DataFrame</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">])</span>  <span class="c"># 含下标0到9的元素，不含下标10的元素</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>获取名为 close 的 column</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">close</span>
-</span><span class='line'><span class="err">或者</span>
-</span><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!--more-->
-
-
-<h3>取某行（series）中单个元素</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span class='line'><span class="n">close</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">close</span>
-</span><span class='line'><span class="n">close</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">series</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>或</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;close&#39;</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>series 转 list</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">series</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>series 转 np array</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">np_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
-</span><span class='line'><span class="err">或</span>
-</span><span class='line'><span class="n">np_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
-</span><span class='line'><span class="err">或</span>
-</span><span class='line'><span class="n">np_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>结合 talib 计算</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">RSI</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bars</span><span class="o">.</span><span class="n">close</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>可视化</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-</span><span class='line'>    <span class="s">&#39;close&#39;</span><span class="p">:</span> <span class="o">...</span> <span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;open&#39;</span><span class="p">:</span> <span class="o">...</span> <span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;high&#39;</span><span class="p">:</span> <span class="o">...</span> <span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;low&#39;</span><span class="p">:</span> <span class="o">...</span> <span class="p">,</span>
-</span><span class='line'>    <span class="s">&#39;timestamp&#39;</span><span class="p">,</span> <span class="o">...</span>
-</span><span class='line'><span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># figure 1</span>
-</span><span class='line'><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;timestamp&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">,</span> <span class="s">&#39;high&#39;</span><span class="p">,</span> <span class="s">&#39;low&#39;</span><span class="p">])</span>  <span class="c"># 展示 close high low 三个属性</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># figure 2</span>
-</span><span class='line'><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;timestamp&#39;</span><span class="p">)</span>  <span class="c"># 展示全部属性</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># 展示上面两幅绘制过的图</span>
-</span><span class='line'><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Over</p>
 ]]></content>
   </entry>
   
