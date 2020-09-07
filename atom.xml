@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-06-24T18:32:16+08:00</updated>
+  <updated>2020-09-07T17:08:12+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -12,6 +12,185 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[macOS BigSur 适配指引]]></title>
+    <link href="http://openfibers.github.io/blog/2020/09/07/make-app-compatible-with-macos-bigsur/"/>
+    <updated>2020-09-07T17:06:28+08:00</updated>
+    <id>http://openfibers.github.io/blog/2020/09/07/make-app-compatible-with-macos-bigsur</id>
+    <content type="html"><![CDATA[<h2>在 Apple Silicon 上做性能分析</h2>
+
+<ul>
+<li>原生代码一般都会比转码性能更好</li>
+<li>小心使用 Intel 专有的代码优化（SSE, AVX）
+
+<ul>
+<li>可能需要针对 Apple Silicon 的优化版本</li>
+</ul>
+</li>
+<li>尽可能使用 Apple 提供的 AP (Accelerate framework)</li>
+</ul>
+
+
+<h2>Apple Silicon 的非对称 CPU 核心</h2>
+
+<ul>
+<li>Apple Silicon Mac 有两种类型的核心
+
+<ul>
+<li>高性能核心（P Cores）</li>
+<li>节能核心（Cores)</li>
+<li>在高并发任务场景下，所有的核心可以同时开启</li>
+</ul>
+</li>
+</ul>
+
+
+<h2>避免使用忙等和 spinlock</h2>
+
+<ul>
+<li>忙等会占用性能核心，进而导致任务延迟</li>
+<li>推荐的阻塞同步原语
+
+<ul>
+<li>NSLock, os_unfair_lock, pthread mutexes</li>
+<li>NSCondition, pthread 条件变量</li>
+</ul>
+</li>
+<li>避免按照 CPU 的数量划分工作任务</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Prefer blocking locks and condition variables
+</span><span class='line'>func performWorkUnderSpinlock () {
+</span><span class='line'>  os_unfair_lock_lock()
+</span><span class='line'>  performWork()
+</span><span class='line'>  os_unfair_lock_unlock()
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>func retrieveNextWorkTask() -&gt; WorkTask {
+</span><span class='line'>  condition.lock()
+</span><span class='line'>  while !taskQueue.hasAnyWork {
+</span><span class='line'>      condition.wait()
+</span><span class='line'>  }
+</span><span class='line'>  let task = taskQueue.pop()
+</span><span class='line'>  condition.unlock()
+</span><span class='line'>  return task
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>在 Apple Silicon 上调试、测试和性能分析</h2>
+
+<ul>
+<li>构建工作可以使用任何 Mac，但是运行 arm64 代码只能在 Apple Silicon Mac 上</li>
+<li>分别测试原生和 Rosetta 的运行方式</li>
+<li>注意 Intel 专有代码和忙等的实现</li>
+</ul>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">   </th>
+<th style="text-align:center;"> 第一方<br>从源码编译<br>和你的 app 一起发布 </th>
+<th style="text-align:right;"> 第三方<br>预先编译好的二进制<br>和 app 一起或者单独发布 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 进程内      </td>
+<td style="text-align:center;"> √ </td>
+<td style="text-align:right;">         √ </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 进程外      </td>
+<td style="text-align:center;"> √        </td>
+<td style="text-align:right;"> x<br>原生 app 只能加载原生插件<br>Rosetta 转码 ap 只能加载 x86_64 插件 </td>
+</tr>
+</tbody>
+</table>
+
+
+<h2>通过 XPC 使用进程外插件</h2>
+
+<ul>
+<li>每个插件一个进程或者每种架构一个进程</li>
+<li>更好的稳定性和安全性</li>
+</ul>
+
+
+<h2>为了插件使用 Rosetta</h2>
+
+<ul>
+<li>用户可以强制一个通用 app 通过 Rosetta 启动</li>
+<li>通过 Info.pist 关键字可以禁用</li>
+<li>详见 macOS 移植文档</li>
+</ul>
+
+
+<h2>警惕多线程缺陷</h2>
+
+<ul>
+<li>Intel CPU 和 Apple Silicon 采用不同的内存排序模型</li>
+<li>正确的代码有相同的行为，有缺陷的代码（争条件，数据竟争）却各有各的表现
+
+<ul>
+<li>一个数据竞争在 Intel CPU 上也许不显露，却有可能在 Apple Silicon 上导致崩溃</li>
+<li>Rosetta 提供 Intel CPU 相同的内存排序</li>
+</ul>
+</li>
+<li>使用 Thread Sanitizer 来发现和防止数据竞争问题</li>
+</ul>
+
+
+<h2>兼容性</h2>
+
+<ul>
+<li>兼容的 app 自动可见</li>
+<li>可以在 App Store Connect 管理</li>
+</ul>
+
+
+<h2>硬件的区别</h2>
+
+<ul>
+<li>鼠标和触控事件</li>
+<li>环境传感器的区别
+
+<ul>
+<li>陀螺仪</li>
+<li>指南针</li>
+<li>雷达摄像头</li>
+<li>GPS</li>
+</ul>
+</li>
+<li>相机
+
+<ul>
+<li>使用 AVCaptureDeviceDiscoverySession 自动兼容</li>
+</ul>
+</li>
+<li>照片选取</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[diff: /Manifest.lock: No such file or directory: PODS_ROOT not defined]]></title>
@@ -2975,60 +3154,6 @@ risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1
 <p><a href="http://www.turingfinance.com/computational-investing-with-python-week-one/">Measures of Risk-adjusted Return</a></p>
 
 <p>Over</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[python talib 的一些基础用法]]></title>
-    <link href="http://openfibers.github.io/blog/2018/12/31/python-talib-basics/"/>
-    <updated>2018-12-31T14:27:06+08:00</updated>
-    <id>http://openfibers.github.io/blog/2018/12/31/python-talib-basics</id>
-    <content type="html"><![CDATA[<p>首先还是导入一些业界标准库：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>计算RSI</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">close</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bars</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
-</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">ta</span><span class="o">.</span><span class="n">RSI</span><span class="p">(</span><span class="n">close</span><span class="p">))</span>  <span class="c"># 默认15根bars</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>计算MA</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">)</span>  <span class="c"># 默认 30 根 bars，即 MA30</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>设置计算用的时长，比如计算 MA5</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>计算 EMA11 和 EMA22</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
-</span><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>全部指标和方法列表</h3>
-
-<p><a href="http://mrjbq7.github.io/ta-lib/funcs.html">http://mrjbq7.github.io/ta-lib/funcs.html</a></p>
 ]]></content>
   </entry>
   

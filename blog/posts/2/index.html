@@ -7,7 +7,8 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="Pod 1.5.0 分支依赖，分支有新提交后，重新 pod install，pod 不更新 主工程源码依赖 SDK develop 分支，pod install 和 pod install --fast-mode ，拉下来的 SDK 均不是 develop 分支最新提交，而是上次执行 pod &hellip;">
+	<meta name="description" content=" 1
+import numpy as np Read on &rarr; Comments ">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -80,6 +81,49 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2019/07/22/demark-sequential-using-numpy/">
+		
+			Demark Sequential Using Numpy</a>
+	</h2>
+	<div class="entry-content">
+		<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+		
+		<a href="/blog/2019/07/22/demark-sequential-using-numpy/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-07-22T15:35:07+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+</div>
+	
+	<div class="comments"><a href="/blog/2019/07/22/demark-sequential-using-numpy/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -756,94 +800,6 @@ risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1
 </div>
 	
 	<div class="comments"><a href="/blog/2019/01/15/funds-perfomance-measures/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2018/12/31/python-talib-basics/">
-		
-			Python Talib 的一些基础用法</a>
-	</h2>
-	<div class="entry-content">
-		<p>首先还是导入一些业界标准库：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>计算RSI</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">close</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bars</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
-</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">ta</span><span class="o">.</span><span class="n">RSI</span><span class="p">(</span><span class="n">close</span><span class="p">))</span>  <span class="c"># 默认15根bars</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>计算MA</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">)</span>  <span class="c"># 默认 30 根 bars，即 MA30</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>设置计算用的时长，比如计算 MA5</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>计算 EMA11 和 EMA22</h3>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
-</span><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>全部指标和方法列表</h3>
-
-<p><a href="http://mrjbq7.github.io/ta-lib/funcs.html">http://mrjbq7.github.io/ta-lib/funcs.html</a></p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2018-12-31T14:27:06+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/python/'>python</a>, <a class='category' href='/blog/categories/ta-lib/'>ta-lib</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2018/12/31/python-talib-basics/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

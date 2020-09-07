@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://openfibers.github.io/blog/2020/09/07/make-app-compatible-with-macos-bigsur/</loc>
+<lastmod>2020-09-07T17:06:28+08:00</lastmod>
+</url>
+<url>
 <loc>http://openfibers.github.io/blog/2020/06/24/pods-root-not-found/</loc>
 <lastmod>2020-06-24T18:25:29+08:00</lastmod>
 </url>
@@ -391,5 +395,8 @@
 </url>
 <url>
 <loc>http://openfibers.github.io/blog/categories/ai/</loc>
+</url>
+<url>
+<loc>http://openfibers.github.io/blog/categories/bigsur/</loc>
 </url>
 </urlset>

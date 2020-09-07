@@ -7,13 +7,8 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="同步转异步 这个是GCD最常见的用法之一，耗时长的操作放在global queue中做，完成之后将结果交给主线程处理： 1
-2
-3
-4
-5
-6
-dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND &hellip;">
+	<meta name="description" content="lldb导入UIKit 使用lldb调试app时，lldb经常提示view.bounds无法打印： 实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入 1
+expr @import UIKit 即可解决： 在开发Mac &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -86,6 +81,100 @@ dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND &hel
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/">
+		
+			Xcode/lldb自动导入UIKit</a>
+	</h2>
+	<div class="entry-content">
+		<h2>lldb导入UIKit</h2>
+
+<p>使用lldb调试app时，lldb经常提示view.bounds无法打印：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import1.png" width="428" height="58"></p>
+
+<p>实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import UIKit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>即可解决：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import2.png" width="396" height="57"></p>
+
+<p>在开发Mac App时也是一样的，比如不导入AppKit则无法打印frame属性，手动导入AppKit即可：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import AppKit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import3.png" width="297" height="113"></p>
+
+<h2>工程自动导入</h2>
+
+<p>但是大部分人都换有懒癌，对于每次调试都要手打一行命令是难以接受的。我们可以在main上加个断点：</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import4.png" width="799" height="113"></p>
+
+<p>在main中断时执行<code>expr @import UIKit</code>，并自动continue:</p>
+
+<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import5.png" width="647" height="370"></p>
+
+<p>然后在工程启动时就会自动导入UIKit到lldb了。</p>
+
+<h2>全局自动导入</h2>
+
+<p>对于懒癌晚期的患者，每个工程单独配置还是挺麻烦的，可以在lldbinit中设置全局自动导入UIKit。在命令行中执行：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo </span>display @import UIKit &gt;&gt; ~/.lldbinit
+</span><span class='line'><span class="nb">echo </span>display @import AppKit &gt;&gt; ~/.lldbinit
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再重新启动调试即可（Xcode7测试时无需重启Xcode）。</p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-24T10:22:27+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/lldb/'>lldb</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -629,80 +718,6 @@ dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND &hel
 </div>
 	
 	<div class="comments"><a href="/blog/2015/11/10/objective-c-properties-begin-with-new/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/11/03/weak-strong-dance-mistakes/">
-		
-			Weak-strong Dance 错误两则</a>
-	</h2>
-	<div class="entry-content">
-		<h2>第一则：RAC中weak-strong dance不完整造成内存泄露</h2>
-
-<p>今天在工程中发现了RAC导致的retain cycle:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
-</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
-</span><span class='line'><span class="p">}];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>相对于正常的RAC用法:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
-</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
-</span><span class='line'><span class="p">}];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，weak-strong dance是必须做的，不做weak-strong dance就会循环引用。</p>
-
-
-		
-		<a href="/blog/2015/11/03/weak-strong-dance-mistakes/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-11-03T10:12:32+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/rac/'>rac</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/11/03/weak-strong-dance-mistakes/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

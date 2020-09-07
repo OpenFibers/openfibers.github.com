@@ -7,14 +7,15 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="首先我们导入一些‘业界标准’库 1
+	<meta name="description" content="首先还是导入一些业界标准库： 1
 2
 3
-4
 import pandas as pd
 import numpy as np
-import talib as ta
-import matplotlib.pyplot as plt Pandas 里有两种常用的结构，一种叫DataFrame， &hellip;">
+import talib as ta 计算RSI 1
+2
+close = np.array(bars.close)
+print(ta.RSI(close)) # &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -87,6 +88,94 @@ import matplotlib.pyplot as plt Pandas 里有两种常用的结构，一种叫Da
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2018/12/31/python-talib-basics/">
+		
+			Python Talib 的一些基础用法</a>
+	</h2>
+	<div class="entry-content">
+		<p>首先还是导入一些业界标准库：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">talib</span> <span class="kn">as</span> <span class="nn">ta</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>计算RSI</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">close</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bars</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+</span><span class='line'><span class="k">print</span><span class="p">(</span><span class="n">ta</span><span class="o">.</span><span class="n">RSI</span><span class="p">(</span><span class="n">close</span><span class="p">))</span>  <span class="c"># 默认15根bars</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>计算MA</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">)</span>  <span class="c"># 默认 30 根 bars，即 MA30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>设置计算用的时长，比如计算 MA5</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">MA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>计算 EMA11 和 EMA22</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</span><span class='line'><span class="n">ta</span><span class="o">.</span><span class="n">EMA</span><span class="p">(</span><span class="n">close</span><span class="p">,</span> <span class="n">timeperiod</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>全部指标和方法列表</h3>
+
+<p><a href="http://mrjbq7.github.io/ta-lib/funcs.html">http://mrjbq7.github.io/ta-lib/funcs.html</a></p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-12-31T14:27:06+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/fin-tech/'>fin-tech</a>, <a class='category' href='/blog/categories/python/'>python</a>, <a class='category' href='/blog/categories/ta-lib/'>ta-lib</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2018/12/31/python-talib-basics/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -716,100 +805,6 @@ BurpSuite是一个常用的调试工具。</p>
 </div>
 	
 	<div class="comments"><a href="/blog/2016/02/26/othttprequest/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/">
-		
-			Xcode/lldb自动导入UIKit</a>
-	</h2>
-	<div class="entry-content">
-		<h2>lldb导入UIKit</h2>
-
-<p>使用lldb调试app时，lldb经常提示view.bounds无法打印：</p>
-
-<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import1.png" width="428" height="58"></p>
-
-<p>实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import UIKit
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>即可解决：</p>
-
-<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import2.png" width="396" height="57"></p>
-
-<p>在开发Mac App时也是一样的，比如不导入AppKit则无法打印frame属性，手动导入AppKit即可：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>expr @import AppKit
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import3.png" width="297" height="113"></p>
-
-<h2>工程自动导入</h2>
-
-<p>但是大部分人都换有懒癌，对于每次调试都要手打一行命令是难以接受的。我们可以在main上加个断点：</p>
-
-<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import4.png" width="799" height="113"></p>
-
-<p>在main中断时执行<code>expr @import UIKit</code>，并自动continue:</p>
-
-<p><img class="left" src="/images/blog/lldb_auto_import/lldb_auto_import5.png" width="647" height="370"></p>
-
-<p>然后在工程启动时就会自动导入UIKit到lldb了。</p>
-
-<h2>全局自动导入</h2>
-
-<p>对于懒癌晚期的患者，每个工程单独配置还是挺麻烦的，可以在lldbinit中设置全局自动导入UIKit。在命令行中执行：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">echo </span>display @import UIKit &gt;&gt; ~/.lldbinit
-</span><span class='line'><span class="nb">echo </span>display @import AppKit &gt;&gt; ~/.lldbinit
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>再重新启动调试即可（Xcode7测试时无需重启Xcode）。</p>
-
-<p>Over</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-02-24T10:22:27+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/lldb/'>lldb</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2016/02/24/auto-import-frameworks-in-xcode-lldb/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

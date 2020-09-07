@@ -7,7 +7,8 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="这本书与11年开始连载，12年角川书店发行了单行本，不是新书。这几天亚马逊付费榜排行第一。前几天买了，刚刚看完。 三个穷小偷为了跑路，钻进一家三十多年没开张的杂货店。 世界观大体就是这样的：当杂货店完全关上门时，店内时间流逝是要比店外面慢的。而且杂货店可以收到三十年前人的来信并回复来信。 &hellip;">
+	<meta name="description" content="1. 适用情况 想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。
+除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。 在苹果制定的游戏规则中，所有在App内提供的服务需要付费时，都应当使用IAP，比如软件功能、游戏道具 &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -80,6 +81,76 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/02/28/in-app-purchase-walk-through/">
+		
+			In-App Purchase Walk Through</a>
+	</h2>
+	<div class="entry-content">
+		<h2>1. 适用情况</h2>
+
+<p>想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。<br/>
+除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。</p>
+
+<p>在苹果制定的游戏规则中，所有在App内提供的服务需要付费时，都应当使用IAP，比如软件功能、游戏道具；所有在App外提供的服务需要付费时，都应使用其他支付方式，比如Uber的信用卡，淘宝、快的打车的支付宝SDK等。</p>
+
+<p>在IAP里，可以出售：</p>
+
+<ol>
+<li>数字内容：比如杂志、图片、游戏关卡解锁、相机付费滤镜等；</li>
+<li>软件功能：如各种扩展features；</li>
+<li>一次性服务：比如一次语音通话等。注意是「一次性」服务，不是一次「性服务」。</li>
+</ol>
+
+
+<p>在IAP里，不能出售:</p>
+
+<ol>
+<li>现实世界的商品或服务：比如刚才提到的一次「性服务」。严格遵守此方案有个好处：IAP 如果被破解，用户无法得到大量实物，开发商也不会有很大经济损失。非要做的话想绕过也是可以的：用 IAP 购买代币，审核通过后用代币购买实物。</li>
+<li>其他<a href="https://developer.apple.com/appstore/guidelines.html">the App Review GuideLines</a>中规定的不允许的内容：比如刚才提到的一次「性服务」。</li>
+</ol>
+
+
+<p>顺便说下，有次大网易的同事分享时提到：使用兑换码兑换App内服务是一条高压线。像Uber和Amazon里允许有码，是因为他们的码是用在现实世界的产品或服务上的。</p>
+
+<p>如果你确定内购需求符合IAP的使用要求，可以继续往下读了。</p>
+
+
+		
+		<a href="/blog/2015/02/28/in-app-purchase-walk-through/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-02-28T16:19:15+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/iap/'>iap</a>, <a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/02/28/in-app-purchase-walk-through/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">

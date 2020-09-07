@@ -7,9 +7,12 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="convertRect:fromView 返回乘以screen scale以后的结果：
-在iOS8上，view如果未添加到任何window，调用此方法可能会出现此后果。
-定高UITextView输入时，文字超过text view高度，输入光标被遮挡或截断，显示不全， &hellip;">
+	<meta name="description" content="第一则：RAC中weak-strong dance不完整造成内存泄露 今天在工程中发现了RAC导致的retain cycle: 1
+2
+3
+4
+@weakify(self)
+[RACObserve(self, fooProperty) subscribeNext:^(id fooProperty &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -82,6 +85,80 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/11/03/weak-strong-dance-mistakes/">
+		
+			Weak-strong Dance 错误两则</a>
+	</h2>
+	<div class="entry-content">
+		<h2>第一则：RAC中weak-strong dance不完整造成内存泄露</h2>
+
+<p>今天在工程中发现了RAC导致的retain cycle:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>相对于正常的RAC用法:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">@</span><span class="n">weakify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'><span class="p">[</span><span class="n">RACObserve</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="nl">subscribeNext</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">fooProperty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">@</span><span class="n">strongify</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span> <span class="n">doSomething</span><span class="p">];</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>少了一行<strong>@strongify(self)</strong>即造成了循环引用，即对于RAC来说，weak-strong dance是必须做的，不做weak-strong dance就会循环引用。</p>
+
+
+		
+		<a href="/blog/2015/11/03/weak-strong-dance-mistakes/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-03T10:12:32+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/rac/'>rac</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/11/03/weak-strong-dance-mistakes/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -657,112 +734,6 @@ Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。</p>
 </div>
 	
 	<div class="comments"><a href="/blog/2015/06/19/wwdc-2015-features/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/04/27/transparent-window-in-osx/">
-		
-			OSX各种实现毛玻璃效果窗口的方式与比较</a>
-	</h2>
-	<div class="entry-content">
-		<p>毛玻璃窗体是10.10中新增的效果. 比如Finder的左边栏.<br/>
-本文只对10.8, 10.9, 10.10三个版本进行讨论. 我的App未对10.6和10.7做任何支持, 此处也不予讨论.</p>
-
-<h2>第一种方式: NSVisualEffectView</h2>
-
-<p>这是10.10中新开放的API, 只能在10.10的runtime上使用.<br/>
-如果需要上架App Store, 这也是在10.10上完成毛玻璃效果的唯一方式.<br/>
-首先为NSView增加扩展:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//Returns NSVisualEffectView</span>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@implementation</span> <span class="nc">NSView</span> <span class="nl">(Vibrancy)</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">insertVibrancyViewBlendingMode:</span><span class="p">(</span><span class="n">NSVisualEffectBlendingMode</span><span class="p">)</span><span class="nv">mode</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="kt">Class</span> <span class="n">vibrantClass</span><span class="o">=</span><span class="n">NSClassFromString</span><span class="p">(</span><span class="s">@&quot;NSVisualEffectView&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">vibrantClass</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">NSVisualEffectView</span> <span class="o">*</span><span class="n">vibrant</span><span class="o">=</span><span class="p">[[</span><span class="n">vibrantClass</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFrame</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">bounds</span><span class="p">];</span>
-</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setAutoresizingMask</span><span class="p">:</span><span class="n">NSViewWidthSizable</span><span class="o">|</span><span class="n">NSViewHeightSizable</span><span class="p">];</span>
-</span><span class='line'>        <span class="p">[</span><span class="n">vibrant</span> <span class="nl">setBlendingMode</span><span class="p">:</span><span class="n">mode</span><span class="p">];</span>
-</span><span class='line'>        <span class="p">[</span><span class="nb">self</span> <span class="nl">addSubview</span><span class="p">:</span><span class="n">vibrant</span> <span class="nl">positioned</span><span class="p">:</span><span class="n">NSWindowBelow</span> <span class="nl">relativeTo</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">return</span> <span class="n">vibrant</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-
-		
-		<a href="/blog/2015/04/27/transparent-window-in-osx/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-04-27T19:22:15+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/appkit/'>appkit</a>, <a class='category' href='/blog/categories/cocoa/'>cocoa</a>, <a class='category' href='/blog/categories/macos/'>macos</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/04/27/transparent-window-in-osx/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>
