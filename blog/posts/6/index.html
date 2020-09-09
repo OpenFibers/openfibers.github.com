@@ -7,8 +7,8 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="毛玻璃窗体是10.10中新增的效果. 比如Finder的左边栏.
-本文只对10.8, 10.9, 10.10三个版本进行讨论. 我的App未对10.6和10.7做任何支持, 此处也不予讨论. 第一种方式: NSVisualEffectView 这是10.10中新开放的API, 只能在10. &hellip;">
+	<meta name="description" content="WWDC 2015 更新了五大产品线：OS X EI，iOS 9，watchOS 2，Xcode 7，Swift 2. 1. OS X EI Metal APIs Metal是一个开销极低的一种访问 GPU 的框架。
+Metal framework 提供了 GPU &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -81,6 +81,65 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/06/19/wwdc-2015-features/">
+		
+			WWDC 2015 带来的新玩法</a>
+	</h2>
+	<div class="entry-content">
+		<p>WWDC 2015 更新了五大产品线：OS X EI，iOS 9，watchOS 2，Xcode 7，Swift 2.</p>
+
+<h2>1. OS X EI</h2>
+
+<h3>Metal APIs</h3>
+
+<p>Metal是一个开销极低的一种访问 GPU 的框架。<br/>
+Metal framework 提供了 GPU 加速的先进的3D渲染和数据并行计算能力。<br/>
+Metal 提供了流水线式的 API（streamlined API），预编译着色器（precompiled shaders），以及高性能的多线程支持。这些 features 可以帮助你把你的游戏或 app 的性能提升一个档次。<br/>
+Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。</p>
+
+<p>相关资源：<br/>
+<a href="https://developer.apple.com/metal/">Metal Home Page</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40014221-CH1-SW1">Metal Programming Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalShadingLanguageGuide/Introduction/Introduction.html">Metal Shading Language Guide</a><br/>
+<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalFrameworkReference/index.html">Metal Framework Reference</a></p>
+
+
+		
+		<a href="/blog/2015/06/19/wwdc-2015-features/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-06-19T15:07:10+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/wwdc/'>wwdc</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/06/19/wwdc-2015-features/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -682,63 +741,6 @@ GH60富有富玩法，穷有穷玩法，这次是最穷的玩法。200块钱的�
 </div>
 	
 	<div class="comments"><a href="/blog/2015/03/03/keyboards-from-2012-to-2015/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/">
-		
-			自动选用速度快的CDN播放MV in iOS</a>
-	</h2>
-	<div class="entry-content">
-		<h2>为什么要做这件事</h2>
-
-<p>最近云音乐用户数量要上亿了，用户量增加的过程中总有许许多多以前没暴露的问题。<br/>
-比如最近好多人反馈MV经常卡顿。从反馈情况看是某个区域的用户访问我们CDN的速度比较慢。  <br/>
-但是如果只是换CDN服务提供商的话，就算这个区域的用户连接速度康复了，也很容易造成另一个区域的用户访问CDN变慢的情况。挑选新的CDN提供商也是个麻烦事。<br/>
-不管怎样，先不考虑换CDN的事情，客户端层面的访问速度优化还是有必要做的。<br/>
-既然不把更换CDN的因素考虑在内，一个特定用户的终端连接到每个CDN节点的速度是硬生生摆在那的。<br/>
-所以要提升访问速度有两个事情可以做：</p>
-
-<ol>
-<li>降低视频文件尺寸</li>
-<li>选取最快的CDN节点</li>
-</ol>
-
-
-
-		
-		<a href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-03-03T14:04:16+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

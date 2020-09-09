@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-09-07T17:08:12+08:00</updated>
+  <updated>2020-09-09T11:34:23+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -12,6 +12,86 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[为什么 LINK 和 AMPL 是空气币]]></title>
+    <link href="http://openfibers.github.io/blog/2020/09/09/why-link-and-ampl-is-as-thin-as-air/"/>
+    <updated>2020-09-09T10:27:41+08:00</updated>
+    <id>http://openfibers.github.io/blog/2020/09/09/why-link-and-ampl-is-as-thin-as-air</id>
+    <content type="html"><![CDATA[<h3>LINK</h3>
+
+<p>截止现在，18年到20年，最高价20多，最多涨了100倍。Defi 和 oracle 八竿子碰巧能打到一点点，最近和大热的 Defi 走的很近，市值也一度到了第五名。<br/>
+买的早那是真香，但是有两个硬伤：</p>
+
+<h4>第一个硬伤：实现逻辑方面</h4>
+
+<p>LINK 的核心逻辑：单节点 oracle 容易欺骗用户或失败率高，通过增加冗余节点来保证正确性，同时给予冗余节点代币激励。<br/>
+所以 LINK 的架构如下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>用户 --&gt; 节点 A --&gt; 外部 API
+</span><span class='line'>     |   ...   |
+</span><span class='line'>     -&gt; 节点 N -</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是这样做会带来三个问题：</p>
+
+<ol>
+<li><p>多节点请求外部 API 的返回值一致性问题：</p>
+
+<ul>
+<li>传统 http 接口的请求返回值会根据请求的时间/地理位置信息变动而变动</li>
+<li>LINK 为保证结果一致固化了时间戳参数，所有节点的和地理位置相关的参数需要隐藏</li>
+<li>That is, 外部 API 需要给 LINK 提供专门的接口。存量的海量 http 接口，LINK 虽然可以调用，但是不可用性会很高</li>
+</ul>
+</li>
+<li><p>外部 API 负载问题：</p>
+
+<ul>
+<li>N 个节点带来外部 API 的 QPS 翻 N 倍</li>
+<li>但是如果想要通过降低 N 的数量来降低负载，返回值的正确性会降低，毕竟 LINK 就是为增加冗余而生的</li>
+<li>N 的数量无法通过市场机制决定，只能靠开发团队拍脑袋决定，然而开发团队无法给自己开启上帝模式</li>
+<li>外部 API 没有激励的情况下，凭啥自己要承载额外的流量开销？除非外部 API 和节点是一伙的</li>
+</ul>
+</li>
+<li><p>既然用户相信单点外部 API，直接调用外部 API 不香吗？为什么要过一遍节点？特别是由 2 可知，节点跟外部 API 本身就有利益输送。</p></li>
+</ol>
+
+
+<h4>第二个硬伤：发行量方面：</h4>
+
+<ul>
+<li>Chainlink的代币LINK销售上限为3200万美元，总供应量为10亿; 发行价：0.11USDT</li>
+<li>所有LINK代币中有35％会通过节点运营商来激励生态系统;
+并在公开代币销售中额外销售35％;</li>
+<li>LINK代币总数中的最后30％将留在公司继续开发和员工支付;</li>
+</ul>
+
+
+<p>官方的话说的很好，看起来像是社区先拿到，再是预售，再是公司下车。但是如果按拿到币的先后理一下，真实的顺序是这样的：</p>
+
+<ul>
+<li>LINK代币总数中的30％将留在公司继续开发和员工支付; 成本0.000USD</li>
+<li>并在公开代币销售中额外销售35％;销售上限为3200万美元，总供应量为10亿;半定向发行，公墓成本 0.11USDT，私募没说但是肯定有；</li>
+<li>最后LINK代币中有35％会通过节点运营商来激励生态系统；成本：节点搭建的费用；</li>
+<li>最后的最后，上交易所，成本：韭菜买入价</li>
+</ul>
+
+
+<p>预挖、定向预售，高达总量的 65%。税已经高的比加州都高了，比鸡国略低。<br/>
+而一切的含税方案都是临时方案。</p>
+
+<h3>AMPL</h3>
+
+<p>价涨量涨，价跌量跌的逻辑决定了这个币不是死亡螺旋就是起飞螺旋。稳定是不可能稳定的，老虎机是真的老虎机。<br/>
+价格上涨时，算法的通胀可以让持有者砸盘。但是价格下跌时，价格的回升则需要外部做市商的努力，算法是不知道如何买入的。<br/>
+关于市值高了就稳定了的都市传说：下降时的稳定性取决于外部做市商能付出多少。市值越高则外部做市商付出越多。而做市商即使爱 ampl 超过爱自己的妈妈，也不可能有无线保证金。</p>
+
+<p>结论：老虎机可以玩，长线归0。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[macOS BigSur 适配指引]]></title>
@@ -3009,149 +3089,6 @@ E36B85CC 84991F19 7575D828 470A92AB
 </span><span class='line'><span class="p">[</span><span class="n">controller</span> <span class="nl">presentInController</span><span class="p">:</span><span class="nb">self</span> <span class="nl">barButtonItem</span><span class="p">:</span><span class="n">barButtonItem</span><span class="p">];</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>Over</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[评价基金性能的常用指标]]></title>
-    <link href="http://openfibers.github.io/blog/2019/01/15/funds-perfomance-measures/"/>
-    <updated>2019-01-15T12:19:56+08:00</updated>
-    <id>http://openfibers.github.io/blog/2019/01/15/funds-perfomance-measures</id>
-    <content type="html"><![CDATA[<h3>最大回撤（Max Draw Down）</h3>
-
-<p>最大回撤为：在选定周期内任一历史时点往后推，产品净值走到最低点时的收益率回撤幅度的最大值。</p>
-
-<p>其计算的时间复杂度是O(n)的。有些O(n<sup>2</sup>)的写法比较业余。</p>
-
-<p>python:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">get_max_draw_down</span><span class="p">(</span><span class="n">in_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">dd_list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span class='line'>    <span class="n">max_so_far</span> <span class="o">=</span> <span class="n">in_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span class='line'>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">in_list</span><span class="p">)):</span>
-</span><span class='line'>        <span class="k">if</span> <span class="n">in_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_so_far</span><span class="p">:</span>
-</span><span class='line'>            <span class="n">dd</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>            <span class="n">dd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
-</span><span class='line'>            <span class="n">max_so_far</span> <span class="o">=</span> <span class="n">in_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
-</span><span class='line'>            <span class="n">current</span> <span class="o">=</span> <span class="n">in_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-</span><span class='line'>            <span class="n">dd</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_so_far</span> <span class="o">-</span> <span class="n">current</span><span class="p">)</span> <span class="o">/</span> <span class="n">max_so_far</span>
-</span><span class='line'>            <span class="n">dd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">mdd</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dd_list</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">mdd</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>夏普比率(Sharpe Ratio)</h3>
-
-<p>评价单位承担的风险可以取得多少正向收益。在同种时间跨度下，越高越好。</p>
-
-<h4>计算方法：</h4>
-
-<ul>
-<li>平均收益率超过无风险收益率的部分除以收益率的标准差。</li>
-<li>如果通过高频夏普率（比如1d）推测低频夏普率(一般是年)，若每年有255个交易日，一般是再乘上根号下255。像币圈高频夏普率（4h）推导年，则是再乘上根号下 365 * 24 / 4。
-
-<h4>缺陷：</h4></li>
-<li>由于标准差是正值，所以无法区分上行风险和下行风险。
-
-<h4>优点：</h4></li>
-<li>国内外知名度高。</li>
-</ul>
-
-
-<p>附两个知乎的讲解链接：<br/>
-<a href="https://www.zhihu.com/question/264210987/answer/421333614">夏普率越高越好吗？ - 石川的回答 - 知乎</a><br/>
-<a href="https://www.zhihu.com/question/38316057/answer/75848881">求问基金风险指标的计算：夏普比率，索提诺比率，阿尔法系数等？ - 财小鲸之秦岭的回答 - 知乎</a></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">sharpe_ratio</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">risk_free_rate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">mean</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">mean</span> <span class="o">-</span> <span class="n">risk_free_rate</span><span class="p">)</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其中 returns 为每条 ohlc 的变化率，比如 [0.02, 0.03, -0.03, &hellip;]<br/>
-risk_free_rate 为每条 ohlc 的无风险收益率。比如okex余币宝年化1%，传入的是4小时returns，这里应该传入 1% / (365 * 24 / 4)</p>
-
-<p>可以通过历史净值列表（equity）生成 returns：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">returns_from_equity</span><span class="p">(</span><span class="n">in_equity</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">returns_np</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">in_equity</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">returns_np</span> <span class="o">=</span> <span class="n">returns_np</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="n">returns_np</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span><span class='line'>    <span class="n">returns_np</span> <span class="o">=</span> <span class="n">returns_np</span> <span class="o">-</span> <span class="mi">1</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">returns_np</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后把返回值代入下一步计算。</p>
-
-<!--more-->
-
-
-<h3>索提诺比率(Sortino Ratio)</h3>
-
-<p>计算方法和夏普率相似，但是用低于目标收益率的收益率或亏损时的收益率所计算出的“下行标准差”取代了正常的标准差。和夏普比率一样，在同种时间跨度下，越高越好。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span>
-</span><span class='line'><span class="kn">import</span> <span class="nn">math</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">lpm</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">threshold_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">))</span>
-</span><span class='line'>    <span class="n">threshold_array</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">diff</span> <span class="o">=</span> <span class="n">threshold_array</span> <span class="o">-</span> <span class="n">returns</span>
-</span><span class='line'>    <span class="n">diff</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">diff</span> <span class="o">**</span> <span class="n">order</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">sortino_ratio</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">risk_free_rate</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">mean</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">return</span> <span class="p">(</span><span class="n">mean</span> <span class="o">-</span> <span class="n">risk_free_rate</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lpm</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>更多参数 python 计算，参考：</p>
-
-<p><a href="http://www.turingfinance.com/computational-investing-with-python-week-one/">Measures of Risk-adjusted Return</a></p>
 
 <p>Over</p>
 ]]></content>

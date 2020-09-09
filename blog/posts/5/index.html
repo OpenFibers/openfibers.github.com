@@ -7,12 +7,7 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="第一则：RAC中weak-strong dance不完整造成内存泄露 今天在工程中发现了RAC导致的retain cycle: 1
-2
-3
-4
-@weakify(self)
-[RACObserve(self, fooProperty) subscribeNext:^(id fooProperty &hellip;">
+	<meta name="description" content="在ARC中，属性名使用new开头会报错。比如说更改密码中原始密码的输入框叫oldPasswordTextField，可以；新密码的输入框叫newPasswordTextField，对不起，不行，编译错误。 在ARC出现之前，方法名如果以alloc、copy、init、 &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -85,6 +80,65 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/11/10/objective-c-properties-begin-with-new/">
+		
+			Objective-c中property以new开头报错</a>
+	</h2>
+	<div class="entry-content">
+		<p>在ARC中，属性名使用new开头会报错。比如说更改密码中原始密码的输入框叫<code>oldPasswordTextField</code>，可以；新密码的输入框叫<code>newPasswordTextField</code>，对不起，不行，编译错误。</p>
+
+<p>在ARC出现之前，方法名如果以alloc、copy、init、mutableCopy和new开头，标准做法是返回一个retain count+1的对象。在ARC中，默认声明时强制遵守了这一规范：方法名如果以alloc、copy、init、mutableCopy和new开头，会被隐式声明为attribute((ns_returns_retained))。此行为可被显示声明attribute((ns_returns_not_retained))覆盖。</p>
+
+<p>一般情况下不要使用attribute((ns_returns_not_retained))更改这一行为，除非有什么不得不履行的大义。</p>
+
+<p>引用<a href="http://clang.llvm.org/docs/AutomaticReferenceCounting.html#retained-return-values">Clang 3.5 documentation | Objective-C Automatic Reference Counting | Retained return values</a>:</p>
+
+<blockquote><p>A function or method which returns a retainable object pointer type may be marked as returning a retained value, signifying that the caller expects to take ownership of a +1 retain count.</p>
+
+<p>…</p>
+
+<p>Methods in the alloc, copy, init, mutableCopy, and new families are implicitly marked attribute((ns_returns_retained)). This may be suppressed by explicitly marking the method attribute((ns_returns_not_retained)).</p></blockquote>
+
+<p>参考帖子：<a href="http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios">http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios</a></p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-10T15:11:27+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/11/10/objective-c-properties-begin-with-new/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -675,65 +729,6 @@ Boolean value. Specifies whether the product includes only object code for the n
 </div>
 	
 	<div class="comments"><a href="/blog/2015/09/06/fuck-cocoapods/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/06/19/wwdc-2015-features/">
-		
-			WWDC 2015 带来的新玩法</a>
-	</h2>
-	<div class="entry-content">
-		<p>WWDC 2015 更新了五大产品线：OS X EI，iOS 9，watchOS 2，Xcode 7，Swift 2.</p>
-
-<h2>1. OS X EI</h2>
-
-<h3>Metal APIs</h3>
-
-<p>Metal是一个开销极低的一种访问 GPU 的框架。<br/>
-Metal framework 提供了 GPU 加速的先进的3D渲染和数据并行计算能力。<br/>
-Metal 提供了流水线式的 API（streamlined API），预编译着色器（precompiled shaders），以及高性能的多线程支持。这些 features 可以帮助你把你的游戏或 app 的性能提升一个档次。<br/>
-Metal 最主要的目标是把一部分的CPU 工作交给 GPU 做。</p>
-
-<p>相关资源：<br/>
-<a href="https://developer.apple.com/metal/">Metal Home Page</a><br/>
-<a href="https://developer.apple.com/library/ios/documentation/Miscellaneous/Conceptual/MetalProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40014221-CH1-SW1">Metal Programming Guide</a><br/>
-<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalShadingLanguageGuide/Introduction/Introduction.html">Metal Shading Language Guide</a><br/>
-<a href="https://developer.apple.com/library/ios/documentation/Metal/Reference/MetalFrameworkReference/index.html">Metal Framework Reference</a></p>
-
-
-		
-		<a href="/blog/2015/06/19/wwdc-2015-features/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-06-19T15:07:10+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/wwdc/'>wwdc</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/06/19/wwdc-2015-features/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

@@ -7,8 +7,8 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="lldb导入UIKit 使用lldb调试app时，lldb经常提示view.bounds无法打印： 实际上是lldb启动时没有默认导入UIKit，所以UIKit中的方法无法识别。在lldb中使用@import手动导入 1
-expr @import UIKit 即可解决： 在开发Mac &hellip;">
+	<meta name="description" content="这几天重写了OTHTTPRequest的大部分代码，发布了2.0版。
+改动主要是上传文件功能，以前做的比较粗，是整个文件读到内存再上传的，不能支撑大文件上传，现在multipart/form请求全部改为流上传。此外增加了上传速度计算的功能。 &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -81,6 +81,58 @@ expr @import UIKit 即可解决： 在开发Mac &hellip;">
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/02/26/othttprequest/">
+		
+			OTHTTPRequest v2.0 Release</a>
+	</h2>
+	<div class="entry-content">
+		<p>这几天重写了OTHTTPRequest的大部分代码，发布了2.0版。<br/>
+改动主要是上传文件功能，以前做的比较粗，是整个文件读到内存再上传的，不能支撑大文件上传，现在multipart/form请求全部改为流上传。此外增加了上传速度计算的功能。</p>
+
+<p>最早做这个的原因是13年5月份做网易云音乐的下载性能优化，ASIHTTPRequest下载文件占用CPU时间太长，而当时iPhone4还有一定占有量，做了这个库来提升下载性能。<br/>
+这次发布2.0，修改上传功能，是因为用ASIHTTPRequest做大文件上传时，进度回调有bug，尝试修结果没修成，于是花了点时间做了这个版本。</p>
+
+<p>和1.0一样，整个框架基于NSURLRequest和NSURLConnection。</p>
+
+<p><a href="https://github.com/openfibers/othttprequest">Github链接</a></p>
+
+
+		
+		<a href="/blog/2016/02/26/othttprequest/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-26T14:49:47+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/network/'>network</a>, <a class='category' href='/blog/categories/othttprequest/'>othttprequest</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2016/02/26/othttprequest/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -659,65 +711,6 @@ expr @import UIKit 即可解决： 在开发Mac &hellip;">
 </div>
 	
 	<div class="comments"><a href="/blog/2015/11/30/uitextview-auto-scroll-in-ios8/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/11/10/objective-c-properties-begin-with-new/">
-		
-			Objective-c中property以new开头报错</a>
-	</h2>
-	<div class="entry-content">
-		<p>在ARC中，属性名使用new开头会报错。比如说更改密码中原始密码的输入框叫<code>oldPasswordTextField</code>，可以；新密码的输入框叫<code>newPasswordTextField</code>，对不起，不行，编译错误。</p>
-
-<p>在ARC出现之前，方法名如果以alloc、copy、init、mutableCopy和new开头，标准做法是返回一个retain count+1的对象。在ARC中，默认声明时强制遵守了这一规范：方法名如果以alloc、copy、init、mutableCopy和new开头，会被隐式声明为attribute((ns_returns_retained))。此行为可被显示声明attribute((ns_returns_not_retained))覆盖。</p>
-
-<p>一般情况下不要使用attribute((ns_returns_not_retained))更改这一行为，除非有什么不得不履行的大义。</p>
-
-<p>引用<a href="http://clang.llvm.org/docs/AutomaticReferenceCounting.html#retained-return-values">Clang 3.5 documentation | Objective-C Automatic Reference Counting | Retained return values</a>:</p>
-
-<blockquote><p>A function or method which returns a retainable object pointer type may be marked as returning a retained value, signifying that the caller expects to take ownership of a +1 retain count.</p>
-
-<p>…</p>
-
-<p>Methods in the alloc, copy, init, mutableCopy, and new families are implicitly marked attribute((ns_returns_retained)). This may be suppressed by explicitly marking the method attribute((ns_returns_not_retained)).</p></blockquote>
-
-<p>参考帖子：<a href="http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios">http://stackoverflow.com/questions/24308162/property-name-starting-with-new-prefix-leads-to-bad-access-error-in-ios</a></p>
-
-<p>Over</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-11-10T15:11:27+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/objective-c/'>objective-c</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/11/10/objective-c-properties-begin-with-new/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

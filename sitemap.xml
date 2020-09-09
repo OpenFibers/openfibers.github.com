@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://openfibers.github.io/blog/2020/09/09/why-link-and-ampl-is-as-thin-as-air/</loc>
+<lastmod>2020-09-09T10:27:41+08:00</lastmod>
+</url>
+<url>
 <loc>http://openfibers.github.io/blog/2020/09/07/make-app-compatible-with-macos-bigsur/</loc>
 <lastmod>2020-09-07T17:06:28+08:00</lastmod>
 </url>

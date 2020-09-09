@@ -7,8 +7,8 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="1. 适用情况 想使用In-App Purchase（以下简称IAP）完成App内付费前，先确定需求是不是能用这个方案来满足。
-除了IAP以外，还有支付宝SDK、信用卡等其他方式完成软件内付费。 在苹果制定的游戏规则中，所有在App内提供的服务需要付费时，都应当使用IAP，比如软件功能、游戏道具 &hellip;">
+	<meta name="description" content="为什么要做这件事 最近云音乐用户数量要上亿了，用户量增加的过程中总有许许多多以前没暴露的问题。
+比如最近好多人反馈MV经常卡顿。从反馈情况看是某个区域的用户访问我们CDN的速度比较慢。 但是如果只是换CDN服务提供商的话，就算这个区域的用户连接速度康复了， &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -81,6 +81,63 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/">
+		
+			自动选用速度快的CDN播放MV in iOS</a>
+	</h2>
+	<div class="entry-content">
+		<h2>为什么要做这件事</h2>
+
+<p>最近云音乐用户数量要上亿了，用户量增加的过程中总有许许多多以前没暴露的问题。<br/>
+比如最近好多人反馈MV经常卡顿。从反馈情况看是某个区域的用户访问我们CDN的速度比较慢。  <br/>
+但是如果只是换CDN服务提供商的话，就算这个区域的用户连接速度康复了，也很容易造成另一个区域的用户访问CDN变慢的情况。挑选新的CDN提供商也是个麻烦事。<br/>
+不管怎样，先不考虑换CDN的事情，客户端层面的访问速度优化还是有必要做的。<br/>
+既然不把更换CDN的因素考虑在内，一个特定用户的终端连接到每个CDN节点的速度是硬生生摆在那的。<br/>
+所以要提升访问速度有两个事情可以做：</p>
+
+<ol>
+<li>降低视频文件尺寸</li>
+<li>选取最快的CDN节点</li>
+</ol>
+
+
+
+		
+		<a href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-03T14:04:16+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/03/03/automatic-pick-cdn-for-mv-in-ios/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
