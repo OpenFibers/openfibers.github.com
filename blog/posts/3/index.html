@@ -7,7 +7,7 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="最大回撤（Max Draw Down） 最大回撤为：在选定周期内任一历史时点往后推，产品净值走到最低点时的收益率回撤幅度的最大值。 其计算的时间复杂度是O(n)的。有些O(n2)的写法比较业余。 python: 1
+	<meta name="description" content="直接上图上代码。。。 OTPopoverMenuViewController.h: 1
 2
 3
 4
@@ -17,11 +17,7 @@
 8
 9
 10
-11
-12
-13
-14
-def &hellip;">
+@interface OTPopoverMenuViewController : UIViewController - (void)presentInController &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -94,6 +90,79 @@ def &hellip;">
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2019/01/29/iphone-popover-above-ios9/">
+		
+			iPhone Popover Above iOS9</a>
+	</h2>
+	<div class="entry-content">
+		<p>直接上图上代码。。。</p>
+
+<p><img class="left" src="/images/blog/iphone_popover/iphone_popover.jpg"></p>
+
+<p>OTPopoverMenuViewController.h:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">OTPopoverMenuViewController</span> : <span class="bp">UIViewController</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
+</span><span class='line'>                 <span class="nf">sourceView:</span><span class="p">(</span><span class="bp">UIView</span> <span class="o">*</span><span class="p">)</span><span class="nv">view</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
+</span><span class='line'>              <span class="nf">barButtonItem:</span><span class="p">(</span><span class="bp">UIBarButtonItem</span> <span class="o">*</span><span class="p">)</span><span class="nv">barButtonItem</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+
+		
+		<a href="/blog/2019/01/29/iphone-popover-above-ios9/" class="more-link">Read on &rarr;</a>
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-01-29T16:44:13+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2019/01/29/iphone-popover-above-ios9/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -844,57 +913,6 @@ BurpSuite是一个常用的调试工具。</p>
 </div>
 	
 	<div class="comments"><a href="/blog/2016/03/18/debug-ios-traffic/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2016/03/04/open-sandbox-folder-in-lldb/">
-		
-			在lldb中一键打开模拟器sandbox路径</a>
-	</h2>
-	<div class="entry-content">
-		<p>打开~/.lldbinit，在里面加入一行：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nb">command alias </span>sb script from subprocess import call<span class="p">;</span> call<span class="o">([</span><span class="s2">&quot;open&quot;</span>, <span class="s1">&#39;{0:s}&#39;</span>.format<span class="o">(</span>lldb.frame.EvaluateExpression<span class="o">(</span><span class="s2">&quot;NSHomeDirectory()&quot;</span><span class="o">))</span>.split<span class="o">(</span><span class="s2">&quot;\&quot;&quot;</span><span class="o">)[</span>1<span class="o">]])</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后中断时，在lldb里打sb回车，就能打开模拟器当前运行的app的沙箱路径了。</p>
-
-
-		
-		<a href="/blog/2016/03/04/open-sandbox-folder-in-lldb/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-04T10:39:55+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/lldb/'>lldb</a>, <a class='category' href='/blog/categories/macos/'>macos</a>, <a class='category' href='/blog/categories/xcode/'>xcode</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2016/03/04/open-sandbox-folder-in-lldb/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

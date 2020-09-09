@@ -8,7 +8,7 @@
 
 	
 	<meta name="description" content="All Posts 为什么 LINK 和 AMPL 是空气币 先来说说 LINK 截止现在，18年到20年，最高价20多，最多涨了100倍。Defi 和 oracle 八竿子碰巧能打到一点点，最近和大热的 Defi 走的很近，市值也一度到了第五名。
-买的早那是真香，但是有两个硬伤： 第一个硬伤： &hellip;">
+买的早那是真香，但是有两个硬伤： &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -110,107 +110,6 @@
 
 
 
-<h4>第一个硬伤：实现逻辑方面</h4>
-
-
-
-
-<p>LINK 的核心逻辑：单节点 oracle 容易欺骗用户或失败率高，通过增加冗余节点来保证正确性，同时给予冗余节点代币激励。<br/>
-所以 LINK 的架构如下：</p>
-
-
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>用户 --&gt; 节点 A --&gt; 外部 API
-</span><span class='line'>     |   ...   |
-</span><span class='line'>     -&gt; 节点 N -</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<p>但是这样做会带来三个问题：</p>
-
-
-
-
-<ol>
-<li><p>多节点请求外部 API 的返回值一致性问题：</p>
-
-<ul>
-<li>传统 http 接口的请求返回值会根据请求的时间/地理位置信息变动而变动</li>
-<li>LINK 为保证结果一致固化了时间戳参数，所有节点的和地理位置相关的参数需要隐藏</li>
-<li>That is, 外部 API 需要给 LINK 提供专门的接口。存量的海量 http 接口，LINK 虽然可以调用，但是不可用性会很高</li>
-</ul>
-</li>
-<li><p>外部 API 负载问题：</p>
-
-<ul>
-<li>N 个节点带来外部 API 的 QPS 翻 N 倍</li>
-<li>但是如果想要通过降低 N 的数量来降低负载，返回值的正确性会降低，毕竟 LINK 就是为增加冗余而生的</li>
-<li>N 的数量无法通过市场机制决定，只能靠开发团队拍脑袋决定，然而开发团队无法给自己开启上帝模式</li>
-<li>外部 API 没有激励的情况下，凭啥自己要承载额外的流量开销？除非外部 API 和节点是一伙的</li>
-</ul>
-</li>
-<li><p>既然用户相信单点外部 API，直接调用外部 API 不香吗？为什么要过一遍节点？特别是由 2 可知，节点跟外部 API 本身就有利益输送。</p></li>
-</ol>
-
-
-
-
-<h4>第二个硬伤：发行量方面：</h4>
-
-
-
-
-<ul>
-<li>Chainlink的代币LINK销售上限为3200万美元，总供应量为10亿; 发行价：0.11USDT</li>
-<li>所有LINK代币中有35％会通过节点运营商来激励生态系统;
-并在公开代币销售中额外销售35％;</li>
-<li>LINK代币总数中的最后30％将留在公司继续开发和员工支付;</li>
-</ul>
-
-
-
-
-<p>官方的话说的很好，看起来像是社区先拿到，再是预售，再是公司下车。但是如果按拿到币的先后理一下，真实的顺序是这样的：</p>
-
-
-
-
-<ul>
-<li>LINK代币总数中的30％将留在公司继续开发和员工支付; 成本0.000USD</li>
-<li>并在公开代币销售中额外销售35％;销售上限为3200万美元，总供应量为10亿;半定向发行，公墓成本 0.11USDT，私募没说但是肯定有；</li>
-<li>最后LINK代币中有35％会通过节点运营商来激励生态系统；成本：节点搭建的费用；</li>
-<li>最后的最后，上交易所，成本：韭菜买入价</li>
-</ul>
-
-
-
-
-<p>预挖、定向预售，高达总量的 65%。税已经高的比加州都高了，比鸡国略低。<br/>
-而一切的含税方案都是临时方案。</p>
-
-
-
-
-<h3>再来说说 AMPL</h3>
-
-
-
-
-<p>价涨量涨，价跌量跌的逻辑决定了这个币不是死亡螺旋就是起飞螺旋。稳定是不可能稳定的，老虎机是真的老虎机。<br/>
-价格上涨时，算法的通胀可以让持有者砸盘。但是价格下跌时，价格的回升则需要外部做市商的努力，算法是不知道如何买入的。<br/>
-关于市值高了就稳定了的都市传说：下降时的稳定性取决于外部做市商能付出多少。市值越高则外部做市商付出越多。而做市商即使爱 ampl 超过爱自己的妈妈，也不可能有无限保证金。</p>
-
-
-
-
-<p>结论：老虎机可以玩，长线归0。</p>
-
-
   </p>
   <span class="meta">
     written 
@@ -231,6 +130,133 @@
 
   </span>
 
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2020/09/09/why-link-and-ampl-is-as-thin-as-air/">Read on &rarr;</a>
+  
+</article>
+
+        </div>
+      </div>
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2020/09/08/mai-dian-sqlsan-fen-zhong-su-cheng/">拉埋点数据SQL三分钟速成</a></h2>
+  
+  <p>
+    <h3>1. 基本选取</h3>
+
+
+
+
+<p>我们现在有一个表 user_action，有如下数据：</p>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="o">*</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_id </th>
+<th style="text-align:center;"> app_version </th>
+<th style="text-align:right;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000002</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+<p>app_id app_ver 表示 app 和其版本号<br/>
+device_id 为设备id<br/>
+sys_ver 为系统版本号<br/>
+event_name 为具体的事件名</p>
+
+
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-09-08T17:06:40+08:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+    <a class="full-article-link pull-right" rel="full-article" href="/blog/2020/09/08/mai-dian-sqlsan-fen-zhong-su-cheng/">Read on &rarr;</a>
   
 </article>
 

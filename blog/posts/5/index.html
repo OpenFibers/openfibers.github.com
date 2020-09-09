@@ -7,7 +7,7 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="在ARC中，属性名使用new开头会报错。比如说更改密码中原始密码的输入框叫oldPasswordTextField，可以；新密码的输入框叫newPasswordTextField，对不起，不行，编译错误。 在ARC出现之前，方法名如果以alloc、copy、init、 &hellip;">
+	<meta name="description" content="在iOS8及以下版本的系统上，在定高的UITextView中，输入内容超过Text View高度后，输入光标有时会在Text View的底部显示不全，如how-to-make-a-uitextview-scroll-while-typing-editing中截图所描述。 尝试了各种方案， &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -80,6 +80,98 @@
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/11/30/uitextview-auto-scroll-in-ios8/">
+		
+			iOS8的UITextView输入光标显示不全的hack</a>
+	</h2>
+	<div class="entry-content">
+		<p>在iOS8及以下版本的系统上，在定高的UITextView中，输入内容超过Text View高度后，输入光标有时会在Text View的底部显示不全，如<a href="http://stackoverflow.com/questions/18070537/how-to-make-a-uitextview-scroll-while-typing-editing">how-to-make-a-uitextview-scroll-while-typing-editing</a>中截图所描述。</p>
+
+<p>尝试了各种方案，挑选了一种体验较好的。在<code>textViewDidChanged:</code>中，检测到正在编辑的区域在文字最下行，无动画滚动到结尾：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">textViewDidChange:</span><span class="p">(</span><span class="bp">UITextView</span> <span class="o">*</span><span class="p">)</span><span class="nv">textView</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="c1">//hack for iOS8</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isLessThanIOS9</span><span class="p">)</span><span class="c1">//in iOS9 Apple has already fixed this bug</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="bp">CGRect</span> <span class="n">line</span> <span class="o">=</span> <span class="p">[</span><span class="n">textView</span> <span class="nl">caretRectForPosition</span><span class="p">:</span>
+</span><span class='line'>                       <span class="n">textView</span><span class="p">.</span><span class="n">selectedTextRange</span><span class="p">.</span><span class="n">start</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">CGFloat</span> <span class="n">overflow</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">line</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span>
+</span><span class='line'>        <span class="o">-</span> <span class="p">(</span><span class="n">textView</span><span class="p">.</span><span class="n">contentOffset</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">textView</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span>
+</span><span class='line'>           <span class="o">-</span> <span class="n">textView</span><span class="p">.</span><span class="n">contentInset</span><span class="p">.</span><span class="n">bottom</span> <span class="o">-</span> <span class="n">textView</span><span class="p">.</span><span class="n">contentInset</span><span class="p">.</span><span class="n">top</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">overflow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="c1">//If at the bottom of text view</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>            <span class="c1">//disable animation. Otherwise, when a input confirm scroll animation is doing, input new text, animation will re-do from animation beginning, which looks strange.</span>
+</span><span class='line'>            <span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationsEnabled</span><span class="p">:</span><span class="nb">NO</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//scroll to text end</span>
+</span><span class='line'>            <span class="p">[</span><span class="n">textView</span> <span class="nl">scrollRangeToVisible</span><span class="p">:</span><span class="n">NSMakeRange</span><span class="p">([</span><span class="n">textView</span><span class="p">.</span><span class="n">text</span> <span class="n">length</span><span class="p">],</span> <span class="mi">0</span><span class="p">)];</span>
+</span><span class='line'>            <span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationsEnabled</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-30T14:47:21+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/uikit/'>uikit</a>
+
+
+</div>
+	
+	<div class="comments"><a href="/blog/2015/11/30/uitextview-auto-scroll-in-ios8/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -685,50 +777,6 @@ Boolean value. Specifies whether the product includes only object code for the n
 </div>
 	
 	<div class="comments"><a href="/blog/2015/09/12/ssh-proxy-on-openwrt/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2015/09/06/fuck-cocoapods/">
-		
-			安装指定版本的CocoaPods</a>
-	</h2>
-	<div class="entry-content">
-		<p>在同事机器上，pod 工作的很正常，到了我的机器上，就 link error，原因是他的 pod 自动生成的.a 和我的 pod 自动生成的 .a 带的前缀不一样。</p>
-
-
-		
-		<a href="/blog/2015/09/06/fuck-cocoapods/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-09-06T10:50:14+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/cocoapods/'>cocoapods</a>, <a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2015/09/06/fuck-cocoapods/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

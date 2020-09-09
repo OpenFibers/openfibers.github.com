@@ -7,10 +7,9 @@
 	<meta name="author" content="OpenFibers">
 
 	
-	<meta name="description" content="Activity Monitor 查一下相关几个进程的 pid: 。。进程名我忘了记录了，大约就是 Mc 和 Sym 开头的几个进程 lsof 看一下 pid 相关的 file handle: 1
-2
-lsof -p pid_of_McAfee -Fn | grep Mc
-lsof -p &hellip;">
+	<meta name="description" content="键盘无响应 iOS Simulator main menu - Hardware - Keyboard
+首先取消 Use the Same Keyboard Language as macOS
+点击 Connect Hardware Keyboard 剪贴板无响应 iOS Simulator &hellip;">
 	
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -83,6 +82,57 @@ lsof -p &hellip;">
 		
 	
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2019/07/30/ios-simulator-keyboard-and-pasteboard-issues-fix/">
+		
+			iOS 模拟器键盘无响应和剪贴板不响应问题修复(Xcode 10.3)</a>
+	</h2>
+	<div class="entry-content">
+		<h2>键盘无响应</h2>
+
+<p>iOS Simulator main menu - Hardware - Keyboard<br/>
+首先取消 Use the Same Keyboard Language as macOS<br/>
+点击 Connect Hardware Keyboard</p>
+
+<h2>剪贴板无响应</h2>
+
+<p>iOS Simulator 使用的剪贴板服务挂了，还是 main menu <br/>
+Edit - 取消 Automatically Sync Pasteboard<br/>
+再 Edit - 选中 Automatically Sync Pasteboard</p>
+
+<p>Over</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2019-07-30T15:28:07+08:00" pubdate data-updated="true"></time></div>
+	<div class="tags">
+
+</div>
+	
+	<div class="comments"><a href="/blog/2019/07/30/ios-simulator-keyboard-and-pasteboard-issues-fix/#disqus_thread">Comments</a></div>
+	
+</div>
+</article>
 
 
     <article class="post">
@@ -692,79 +742,6 @@ lsof -p &hellip;">
 </div>
 	
 	<div class="comments"><a href="/blog/2019/02/03/pyda-2e-notes/#disqus_thread">Comments</a></div>
-	
-</div>
-</article>
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2019/01/29/iphone-popover-above-ios9/">
-		
-			iPhone Popover Above iOS9</a>
-	</h2>
-	<div class="entry-content">
-		<p>直接上图上代码。。。</p>
-
-<p><img class="left" src="/images/blog/iphone_popover/iphone_popover.jpg"></p>
-
-<p>OTPopoverMenuViewController.h:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">OTPopoverMenuViewController</span> : <span class="bp">UIViewController</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
-</span><span class='line'>                 <span class="nf">sourceView:</span><span class="p">(</span><span class="bp">UIView</span> <span class="o">*</span><span class="p">)</span><span class="nv">view</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
-</span><span class='line'>              <span class="nf">barButtonItem:</span><span class="p">(</span><span class="bp">UIBarButtonItem</span> <span class="o">*</span><span class="p">)</span><span class="nv">barButtonItem</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">@end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-
-		
-		<a href="/blog/2019/01/29/iphone-popover-above-ios9/" class="more-link">Read on &rarr;</a>
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2019-01-29T16:44:13+08:00" pubdate data-updated="true"></time></div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-	
-	<div class="comments"><a href="/blog/2019/01/29/iphone-popover-above-ios9/#disqus_thread">Comments</a></div>
 	
 </div>
 </article>

@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-09-09T11:38:12+08:00</updated>
+  <updated>2020-09-09T16:23:16+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -22,6 +22,9 @@
 
 <p>截止现在，18年到20年，最高价20多，最多涨了100倍。Defi 和 oracle 八竿子碰巧能打到一点点，最近和大热的 Defi 走的很近，市值也一度到了第五名。<br/>
 买的早那是真香，但是有两个硬伤：</p>
+
+<!--more-->
+
 
 <h4>第一个硬伤：实现逻辑方面</h4>
 
@@ -90,6 +93,780 @@
 关于市值高了就稳定了的都市传说：下降时的稳定性取决于外部做市商能付出多少。市值越高则外部做市商付出越多。而做市商即使爱 ampl 超过爱自己的妈妈，也不可能有无限保证金。</p>
 
 <p>结论：老虎机可以玩，长线归0。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[拉埋点数据SQL三分钟速成]]></title>
+    <link href="http://openfibers.github.io/blog/2020/09/08/mai-dian-sqlsan-fen-zhong-su-cheng/"/>
+    <updated>2020-09-08T17:06:40+08:00</updated>
+    <id>http://openfibers.github.io/blog/2020/09/08/mai-dian-sqlsan-fen-zhong-su-cheng</id>
+    <content type="html"><![CDATA[<h3>1. 基本选取</h3>
+
+<p>我们现在有一个表 user_action，有如下数据：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="o">*</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_id </th>
+<th style="text-align:center;"> app_version </th>
+<th style="text-align:right;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000002</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 21370000 </td>
+<td style="text-align:center;"> 8.15.2 </td>
+<td style="text-align:right;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>app_id app_ver 表示 app 和其版本号<br/>
+device_id 为设备id<br/>
+sys_ver 为系统版本号<br/>
+event_name 为具体的事件名</p>
+
+<!--more-->
+
+
+<h3>2. 选取特定列 (SELECT 子句)</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000002</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>3. 过滤条件 (WHERE 子句)</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;13.3&#39;</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>WHERE 子句全部运算符：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="o">=</span>   <span class="err">等于</span>
+</span><span class='line'><span class="o">!=</span>  <span class="err">不等于</span>
+</span><span class='line'><span class="o">&lt;</span>   <span class="err">小于</span>
+</span><span class='line'><span class="o">&lt;=</span>           <span class="err">小于等于</span>
+</span><span class='line'><span class="o">&gt;</span>            <span class="err">大于</span>
+</span><span class='line'><span class="o">&gt;=</span>           <span class="err">大于等于</span>
+</span><span class='line'><span class="k">BETWEEN</span>      <span class="err">在两者之间</span>
+</span><span class='line'><span class="k">IS</span> <span class="k">NULL</span>      <span class="err">为空</span>
+</span><span class='line'><span class="k">IS</span> <span class="k">NOT</span> <span class="k">NULL</span>  <span class="err">非空</span>
+</span><span class='line'><span class="k">LIKE</span>         <span class="err">字符串包含</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>有些 DB 还支持：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="o">&lt;&gt;</span> <span class="err">不等于</span>
+</span><span class='line'><span class="o">!&lt;</span> <span class="err">不小于</span>
+</span><span class='line'><span class="o">!&gt;</span> <span class="err">不大于</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>4. 组合条件 (WHERE &hellip; AND/OR/IN/NOT IN &hellip;)：</h3>
+
+<ul>
+<li>结合顺序：先算 AND 后算 OR</li>
+<li>AND 和 OR 运算符在左值满足的情况下不计算右值的行为随 DB 不同而不同，但是不关心中间过程的情况下，这个区别一般不会影响计算结果</li>
+</ul>
+
+
+<h4>4.1 AND</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;14.0&#39;</span>
+</span><span class='line'><span class="k">AND</span>
+</span><span class='line'><span class="n">event_name</span> <span class="o">=</span> <span class="s1">&#39;btn2_touched&#39;</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000002</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>4.2 IN</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;14.0&#39;</span>
+</span><span class='line'><span class="k">AND</span>
+</span><span class='line'><span class="n">event_name</span> <span class="k">IN</span> <span class="p">[</span><span class="s1">&#39;btn1_touched&#39;</span><span class="p">,</span> <span class="s1">&#39;btn2_touched&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000002</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>4.3 NOT IN</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;14.0&#39;</span>
+</span><span class='line'><span class="k">AND</span>
+</span><span class='line'><span class="n">event_name</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">[</span><span class="s1">&#39;btn2_touched&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+<h4>4.4 NOT</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="k">NOT</span> <span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;14.0&#39;</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>5. 聚集函数 (COUNT,AVG,MAX,MIN,SUM) 与分组 (GROUP BY)</h3>
+
+<ul>
+<li>SELECT 中未使用聚集函数的所有列都要写在 GROUP BY 子句里</li>
+<li>如果 SELECT 的全部列都使用了聚集函数，可以不写 GROUP BY，但是输出报表时这种情况并不常见</li>
+<li>所有 GROUP BY</li>
+</ul>
+
+
+<p>例子1：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span><span class="p">,</span>
+</span><span class='line'><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="err">样本量</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;13.3&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">GROUP</span> <span class="k">BY</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+<th style="text-align:right;"> 样本量 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+<td style="text-align:right;"> 3 </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>例子2：表内的两行数据在 GROUP BY 的任意一列不一致，就会被归到结果集的两行中：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span><span class="p">,</span>
+</span><span class='line'><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="err">样本量</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;14.0&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">GROUP</span> <span class="k">BY</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+<th style="text-align:right;"> 样本量 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000002</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+<td style="text-align:right;"> 1 </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn1_touched </td>
+<td style="text-align:right;"> 1 </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+<td style="text-align:right;"> 1 </td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>6. 排序(ORDER BY)</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span><span class="p">,</span>
+</span><span class='line'><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="err">样本量</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;14.0&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">GROUP</span> <span class="k">BY</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">ORDER</span> <span class="k">BY</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+<th style="text-align:right;"> 样本量 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn1_touched </td>
+<td style="text-align:right;"> 1 </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000002</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+<td style="text-align:right;"> 1 </td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+<td style="text-align:right;"> 14.0 </td>
+<td style="text-align:right;"> btn2_touched </td>
+<td style="text-align:right;"> 1 </td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>7. 限制结果集数量(LIMIT)</h3>
+
+<p>使用 LIMIT 一般有两种情况：
+* 提升执行速度
+* 有数据库读取条数权限控制，不允许读出更多条</p>
+
+<p>LIMIT 仅对结果集行数限制，和中间计算过程无关：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span><span class="p">,</span>
+</span><span class='line'><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="err">样本量</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">WHERE</span>
+</span><span class='line'><span class="n">sys_ver</span> <span class="o">=</span> <span class="s1">&#39;13.3&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">GROUP</span> <span class="k">BY</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="n">sys_ver</span><span class="p">,</span>
+</span><span class='line'><span class="n">event_name</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">LIMIT</span> <span class="mi">1</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+<th style="text-align:right;"> sys_ver </th>
+<th style="text-align:right;"> event_name </th>
+<th style="text-align:right;"> 样本量 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+<td style="text-align:right;"> 13.3 </td>
+<td style="text-align:right;"> btn1_touched </td>
+<td style="text-align:right;"> 3 </td>
+</tr>
+</tbody>
+</table>
+
 ]]></content>
   </entry>
   
@@ -2924,173 +3701,6 @@ E36B85CC 84991F19 7575D828 470A92AB
 
 
 <h3>切片</h3>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iPhone Popover above iOS9]]></title>
-    <link href="http://openfibers.github.io/blog/2019/01/29/iphone-popover-above-ios9/"/>
-    <updated>2019-01-29T16:44:13+08:00</updated>
-    <id>http://openfibers.github.io/blog/2019/01/29/iphone-popover-above-ios9</id>
-    <content type="html"><![CDATA[<p>直接上图上代码。。。</p>
-
-<p><img class="left" src="http://openfibers.github.io/images/blog/iphone_popover/iphone_popover.jpg"></p>
-
-<p>OTPopoverMenuViewController.h:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="k">@interface</span> <span class="nc">OTPopoverMenuViewController</span> : <span class="bp">UIViewController</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
-</span><span class='line'>                 <span class="nf">sourceView:</span><span class="p">(</span><span class="bp">UIView</span> <span class="o">*</span><span class="p">)</span><span class="nv">view</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
-</span><span class='line'>              <span class="nf">barButtonItem:</span><span class="p">(</span><span class="bp">UIBarButtonItem</span> <span class="o">*</span><span class="p">)</span><span class="nv">barButtonItem</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">@end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<!--more-->
-
-
-<p>OTPopoverMenuViewController.m:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="cp">#import &quot;OTPopoverMenuViewController.h&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@interface</span> <span class="nc">OTPopoverMenuViewController</span> <span class="p">()</span> <span class="o">&lt;</span><span class="n">UIPopoverPresentationControllerDelegate</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@implementation</span> <span class="nc">OTPopoverMenuViewController</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">instancetype</span><span class="p">)</span><span class="nf">initWithNibName:</span><span class="p">(</span><span class="bp">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">nibNameOrNil</span> <span class="nf">bundle:</span><span class="p">(</span><span class="bp">NSBundle</span> <span class="o">*</span><span class="p">)</span><span class="nv">nibBundleOrNil</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="nb">self</span> <span class="o">=</span> <span class="p">[</span><span class="nb">super</span> <span class="nl">initWithNibName</span><span class="p">:</span><span class="n">nibNameOrNil</span> <span class="nl">bundle</span><span class="p">:</span><span class="n">nibBundleOrNil</span><span class="p">];</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="nb">self</span><span class="p">.</span><span class="n">modalPresentationStyle</span> <span class="o">=</span> <span class="n">UIModalPresentationPopover</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">UIPopoverPresentationController</span> <span class="o">*</span><span class="n">popController</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">popoverPresentationController</span><span class="p">];</span>
-</span><span class='line'>        <span class="nb">self</span><span class="p">.</span><span class="n">preferredContentSize</span> <span class="o">=</span> <span class="n">CGSizeMake</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">popController</span><span class="p">.</span><span class="n">permittedArrowDirections</span> <span class="o">=</span> <span class="n">UIPopoverArrowDirectionUp</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">popController</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="p">[</span><span class="nb">self</span> <span class="n">initUI</span><span class="p">];</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nb">self</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
-</span><span class='line'>                 <span class="nf">sourceView:</span><span class="p">(</span><span class="bp">UIView</span> <span class="o">*</span><span class="p">)</span><span class="nv">view</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="n">UIPopoverPresentationController</span> <span class="o">*</span><span class="n">popController</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">popoverPresentationController</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">popController</span><span class="p">.</span><span class="n">sourceView</span> <span class="o">=</span> <span class="n">view</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">popController</span><span class="p">.</span><span class="n">sourceRect</span> <span class="o">=</span> <span class="n">view</span><span class="p">.</span><span class="n">bounds</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">[</span><span class="n">controller</span> <span class="nl">presentViewController</span><span class="p">:</span><span class="nb">self</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">completion</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">presentInController:</span><span class="p">(</span><span class="bp">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
-</span><span class='line'>              <span class="nf">barButtonItem:</span><span class="p">(</span><span class="bp">UIBarButtonItem</span> <span class="o">*</span><span class="p">)</span><span class="nv">barButtonItem</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="n">UIPopoverPresentationController</span> <span class="o">*</span><span class="n">popController</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="n">popoverPresentationController</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">popController</span><span class="p">.</span><span class="n">barButtonItem</span> <span class="o">=</span> <span class="n">barButtonItem</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">[</span><span class="n">controller</span> <span class="nl">presentViewController</span><span class="p">:</span><span class="nb">self</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">completion</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="n">UIModalPresentationStyle</span><span class="p">)</span><span class="nf">adaptivePresentationStyleForPresentationController:</span><span class="p">(</span><span class="n">UIPresentationController</span> <span class="o">*</span><span class="p">)</span><span class="nv">controller</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">UIModalPresentationNone</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">initUI</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">@end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>调用:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='objective-c'><span class='line'><span class="n">OTPopoverMenuViewController</span> <span class="o">*</span><span class="n">controller</span> <span class="o">=</span> <span class="p">[[</span><span class="n">OTPopoverMenuViewController</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
-</span><span class='line'><span class="p">[</span><span class="n">controller</span> <span class="nl">presentInController</span><span class="p">:</span><span class="nb">self</span> <span class="nl">sourceView</span><span class="p">:</span><span class="n">view</span><span class="p">];</span>
-</span><span class='line'><span class="c1">//或</span>
-</span><span class='line'><span class="p">[</span><span class="n">controller</span> <span class="nl">presentInController</span><span class="p">:</span><span class="nb">self</span> <span class="nl">barButtonItem</span><span class="p">:</span><span class="n">barButtonItem</span><span class="p">];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Over</p>
 ]]></content>
   </entry>
   
