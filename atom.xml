@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-09-09T16:23:16+08:00</updated>
+  <updated>2020-09-10T15:00:45+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -568,7 +568,9 @@ event_name 为具体的事件名</p>
 <ul>
 <li>SELECT 中未使用聚集函数的所有列都要写在 GROUP BY 子句里</li>
 <li>如果 SELECT 的全部列都使用了聚集函数，可以不写 GROUP BY，但是输出报表时这种情况并不常见</li>
-<li>所有 GROUP BY</li>
+<li>表内有的两行数据行A和行B，若行A和行B在 GROUP BY 子句指定的任意一列中不一致，则行A和行B会被归到结果集不同的两行中，不被聚集</li>
+<li>COUNT() 接受列名或者 *。传入列名时，返回列内不为 NULL 的总数量，传入 * 时，返回列内含 NULL 的总数量</li>
+<li>比如性能耗时均值，可以用 AVG 比较方便的计算出来</li>
 </ul>
 
 
@@ -635,7 +637,7 @@ event_name 为具体的事件名</p>
 </table>
 
 
-<p>例子2：表内的两行数据在 GROUP BY 的任意一列不一致，就会被归到结果集的两行中：</p>
+<p>例子2：表内有的两行数据行A和行B，若行A和行B在 GROUP BY 子句指定的任意一列中不一致，则行A和行B会被归到结果集不同的两行中，不被聚集：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
