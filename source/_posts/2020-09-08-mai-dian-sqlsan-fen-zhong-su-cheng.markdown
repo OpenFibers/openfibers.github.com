@@ -286,14 +286,20 @@ event_name
 
 ```
 SELECT
-COUNT(DISTINCT device_id) as 激活设备数
+app_version,
+COUNT(DISTINCT device_id) as 激活设备数,
+COUNT(*) as 点击数
+
 FROM user_action
+
+GROUP BY
+app_version
 ;
 ```
 
-| 激活设备数 |
-|:------------- |
-| 3 |
+| app_version | 激活设备数 | 点击数 |
+|:------------- |:------------- |:------------- |
+| 8.15.2 | 3 | 6 |
 
 * 在 COUNT 内部使用，仅可以匹配 COUNT(列), 不能匹配 COUNT(*)。匹配结果会包含 NULL。  
 * DISTINCT 除了可以作用于 COUNT/AVG/SUM，也可以作用于 MIN/MAX，但是 MIN/MAX 加 DISTINCT 没啥区别。
