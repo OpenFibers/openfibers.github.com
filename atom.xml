@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-09-10T15:00:45+08:00</updated>
+  <updated>2020-09-11T14:40:11+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -797,7 +797,111 @@ event_name 为具体的事件名</p>
 </table>
 
 
-<h3>7. 限制结果集数量(LIMIT)</h3>
+<h3>7. 去除列内相同值的数据(DISTINCT)</h3>
+
+<h4>7.1 在 COUNT/AVG/SUM 内部使用</h4>
+
+<p>最常见的是配合 COUNT 使用。COUNT(DISTINCT user_id) 常用于计算 UV、活跃设备数:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>
+</span><span class='line'><span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span> <span class="n">device_id</span><span class="p">)</span> <span class="k">as</span> <span class="err">激活设备数</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> 激活设备数 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 3 </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>在 COUNT 内部使用，仅可以匹配 COUNT(列), 不能匹配 COUNT(*)。匹配结果会包含 NULL。<br/>
+DISTINCT 除了可以作用于 COUNT/AVG/SUM，也可以作用于 MIN/MAX，但是 MIN/MAX 加 DISTINCT 没啥区别。</p>
+
+<h4>7.2 作用于 SELECT 子句</h4>
+
+<p>作用于 SELECT 子句时，紧跟 SELECT 写，对所有列生效。不能对部分列生效：</p>
+
+<p>例子1 单列：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="k">DISTINCT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>例子2 多列：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="k">DISTINCT</span>
+</span><span class='line'><span class="n">app_version</span><span class="p">,</span>
+</span><span class='line'><span class="n">device_id</span><span class="p">,</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">user_action</span>
+</span><span class='line'><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<table>
+<thead>
+<tr>
+<th style="text-align:left;"> app_version </th>
+<th style="text-align:center;">device_id</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000001</td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000002</td>
+</tr>
+<tr>
+<td style="text-align:left;"> 8.15.2 </td>
+<td style="text-align:center;"> x000003</td>
+</tr>
+</tbody>
+</table>
+
+
+<h3>8. 限制结果集数量(LIMIT)</h3>
 
 <p>使用 LIMIT 一般有两种情况：
 * 提升执行速度
@@ -868,6 +972,30 @@ event_name 为具体的事件名</p>
 </tr>
 </tbody>
 </table>
+
+
+<h3>9. 索引</h3>
+
+<ul>
+<li><p>索引建在经常需要 WHERE 的列上。</p></li>
+<li><p>WHERE 中以下表达式会导致单次运算无法使用索引：</p>
+
+<ul>
+<li>WHERE 子句的查询条件里有 !=</li>
+<li>WHERE 子句使用了 Mysql 函数的时候: WHERE left(name, 4) = &lsquo;xxx&rsquo;</li>
+<li>使用 LIKE，匹配关键字带有前置通配符时，无法使用索引:
+
+<ul>
+<li>WHERE name LIKE &lsquo;%Alisa%&rsquo; 无法使用</li>
+<li>WHERE name LIKE &lsquo;Alisa%&rsquo; 可以使用</li>
+<li>WHERE name LIKE &lsquo;%Alisa&rsquo; 无法使用</li>
+</ul>
+</li>
+<li>WHERE 子句使用了 IS NULL 或者 IS NOT NULL</li>
+<li>WHERE 子句条件中有 OR，即使其中有条件带索引也不会使用</li>
+</ul>
+</li>
+</ul>
 
 ]]></content>
   </entry>
