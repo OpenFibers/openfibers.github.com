@@ -295,8 +295,9 @@ FROM user_action
 |:------------- |
 | 3 |
 
-在 COUNT 内部使用，仅可以匹配 COUNT(列), 不能匹配 COUNT(*)。匹配结果会包含 NULL。  
-DISTINCT 除了可以作用于 COUNT/AVG/SUM，也可以作用于 MIN/MAX，但是 MIN/MAX 加 DISTINCT 没啥区别。  
+* 在 COUNT 内部使用，仅可以匹配 COUNT(列), 不能匹配 COUNT(*)。匹配结果会包含 NULL。  
+* DISTINCT 除了可以作用于 COUNT/AVG/SUM，也可以作用于 MIN/MAX，但是 MIN/MAX 加 DISTINCT 没啥区别。
+* 对列A 使用了 COUNT/SUM/AVG，再去 DISTINCT 列A 以外的其他列是没有意义的，因为当 COUNT/SUM/AVG 生效时，其他没写 COUNT/SUM/AVG 的列都成为了这些数字结果的属性，在结果集中已经是唯一的了。  
 
 #### 7.2 作用于 SELECT 子句
 
