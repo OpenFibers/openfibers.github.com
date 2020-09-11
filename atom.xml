@@ -4,7 +4,7 @@
   <title><![CDATA[Hack Life of OpenFibers]]></title>
   <link href="http://openfibers.github.io/atom.xml" rel="self"/>
   <link href="http://openfibers.github.io/"/>
-  <updated>2020-09-11T14:40:11+08:00</updated>
+  <updated>2020-09-11T15:03:23+08:00</updated>
   <id>http://openfibers.github.io/</id>
   <author>
     <name><![CDATA[OpenFibers]]></name>
@@ -828,8 +828,12 @@ event_name 为具体的事件名</p>
 </table>
 
 
-<p>在 COUNT 内部使用，仅可以匹配 COUNT(列), 不能匹配 COUNT(*)。匹配结果会包含 NULL。<br/>
-DISTINCT 除了可以作用于 COUNT/AVG/SUM，也可以作用于 MIN/MAX，但是 MIN/MAX 加 DISTINCT 没啥区别。</p>
+<ul>
+<li>在 COUNT 内部使用，仅可以匹配 COUNT(列), 不能匹配 COUNT(*)。匹配结果会包含 NULL。</li>
+<li>DISTINCT 除了可以作用于 COUNT/AVG/SUM，也可以作用于 MIN/MAX，但是 MIN/MAX 加 DISTINCT 没啥区别。</li>
+<li>对列A 使用了 COUNT/SUM/AVG，再去 DISTINCT 列A 以外的其他列是没有意义的，因为当 COUNT/SUM/AVG 生效时，其他没写 COUNT/SUM/AVG 的列都成为了这些数字结果的属性，在结果集中已经是唯一的了。</li>
+</ul>
+
 
 <h4>7.2 作用于 SELECT 子句</h4>
 
