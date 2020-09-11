@@ -277,7 +277,63 @@ event_name
 | 8.15.2 | x000002| 14.0 | btn2_touched | 1 |
 | 8.15.2 | x000003| 14.0 | btn2_touched | 1 |
 
-### 7. 限制结果集数量(LIMIT)
+
+### 7. 去除列内相同值的数据(DISTINCT)
+
+#### 7.1 在 COUNT/AVG/SUM 内部使用
+
+最常见的是配合 COUNT 使用。COUNT(DISTINCT user_id) 常用于计算 UV、活跃设备数:  
+
+```
+SELECT
+COUNT(DISTINCT device_id) as 激活设备数
+FROM user_action
+;
+```
+
+| 激活设备数 |
+|:------------- |
+| 3 |
+
+在 COUNT 内部使用，仅可以匹配 COUNT(列), 不能匹配 COUNT(*)。匹配结果会包含 NULL。  
+DISTINCT 除了可以作用于 COUNT/AVG/SUM，也可以作用于 MIN/MAX，但是 MIN/MAX 加 DISTINCT 没啥区别。  
+
+#### 7.2 作用于 SELECT 子句
+
+作用于 SELECT 子句时，紧跟 SELECT 写，对所有列生效。不能对部分列生效：
+
+例子1 单列：  
+
+```
+SELECT DISTINCT
+app_version,
+FROM user_action
+;
+```
+
+| app_version |
+|:------------- |
+| 8.15.2 |
+
+
+例子2 多列：  
+
+```
+SELECT DISTINCT
+app_version,
+device_id,
+FROM user_action
+;
+```
+
+| app_version |device_id|
+|:------------- |:---------------:|
+| 8.15.2 | x000001|
+| 8.15.2 | x000002|
+| 8.15.2 | x000003|
+
+
+### 8. 限制结果集数量(LIMIT)
 
 使用 LIMIT 一般有两种情况：
 * 提升执行速度
@@ -311,3 +367,20 @@ LIMIT 1
 | app_version |device_id| sys_ver | event_name | 样本量 |
 |:------------- |:---------------:| -------------:| -------------:|-------------:|-------------:|
 | 8.15.2 | x000001| 13.3 | btn1_touched | 3 |
+
+
+### 9. 索引
+
+* 索引建在经常需要 WHERE 的列上。
+
+* WHERE 中以下表达式会导致单次运算无法使用索引：  
+	* WHERE 子句的查询条件里有 !=
+	* WHERE 子句使用了 Mysql 函数的时候: WHERE left(name, 4) = 'xxx'
+	* 使用 LIKE，匹配关键字带有前置通配符时，无法使用索引: 
+		* WHERE name LIKE '%Alisa%' 无法使用
+		* WHERE name LIKE 'Alisa%' 可以使用
+		* WHERE name LIKE '%Alisa' 无法使用
+	* WHERE 子句使用了 IS NULL 或者 IS NOT NULL
+	* WHERE 子句条件中有 OR，即使其中有条件带索引也不会使用
+
+
